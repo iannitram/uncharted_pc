@@ -25,6 +25,8 @@ code runs directly on your PC and the graphics are translated to Vulkan. Unpack 
 ## Requirements
 
 - Windows 10 (1903 or later) or Windows 11, 64-bit.
+- An Intel Core 4th generation (Haswell, 2013) or newer, or an AMD Ryzen: the games use
+  instructions of the PS4's processor (AVX, BMI1, MOVBE, LZCNT) that older CPUs lack.
 - A graphics card with Vulkan 1.3 and a current driver, with **6 GB of video memory or more**.
   4 GB cards (GTX 1650, RX 570) run out of video memory and crash after a while; on those, keep
   Anti-aliasing and Frame generation off.
