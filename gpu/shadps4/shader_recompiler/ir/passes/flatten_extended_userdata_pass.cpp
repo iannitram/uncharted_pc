@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <cstring>
+#include "bbport_toggles.h"
 #include <mutex>
 #include <unordered_map>
 #include <boost/container/flat_map.hpp>
@@ -101,25 +102,29 @@ static bool SrtWalkerSignalHandler(void* context, void* fault_address) {
     if (code < code_start || code >= code_end) {
         return false; // Not in SRT code range
     }
+    // bbport: walks ahead of the game (draw preparation workers, the recording thread's table
+    // check) may follow pointers into memory the game has reused since. They go back to their
+    // recovery point (probe.c) and the GPU thread walks the tables itself; patching here made
+    // one stale read zero that load for good.
+    if (runtime_fault_recover) {
+        return false;
+    }
 
-    // bbport: the draw preparation workers run walkers concurrently, and two of them can fault
-    // on the same instruction. The second one used to decode the first one's `xor` and fail the
-    // assertion below ("SrtWalkerSignalHandler: Assertion Failed!" while loading an area).
-    // Patches are made under a lock, and an instruction already patched is simply retried.
+    // bbport: upstream walks on one thread. With several, a thread that faulted on the mov
+    // found the xor another thread had just written and the ASSERT below stopped the game
+    // (code 23 while loading an area). One patcher at a time; an instruction already patched
+    // is simply run again.
     static std::mutex patch_mutex;
-    std::scoped_lock lk{patch_mutex};
+    std::scoped_lock patch_lock{patch_mutex};
 
     // Patch instruction to zero register
     ZydisDecodedInstruction instruction;
     ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
     ZyanStatus status = Common::Decoder::Instance()->decodeInstruction(instruction, operands,
                                                                        const_cast<void*>(code), 15);
-
     if (ZYAN_SUCCESS(status) && instruction.mnemonic == ZYDIS_MNEMONIC_XOR &&
-        operands[0].type == ZYDIS_OPERAND_TYPE_REGISTER &&
-        operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER &&
-        operands[0].reg.value == operands[1].reg.value) {
-        return true; // bbport: patched by another thread meanwhile
+        operands[1].type == ZYDIS_OPERAND_TYPE_REGISTER) {
+        return true;
     }
 
     ASSERT(ZYAN_SUCCESS(status) && instruction.mnemonic == ZYDIS_MNEMONIC_MOV &&
@@ -151,12 +156,15 @@ static bool SrtWalkerSignalHandler(void* context, void* fault_address) {
         return false;
     }
 
-    // Fill nops. bbport: before the new head, so another thread running this code meanwhile
-    // sees the old mov (with a NOP displacement: it faults and retries above) or the finished
-    // patch, never a 3-byte xor followed by the old instruction's displacement bytes.
-    memset(code_patch + patch_size, 0x90, len - patch_size);
-    std::atomic_thread_fence(std::memory_order_release);
-    std::memcpy(code_patch, patch, patch_size);
+    // bbport: other threads may be running this code. Written from the end, every state in
+    // between is a load into the same register or a register move into it: nops over the
+    // displacement, then the ModRM byte (mov reg, reg), the REX prefix, the xor opcode last.
+    for (size_t i = len; i-- > patch_size;) {
+        __atomic_store_n(&code_patch[i], u8{0x90}, __ATOMIC_RELEASE);
+    }
+    for (const size_t i : {size_t{2}, size_t{0}, size_t{1}}) {
+        __atomic_store_n(&code_patch[i], patch[i], __ATOMIC_RELEASE);
+    }
 
     LOG_WARNING(Render_Recompiler, "Patched SRT walker at {}, fault address {}", code,
                 fault_address);
