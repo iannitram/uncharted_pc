@@ -18,6 +18,9 @@
 
 #include <vk_mem_alloc.h>
 
+#include <atomic>
+#include <cstdio>
+
 namespace Vulkan {
 
 bool g_device_fault_ext = false;
@@ -25,6 +28,18 @@ bool g_device_fault_ext = false;
 // last checkpoints a GPU crash report prints.
 bool g_gpu_checkpoints = false;
 VkQueue g_crash_queue = VK_NULL_HANDLE;
+
+void NoteOverBudget(const char* what) {
+    static std::atomic<bool> image_noted{false}, buffer_noted{false};
+    auto& noted = what[0] == 'i' ? image_noted : buffer_noted;
+    if (!noted.exchange(true)) {
+        std::printf("GPU: video memory full: %s memory allocated past the driver's budget (the driver "
+                    "may keep it in system memory: slower, but the game goes on). A lower output "
+                    "resolution or upscaler preset needs less.\n",
+                    what);
+        std::fflush(stdout);
+    }
+}
 
 namespace {
 
