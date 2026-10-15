@@ -13,7 +13,7 @@ add_compile_options(-fno-omit-frame-pointer)
 if (WIN32)
     # Current MSYS2 clang/libc++ dropped transitive standard includes the vendored code relies
     # on (shim/libcxx_compat.h). Every C++ file of this build and its subdirectories.
-    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/shim/libcxx_compat.h>")
+    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include \"${CMAKE_CURRENT_SOURCE_DIR}/shim/libcxx_compat.h\">")
 endif()
 
 # bbport: link-time optimization (BB_LTO, default on) and profile-guided optimization
