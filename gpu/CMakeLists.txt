@@ -86,12 +86,19 @@ add_subdirectory(third_party/sirit EXCLUDE_FROM_ALL)
 # bbport: FSR 3.1 temporal upscaling / frame generation, native Vulkan (MIT, FireBurn/FSR-Vulkan).
 set(FFX_VK_PORTABLE_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(FFX_VK_PORTABLE_BUILD_PROBE OFF CACHE BOOL "" FORCE)
-if (WIN32)
-    # The FidelityFX sources use MSVC's _countof, which current MSYS2 clang/libc++ headers no
-    # longer declare for them (shim/ffx_countof.h). Applies to this directory from here on.
-    add_compile_options("SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/shim/ffx_countof.h")
-endif()
 add_subdirectory(third_party/fsr-vulkan EXCLUDE_FROM_ALL)
+if (WIN32)
+    # The FidelityFX sources rely on MSVC's _countof and on includes that current MSYS2
+    # clang/libc++ no longer provide transitively (shim/ffx_compat.h). FSR-Vulkan's targets only.
+    get_property(ffx_targets DIRECTORY third_party/fsr-vulkan PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(ffx_target IN LISTS ffx_targets)
+        get_target_property(ffx_type ${ffx_target} TYPE)
+        if (ffx_type MATCHES "^(STATIC_LIBRARY|SHARED_LIBRARY|OBJECT_LIBRARY|EXECUTABLE)$")
+            target_compile_options(${ffx_target} PRIVATE
+                "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/shim/ffx_compat.h")
+        endif()
+    endforeach()
+endif()
 
 # Host shaders -> headers (same scheme as shadPS4's host_shaders/CMakeLists.txt).
 set(SHADER_SRC ${CMAKE_CURRENT_SOURCE_DIR}/shadps4/video_core/host_shaders)
