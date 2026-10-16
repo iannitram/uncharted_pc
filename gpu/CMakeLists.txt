@@ -10,6 +10,11 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 # Frame pointers keep the loader's thread dumps (watchdog, SIGUSR2 sampling) walkable.
 add_compile_options(-fno-omit-frame-pointer)
+if (WIN32)
+    # Current MSYS2 clang/libc++ dropped transitive standard includes the vendored code relies
+    # on (shim/libcxx_compat.h). Every C++ file of this build and its subdirectories.
+    add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/shim/libcxx_compat.h>")
+endif()
 
 # bbport: link-time optimization (BB_LTO, default on) and profile-guided optimization
 # (BB_PGO: off, generate = instrumented build writing into BB_PGO_DIR, use = build with that
@@ -87,18 +92,6 @@ add_subdirectory(third_party/sirit EXCLUDE_FROM_ALL)
 set(FFX_VK_PORTABLE_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(FFX_VK_PORTABLE_BUILD_PROBE OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/fsr-vulkan EXCLUDE_FROM_ALL)
-if (WIN32)
-    # The FidelityFX sources rely on MSVC's _countof and on includes that current MSYS2
-    # clang/libc++ no longer provide transitively (shim/ffx_compat.h). FSR-Vulkan's targets only.
-    get_property(ffx_targets DIRECTORY third_party/fsr-vulkan PROPERTY BUILDSYSTEM_TARGETS)
-    foreach(ffx_target IN LISTS ffx_targets)
-        get_target_property(ffx_type ${ffx_target} TYPE)
-        if (ffx_type MATCHES "^(STATIC_LIBRARY|SHARED_LIBRARY|OBJECT_LIBRARY|EXECUTABLE)$")
-            target_compile_options(${ffx_target} PRIVATE
-                "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/shim/ffx_compat.h")
-        endif()
-    endforeach()
-endif()
 
 # Host shaders -> headers (same scheme as shadPS4's host_shaders/CMakeLists.txt).
 set(SHADER_SRC ${CMAKE_CURRENT_SOURCE_DIR}/shadps4/video_core/host_shaders)
