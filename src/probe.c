@@ -930,7 +930,15 @@ int main(int argc, char **argv) {
         }
         memcpy(image + relocs[i].target, &value, 8);
     }
-    if (patch_file) apply_patches(patch_file, segments, ns, relocs, nr);
+    if (patch_file) {
+        apply_patches(patch_file, segments, ns, relocs, nr);
+        /* The in-game menu shows the patch-driven game effects (Bloodborne) only when they apply. */
+#ifdef _WIN32
+        _putenv_s("BB_GAME_PATCHES", "1");
+#else
+        setenv("BB_GAME_PATCHES", "1", 1);
+#endif
+    }
     install_guest_hooks(segments, ns);
     {
         uint64_t image_end=0;
