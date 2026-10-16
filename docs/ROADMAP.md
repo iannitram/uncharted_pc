@@ -80,6 +80,18 @@ Our own baseline (Phase 0 below) replaces this table with measurements.
 ### Phase 4: 60 FPS on the Strix Halo
 - Measure per game, find the bottleneck, tune. Done when each game holds 60 FPS in a
   defined test route.
+- **First-launch shader preparation (Ian, 2026-10-16):** like God of War or The Last of Us
+  Part I on Steam, show a one-time "preparing shaders" screen the first time a game starts,
+  then play without compile stutter. Today shaders are translated and compiled while playing;
+  the results are cached in `user/`, and the cache is thrown away when the graphics driver or
+  card changes (log line "Pipeline cache isn't compatible with current system: rebuilding
+  it"). Steps: (1) measure how bad the first-run stutter is per game; (2) record which
+  shaders a full play route uses, keyed by shader hash; (3) at first launch, find those
+  shaders in the player's own dump and compile them before the game starts, with a progress
+  bar; (4) redo the step automatically after a driver change. Open question: whether the
+  game's shaders can be found in the dump without running the game (not yet looked at). Do
+  not ship translated or compiled shaders in the repository. Also check whether Steam's own
+  shader pre-caching helps when this is added as a non-Steam shortcut (not known).
 
 ### Phase 5: handheld on the Legion Go and packaging
 - AppImage first (the repo already has `packaging/appimage.sh`) plus a Steam shortcut; a
