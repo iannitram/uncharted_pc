@@ -1,10 +1,12 @@
-Первая версия векторов движения объектов собрана, игра запущена, ошибок при старте нет. Но в самой игре я её ещё не проверял: шейдеры G-buffer с новым кодом компилируются только при загрузке уровня, так что главная проверка впереди.
+_Translated from Russian; original: [docs/ru/history/object_motion_notes_2026-09-26.md](../ru/history/object_motion_notes_2026-09-26.md)._
 
-Как это работает:
-- Вершинный шейдер каждой отрисовки в G-buffer сохраняет итоговые позиции вершин и читает позиции тех же вершин из прошлого кадра.
-- Пиксельный шейдер пишет разницу в дополнительную цель G-buffer.
-- Где объект двигался, FSR получает этот вектор, в остальных местах — вектор камеры.
-- Позиции сохраняются только для движущихся отрисовок: тех, у которых изменились константы вершинного шейдера (матрица объекта, кости). Статичная геометрия памяти не тратит.
-- Это учитывает любую анимацию, которую считает вершинный шейдер: скиннинг, оружие, ткань, врагов.
+The first version of object motion vectors is built, the game launched, and there are no errors at startup. But I have not checked it in the game itself yet: the G-buffer shaders with the new code are compiled only when a level loads, so the main check is still ahead.
 
-Загрузись, пожалуйста, в игру и напиши «готов». Я проверю лог: сколько отрисовок движется и у скольких нашлись позиции прошлого кадра. Потом побегай с пилой на спине. Для сравнения я смогу выключать векторы объектов на ходу, остаются только векторы камеры.
+How it works:
+- The vertex shader of every draw into the G-buffer saves the final vertex positions and reads the positions of the same vertices from the previous frame.
+- The pixel shader writes the difference into an additional G-buffer target.
+- Where an object moved, FSR gets this vector; everywhere else, the camera vector.
+- Positions are saved only for moving draws: those whose vertex shader constants (object matrix, bones) changed. Static geometry costs no memory.
+- This covers any animation computed by the vertex shader: skinning, weapons, cloth, enemies.
+
+Please load into the game and write "ready". I will check the log: how many draws are moving and how many of them found previous-frame positions. Then run around with the saw on your back. For comparison, I can turn object vectors off on the fly, leaving only camera vectors.

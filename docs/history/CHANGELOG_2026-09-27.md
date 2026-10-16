@@ -1,65 +1,67 @@
-# Исправления — 2026-09-27
+_Translated from Russian; original: [docs/ru/history/CHANGELOG_2026-09-27.md](../ru/history/CHANGELOG_2026-09-27.md)._
 
-## ✅ Что исправлено
+# Fixes — 2026-09-27
 
-### 1. Маска реактивности не сохранялась
-- **Файл:** `gpu/shim/bbport_settings.cpp`
-- **Проблема:** Чекбокс "Показать маску (отладка)" не сохранялся в `bbport.ini`
-- **Решение:** Добавлена загрузка/сохранение параметра `debug_view`
+## ✅ What was fixed
 
-### 2. 🔥 ДИНАМИЧЕСКОЕ ПЕРЕКЛЮЧЕНИЕ ПРЕСЕТОВ на RX 7800 XT
-- **Файлы:** 
+### 1. Reactive mask was not saved
+- **File:** `gpu/shim/bbport_settings.cpp`
+- **Problem:** The "Show mask (debug)" checkbox was not saved to `bbport.ini`
+- **Solution:** Added loading/saving of the `debug_view` parameter
+
+### 2. 🔥 DYNAMIC PRESET SWITCHING on the RX 7800 XT
+- **Files:** 
   - `gpu/shadps4/video_core/renderer_vulkan/vk_temporal_upscaler.cpp`
   - `gpu/shim/bbport_overlay.cpp`
-- **Проблема:** RX 7800 XT не поддерживает `blit D32S8`, поэтому требовался перезапуск
-- **Решение:**
-  - Fallback: UI depth очищается вместо копирования (работает корректно)
-  - Убрана блокировка `BB_LIVE_SCALING_UNSUPPORTED`
-  - Обновлено меню — убрано требование перезапуска для пресетов
+- **Problem:** The RX 7800 XT does not support `blit D32S8`, so a restart was required
+- **Solution:**
+  - Fallback: the UI depth is cleared instead of copied (works correctly)
+  - Removed the `BB_LIVE_SCALING_UNSUPPORTED` blocking check
+  - Updated the menu — removed the restart requirement for presets
 
-### 3. Правильная конфигурация
-- **Файл:** `bbport.ini`
-- **Критично:** `jitter=1` (БЫЛО ВЫКЛЮЧЕНО!)
-- Оптимизированы параметры резкости и маски
+### 3. Correct configuration
+- **File:** `bbport.ini`
+- **Critical:** `jitter=1` (IT WAS OFF!)
+- Sharpness and mask parameters tuned
 
 ---
 
-## 🎮 Что теперь работает БЕЗ перезапуска
+## 🎮 What now works WITHOUT a restart
 
-- ✅ **Смена пресетов** (Native AA / Quality / Balanced / Performance / Ultra Performance)
-- ✅ Включение/выключение апскейлера
-- ✅ Резкость
+- ✅ **Changing presets** (Native AA / Quality / Balanced / Performance / Ultra Performance)
+- ✅ Enabling/disabling the upscaler
+- ✅ Sharpness
 - ✅ Jitter
-- ✅ Маска реактивности
-- ✅ Отладочные режимы
+- ✅ Reactive mask
+- ✅ Debug modes
 
-**Перезапуск нужен ТОЛЬКО для:** векторов движения объектов (`object_motion`)
-
----
-
-## 🧪 Тестирование
-
-### Сборка
-✅ Успешно
-
-### Проверить в игре:
-
-1. **Динамическое переключение:**
-   - Открыть меню (Insert или L3+R3)
-   - Сменить пресет
-   - **Должно применится СРАЗУ**
-
-2. **Шлейфы на оружии:**
-   - С `jitter=1` должны стать НАМНОГО меньше
-   - Сравнить с `object_motion=0`
-
-3. **Маска реактивности:**
-   - Должна отображаться (красный цвет)
-   - Помечены прозрачные эффекты
+**A restart is needed ONLY for:** object motion vectors (`object_motion`)
 
 ---
 
-## 📝 Изменённые файлы
+## 🧪 Testing
+
+### Build
+✅ Successful
+
+### Check in game:
+
+1. **Dynamic switching:**
+   - Open the menu (Insert or L3+R3)
+   - Change the preset
+   - **It should apply IMMEDIATELY**
+
+2. **Ghosting trails on the weapon:**
+   - With `jitter=1` they should become MUCH smaller
+   - Compare with `object_motion=0`
+
+3. **Reactive mask:**
+   - It should be displayed (red)
+   - Transparent effects are marked
+
+---
+
+## 📝 Changed files
 
 - `gpu/shim/bbport_settings.cpp`
 - `gpu/shadps4/video_core/renderer_vulkan/vk_temporal_upscaler.cpp`
