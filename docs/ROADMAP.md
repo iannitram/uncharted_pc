@@ -1,206 +1,103 @@
-# Нативный порт Bloodborne: что сделано и что дальше
+# Roadmap: Uncharted: The Nathan Drake Collection, native on Linux (SteamOS)
 
-Основной текст — состояние на 2026-09-26; ниже первым разделом — что изменилось к 30.09.
-Самый подробный срез: [CURRENT_STATUS_2026-09-29.md](history/CURRENT_STATUS_2026-09-29.md).
-Отчёт о работе 30.09–01.10 (конвейер GPU, апскейлер, падение, лаунчер, AppImage):
-[SESSION_2026-09-30.md](history/SESSION_2026-09-30.md).
-Подробности по отдельным темам:
-[parallel_gpu.md](parallel_gpu.md) (многопоточность GPU, подтормаживания при подгрузке),
-[upscaler.md](upscaler.md) (анализ кадра игры, константы сцены).
+Status as of 2026-10-16. This replaces the Bloodborne roadmap, which is kept in
+`history/ROADMAP_bloodborne_2026-09_ru.md` (Russian, unchanged).
 
-## Обновление 30.09
+## Goal
 
-- Сделано после 26.09: FSR 4 INT8 (v07), векторы движения объектов, смена пресета без
-  перезапуска (уменьшенные цели сцены; глубина D32S8 копируется шейдером), LTO и PGO,
-  масштабирование подготовки draw под число потоков (Steam Deck тоже).
-- Проблемы из раздела «Известные проблемы» ниже: пункт 3 (перезапуск при смене пресета)
-  решён; пункт 1 (векторы объектов) реализован, у FSR 4 остаётся гостинг на персонаже при
-  Ultra Performance; пункт 2 (мыльный интерфейс) — UI рисуется в 1920×1080.
-- Ограничение: уменьшенный рендер сцены (`SceneTargets::Eligible`) требует цель 1920×1080,
-  то есть работает только при выводе 1080p.
-- Распараллеливание потока GPU-команд (шаг 2 [parallel_gpu.md](parallel_gpu.md)): текстуры на
-  отдельном потоке параллельно с буферами работают корректно, но прироста не дают —
-  данные каждого draw переезжают между ядрами. Узкое место — поток GPU-команд: 91% на CPU,
-  ~9% ожидания мелких копий гостевой памяти перед fence. Дальше — двухстадийный конвейер
-  (второй поток владеет текстурным кешем и записью draw, копия регистров из дельт сканера)
-  или мемоизация привязок текстур между кадрами; см. «What would scale» в parallel_gpu.md.
-- **Двухстадийный конвейер draw** (`vk_draw_pipe.h`): поток GPU-команд декодирует PM4 и
-  выбирает пайплайн, второй поток (`bb:DrawRec`) со своей копией регистров привязывает ресурсы
-  и записывает draw. +19% FPS на 16 потоках, +18% на 8 (как Steam Deck). Включён по умолчанию
-  при 8+ потоках (`BB_DRAW_PIPE=0/1`). Узкое место теперь — вторая стадия; подробности и план —
-  в parallel_gpu.md.
-- Пресеты и нагрузка GPU: сцена на RX 7800 XT стоит мало, поэтому пресет меняет время GPU
-  лишь на ~0.5 мс, а сам FSR 4 при выводе 1080p — ~1.4 мс (FSR 4 Ultra Performance дороже
-  нативного рендера без апскейлера). Исправлено: проходы освещения оставались в 1920×1080 при
-  любом пресете (проверка смотрела на чужие слоты целей); уменьшенные цели теперь сэмплируются
-  напрямую, без ресэмплинга в натив (кэш шейдеров пересобирается один раз). Следующее для
-  Steam Deck — гостевая копия памяти целей рендеринга `3d5ebf4e` (см. parallel_gpu.md).
-- **Исправлено падение с конвейером** (порча гостевой кучи, guest offset `0x263b8e7`, через
-  13–17 минут): прерывание «GPU простаивает» уходило раньше меток EOP, отложенных в поток записи
-  Vulkan, и игра освобождала объекты с этими метками. Теперь перед ним конвейер и отложенные
-  метки дожидаются; 2 прогона по 30 минут без падений (до исправления — 7 из 7 падений).
-- **Разрешение вывода 1440p/2160p** (меню «Разрешение вывода», bbport.ini `output_res`, после
-  перезапуска): сцена рисуется в разрешении пресета от выхода, апскейлер (FSR 3 или FSR 4)
-  дорисовывает кадр, интерфейс растеризуется в выходном разрешении. Эффекты игры (аберрация,
-  DoF, размытие, SSAO, сглаживание игры, динамические тени, SSR, заставки, LOD) — там же.
-- **Лаунчер** (`launcher/bb-launcher.sh`, GTK4/libadwaita) и **AppImage** для Steam Deck
-  (`bash packaging/appimage.sh` → `dist/`; данные в `~/.local/share/bbport`, `--play` —
-  запуск без окна лаунчера).
-- Инструменты: `BB_PAD_FILE` (скриптовый ввод геймпада), `ab.sh` (A/B битов
-  `BB_TOGGLE_FILE` в запущенной игре), в `Frame stats` — простой и блокировки потока GPU.
+Run Uncharted 1, 2 and 3 from the PS4 collection natively on Linux, on two machines
+running SteamOS: a Strix Halo machine (main test and debug box) and a Legion Go
+(handheld performance target). The existing Linux code path, inherited from the
+Bloodborne port, is made to work for Uncharted. The emulation is not rewritten.
 
-## Как устроен порт
+Ground rules:
 
-- Оригинальный eboot (CUSA03173 v01.09) исполняется напрямую на x86-64. Системные библиотеки
-  PS4 заменены своим HLE-рантаймом на C (`runtime_*.c`, `probe.c`).
-- Графика: видеоядро и рекомпилятор шейдеров shadPS4 (GPL), собранные в `libbbgpu.so`
-  (`gpu/`), с собственными доработками. Эмулятор shadPS4 целиком не используется.
-- Патчи игры (FPS, разрешение и др.) — XML сообщества (`patches/Bloodborne.xml`),
-  компилируются `patches.py` и накладываются загрузчиком при старте.
+- This stays a fork of `Supermedo/uncharted_pc` and keeps merging his changes. Linux work
+  lives on the `linux` branch. Nothing goes back to SuperMedo without Ian saying so, one
+  change at a time.
+- No game files, dumps or keys in the repository. Each machine uses its own dump of the
+  collection (CUSA02343 / CUSA02320).
+- Every claim in a report says whether it was measured or only read from the code.
 
-## Сделано
+## What the code review found (2026-10-16, read from the code, nothing run on Linux yet)
 
-### Производительность и плавность
+- The tree descends from the Linux port of Bloodborne (`deadinside28/bloodborne_pc`, fork
+  point 0afaaa2, 2026-10-04). SuperMedo's 26 Uncharted commits since then touch no Linux
+  script. **Nothing suggests Linux was run on this tree after the fork.**
+- `build.sh` still has a working-looking Linux branch (pkg-config for Vulkan and SDL3, CMake
+  and Ninja, `libbbgpu.so`). `src/` is mostly branched for both platforms.
+- `run.sh` is still the Bloodborne launcher (default game folder `../CUSA03173`). It has no
+  choice of Uncharted 1, 2 or 3 and no relaunch when the collection menu starts another game
+  (`sceSystemServiceLoadExec`, exit code 101). That logic lives only in `run.py`, which uses
+  Windows-only calls. **Linux needs a `run.py` equivalent.**
+- No Linux equivalents yet for: the Uncharted launcher (`uncharted_launcher.py`, Windows
+  only), the DLSS bridge (NVIDIA only, not needed on AMD hardware), and a few diagnostics.
+- One spot to test first: `src/runtime_fiber.c`, where the Linux stack-bounds handling is
+  deliberately a no-op.
+- bbport (the Bloodborne port) is 8 commits ahead of the fork point (settings menu, memory
+  layer, DLSS in the AppImage, online play). Decide later which, if any, to take.
 
-| Что | Результат |
-|---|---|
-| Запись команд Vulkan в отдельном потоке, кеши текстур/буферов, rwlock вместо мьютекса | 26 → 64 FPS в одной сцене |
-| Подготовка draw-вызовов на 4 потоках (`bb:DrawPrep`), проверка на потоке GPU | +11.5% |
-| Окно снятия защиты 256 КиБ при записи игры в память (меньше page fault) | +22% |
-| Кеш описаний текстур, быстрый путь для тех же render target | до ~94 FPS на улице |
-| Копирования гостевой памяти на пуле потоков, пул staging-буферов | фризы при подгрузке 60–170 мс → 40–50 мс |
-| Ожидание копий перед видимыми игре fence | убрано мерцание интерфейса |
-| Режим «Readbacks Relaxed» | нет «взрывов вершин» (FaceGen) |
-| Vblank 480 Гц + лимит кадров до min(монитор, 120), вывод сразу по флипу | ровная подача кадров; бег не замедляется выше 120 FPS |
+## Baseline: how stock shadPS4 does today
 
-Всё переключается во время игры через `BB_TOGGLE_FILE` (битовая маска) для A/B-сравнений.
-Статистика: `BB_FRAME_STATS=1`.
+Public compatibility reports (shadPS4 compatibility list, read 2026-10-16, not our own
+measurement): none of the collection's title ids is marked playable.
 
-### Звук, ввод
+| Title id | OS | Reported status | Note |
+|---|---|---|---|
+| CUSA02320 | Windows | nothing (crashes) | issue #71, 2026-10-05 |
+| CUSA02320 | Linux | ingame, graphics and cutscene problems | issue #147, 2026-07-30 |
+| CUSA02343 | Windows | menus | issue #2645 |
+| CUSA02344 | Windows | ingame, some sounds missing | issue #441, 2026-10-14 |
+| CUSA02826 | Linux | menus; Uncharted 3 crashes on load | issue #477, 2026-10-14 |
 
-- Вывод звука с правильным темпом (раньше щелчки каждые 10.7 мс).
-- Геймпад через SDL3, запасная раскладка клавиатуры.
+Our own baseline (Phase 0 below) replaces this table with measurements.
 
-### Анализ кадра
+## Phases
 
-- `BB_CAPTURE_TRIGGER=<файл>` записывает один кадр: проходы, цели, шейдеры, текстуры,
-  константы, режимы смешивания.
-- Разобрано устройство кадра Bloodborne (G-buffer, свет, цвет сцены RGBA16F, туман,
-  пост-обработка, тонмаппинг, сглаживание игры, интерфейс) и 864-байтные константы сцены
-  (матрицы вида и проекции).
+### Phase 0: baseline with stock shadPS4 (Strix Halo)
+- Install the latest shadPS4 release on the Strix Halo, install the dump, and play each
+  game for about 15 minutes.
+- Record per game: boots, reaches the menu, plays in-game, frame rate, visible problems,
+  saved log. Fill in the table above. Done when all three games have a measured row.
 
-### Временной апскейлер (FSR 3.1)
+### Phase 1: it builds on Linux
+- Build the current tree on the Strix Halo (SteamOS, in a container or distrobox as needed).
+  Fix compile and link errors. Also test-compile on Arch in a container on Hyperion first.
+- Done when `bash build.sh` produces the loader and `libbbgpu.so` on Linux and the build
+  steps are written down.
 
-- **Векторы движения камеры**: из глубины сцены и матриц текущего и прошлого кадра
-  (`vk_camera_motion.cpp`, `camera_motion.comp`). Проверены перепроецированием прошлого
-  кадра: статичная геометрия совпадает.
-- **Jitter**: субпиксельный сдвиг геометрии сцены через viewport, последовательность
-  Halton(2,3); число фаз 8·(вывод/рендер)². Интерфейс и пост-обработка не сдвигаются.
-- **FSR 3.1** (FireBurn/FSR-Vulkan, нативный Vulkan, подмодуль `gpu/third_party/fsr-vulkan`):
-  - *Native AA*: на HDR-цвете сцены перед пост-обработкой, 1:1.
-  - *Пресеты Quality/Balanced/Performance/Ultra Performance* (x1.5/1.7/2/3): игра рендерит в
-    пониженном разрешении (патч разрешения, который `patches.py` выводит из патча 720p
-    сообщества), FSR увеличивает готовый кадр до 1920x1080 перед первым проходом интерфейса.
-    Интерфейс и проход вывода перенаправлены в изображения полного размера, презентер
-    показывает их вместо буфера игры.
-- **Маска реактивности** (снимок сцены до прозрачных отрисовок, сравнение перед наложением
-  тумана): работает, но на дымке Bloodborne даёт дрожание — по умолчанию выключена.
-- **Внутриигровое меню** (Dear ImGui, Insert или L3+R3): апскейлер, пресет, резкость,
-  jitter, маска, счётчик FPS. Настройки в `bbport.ini`. Смена пресета — кнопка
-  «Применить и перезапустить игру».
+### Phase 2: Uncharted boots and shows the menu
+- Write the Linux `run.py` (game choice, relaunch on exit code 101, saves, config).
+- Done when the collection menu appears and each of the three games starts to its first
+  scene, measured with logs, on the Strix Halo.
 
-## Известные проблемы
+### Phase 3: all three games playable
+- Work through the known problems in the README: Uncharted 2 streaming crash
+  (`iSubMesh < m_numSubMeshInstances`), Uncharted 3 London bar crash, flashing shapes on
+  some characters, and anything Linux-specific that turns up.
+- Done when each game can be played for 30 minutes without a crash.
 
-Состояние последнего коммита. В рабочем дереве подготовлен перенос пресетов на уменьшенные
-цели рендера при сохранении гостевых буферов, постобработки и UI в 1920×1080. Переходы
-между пресетами и копирование цвета/глубины/stencil прошли Vulkan-тест на Lavapipe.
-RX 7800 XT не поддерживает blit D32S8, поэтому новый путь оставлял FSR вход 1920×1080
-и снижал FPS. Для таких GPU запуск теперь автоматически выбирает проверенный путь с патчем
-разрешения игры и UI 1920×1080; смена пресета снова требует перезапуска. На GPU с нужной
-поддержкой остаётся переключение без перезапуска. Пункты 2–3 ниже относятся к последнему
-коммиту, до этих изменений рабочего дерева.
+### Phase 4: 60 FPS on the Strix Halo
+- Measure per game, find the bottleneck, tune. Done when each game holds 60 FPS in a
+  defined test route.
 
-Общий проход векторов движения объектов был слишком дорогим: Performance давал около
-49 FPS с ним и 77–78 FPS без него. Теперь дополнительная цель и шейдеры включаются только
-для G-buffer отрисовок с буфером позы/костей; остальные используют векторы камеры.
-В пробном запуске выборочный путь держал около 81–87 FPS, без пропусков из-за ёмкости
-истории. Векторы объектов включены по умолчанию; `BB_OBJECT_MOTION=0` отключает их, а
-`BB_OBJECT_MOTION_ALL=1` возвращает старый общий путь для сравнения. Выбор по размеру
-буфера пока эвристический: качество оружия и одежды в движении требует проверки в игре.
+### Phase 5: handheld on the Legion Go and packaging
+- AppImage first (the repo already has `packaging/appimage.sh`) plus a Steam shortcut; a
+  proper Arch package later if wanted.
+- Done when the AppImage runs on the Legion Go at a playable frame rate and a clean install
+  is documented.
 
-1. **Движущиеся объекты «рассыпаются»** (оружие на спине, персонаж, ткань, враги): есть
-   только векторы движения камеры. Камера от третьего лица следует за персонажем, поэтому
-   векторы камеры для него неверны, и апскейлер берёт историю не из того места. Это касается
-   любого временного апскейлера (FSR 3/4, DLSS, XeSS).
-2. **Интерфейс в пресетах мыльный**: с патчем разрешения игра считает себя 540p-игрой и,
-   судя по всему, готовит шрифты и элементы интерфейса под это разрешение. Меню
-   (титульное, пауза) вообще не проходят через апскейлер.
-3. **Смена пресета требует перезапуска**: разрешение задаётся патчем кода при старте, а
-   буферы игра выделяет один раз.
+## Documentation
 
-## План
+- Done: this roadmap; the old Russian one archived.
+- To do: translate every remaining Russian document in `docs/` to English (16 of the 19 files
+  are mostly or partly Russian; only `parallel_gpu.md` and `original-readme/` are English),
+  marking Bloodborne-only statements as "inherited from Bloodborne, not verified for
+  Uncharted". Suitable as homework for the local Qwen model, then reviewed.
+- To do: a Linux and SteamOS install guide for Uncharted (none exists).
 
-### 1. Векторы движения объектов
+## Open items
 
-Нужны всем апскейлерам и генерации кадров. Игра их не считает, поэтому считаем сами.
-
-Как:
-- Для каждой отрисовки в G-buffer (проходы с 5+ целями) рекомпилятор делает второй вариант
-  вершинного шейдера, который выдаёт позицию дважды: с текущими константами и с константами
-  прошлого кадра. Разница проекций — вектор движения, пишется во вспомогательную цель
-  RG16F как дополнительный выход пиксельного шейдера.
-- Константы прошлого кадра: для каждого draw запоминаем содержимое константных буферов
-  (матрица объекта, кости скелета) по ключу «шейдер + номер draw в проходе» или по адресу
-  данных. Нужно выяснить, как игра хранит матрицы скелета: в буферах, которые перезаписываются
-  каждый кадр (тогда копируем прошлую версию), или в кольцевом буфере (тогда достаточно
-  адреса прошлого кадра).
-- Где объект не найден (первый кадр, новый объект) — векторы камеры, как сейчас.
-- Проверка: отладочный вид векторов (`BB_DEBUG_MOTION`), перепроецирование прошлого кадра
-  по полным векторам, визуально — пила на спине при беге.
-
-### 2. Масштабирование на уровне рендерера (вместо патча разрешения)
-
-Игра работает в 1920x1080 (или в разрешении монитора), а в пониженном разрешении рисуются
-только проходы 3D-сцены. Интерфейс и меню остаются чёткими, пресет меняется на лету.
-
-Как:
-- Кеш текстур выделяет для целей сцены (G-buffer, глубина, свет, цвет сцены, эффекты) копию
-  уменьшенного размера; гостевая память и описания игры не меняются.
-- Viewport и scissor проходов в эти цели масштабируются (как уже сделано для интерфейса,
-  включая проходы с отключённым отсечением).
-- Шейдеры, которые считают по пиксельным координатам (`gl_FragCoord`, `texelFetch`,
-  compute-шейдеры по пикселям), получают коэффициент масштаба через push-константы
-  рекомпилятора. Выборки по нормированным координатам работают без изменений.
-- FSR ставится туда же, где Native AA: цвет сцены перед пост-обработкой (HDR, лучшее
-  качество); пост-обработка и интерфейс идут в полном разрешении.
-- Риски: проходы, читающие цели сцены по пиксельным координатам в пост-обработке, и
-  чтения из гостевой памяти этих целей (их нужно запретить или масштабировать обратно).
-
-### 3. Другие апскейлеры
-
-Все используют одни и те же входы (цвет, глубина, векторы движения, jitter, маски).
-
-- **FSR 4 (INT8)**: в FSR-Vulkan есть экспериментальный провайдер FSR 4 v07 INT8 — добавить
-  как вариант в меню и сравнить с FSR 3.1 после шага 1.
-- **DLSS**: нативный Linux Vulkan SDK (NGX). На RX 7800 XT не работает, но нужен для
-  пользователей NVIDIA.
-- **XeSS / XeFG и OptiScaler**: Intel поставляет их только как Windows DLL. Варианты:
-  загрузчик Windows DLL (PE) внутри процесса либо запуск всей сборки под Proton с
-  OptiScaler, которому отдаём входы через интерфейс DLSS.
-  Проверено 29.09: libxess.dll (одинаковая у DOOM: The Dark Ages, PRAGMATA и др.) имеет
-  Vulkan-путь (`xessVKCreateContext`, `xessVKExecute`), но импортирует ~300 функций:
-  MSVCP140 (iostream), VCRUNTIME140 (C++-исключения), UCRT, kernel32, setupapi, dxgi.
-  Решено отложить; самый реалистичный путь — хелпер под Wine с общей памятью Vulkan.
-
-### 4. Генерация кадров
-
-- FSR 3.1 Frame Generation (есть в FSR-Vulkan): промежуточный кадр между двумя готовыми,
-  по тем же векторам движения; интерфейс нужно рисовать поверх отдельно (есть перенаправление
-  интерфейса — его можно рендерить в отдельный слой).
-- XeFG — после решения с Windows DLL (см. выше).
-- Требование: подача кадров через презентер (очередь и VRR уже работают).
-
-### 5. Прочее
-
-- Steam Deck: портативная сборка (patchelf, без Nix), проверка пресетов на 1280x800.
-- Дальнейшая разгрузка потока GPU (шаг 2 из [parallel_gpu.md](parallel_gpu.md)).
+- Which of bbport's 8 newer commits to take.
+- Whether the Windows launcher gets a Linux counterpart or Linux stays command line plus
+  Steam shortcut.
