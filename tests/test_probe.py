@@ -3,10 +3,11 @@ from paths import ROOT
 from pathlib import Path
 import struct
 import subprocess
+import sys
 import tempfile
 import unittest
 
-EXE = ROOT / 'out/bb-probe'
+EXE = ROOT / ('out/bb-probe.exe' if sys.platform == 'win32' else 'out/bb-probe')
 
 
 def package(code, relocs=(), names=(), capabilities=None):
