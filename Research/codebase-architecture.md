@@ -6,6 +6,20 @@ refer to `HEAD` unless noted. While this was written, the lead had uncommitted e
 overlay to English and hiding the Bloodborne effect switches unless patches were applied, via a new
 `BB_GAME_PATCHES` variable). Those edits are noted where they matter.
 
+> **Since this snapshot** (same day, branch `claude/epic-brown-rournp`):
+> - The overlay change landed (improvement 1).
+> - CI exists, covering improvement 2 and part of 3: `.github/workflows/ci.yml` with
+>   `tools/ci_linux.sh`.
+> - The Linux build works again, which corrects the "probably broken" note under
+>   [Linux status](#linux-status-for-uncharted). Several real breakages were fixed: Win32 calls in
+>   `vk_scheduler.cpp`, missing `<unistd.h>`, and miniupnpc and xbyak handled only on Windows in
+>   CMake. `shell.nix` gained the online dependencies.
+> - Every test now builds and runs on Linux: 82 Python tests with none skipped, the five C
+>   programs, and the seven C++ GPU tests on lavapipe. `test_probe.py` also finds
+>   `bb-probe.exe` (part of improvement 3).
+> - The "Bloodborne" fallback names in `probe.c`, `bbgpu.cpp` and `vulkan_smoke.c` are gone
+>   (improvement 13).
+
 ## Key takeaways
 
 - **Architecture in one line.** Python scripts turn a decrypted PS4 SELF and its bundled

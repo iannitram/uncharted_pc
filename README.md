@@ -54,6 +54,19 @@ code runs directly on your PC and the graphics are translated to Vulkan. Unpack 
 MSYS2 CLANG64 on Windows: `bash build.sh` builds `out\bb-probe.exe`, and
 `bash packaging/windows/package.sh` makes `dist\uncharted-windows` and the zip.
 
+Linux (Ubuntu 24.04): `bash tools/ci_linux.sh --deps` installs the dependencies, and
+`bash tools/ci_linux.sh` builds the GPU library and `bb-probe`, then runs every test. The C++ GPU
+tests run on lavapipe, so no GPU is needed. CI runs the same script on every pull request, plus
+the Windows build. The Uncharted games themselves only run on Windows for now
+([roadmap](docs/ROADMAP.md#5-linux-and-steam-deck-for-uncharted)).
+
+## Documentation
+
+- [Roadmap](docs/ROADMAP.md): goals, open decisions and milestones.
+- [Research](Research/README.md): how the port works, the games and their engine, graphics,
+  similar projects, licensing, and the [known problems mapped to leads](Research/uncharted-collection-technical.md#known-problems-mapped-to-research).
+- [Design notes and logs](docs/README.md), mostly from the Bloodborne port this one grew out of.
+
 ## Credits
 
 Built on [bbport](https://github.com/deadinside28/bloodborne_pc), the native Linux port of
