@@ -32,6 +32,7 @@ if [[ ${1:-} == --deps ]]; then
         build-essential clang cmake ninja-build pkg-config python3 git ca-certificates \
         libvulkan-dev mesa-vulkan-drivers glslang-tools \
         libboost-dev libfmt-dev libzydis-dev libxxhash-dev libx11-dev \
+        libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxss-dev libxkbcommon-dev \
         libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev \
         libprotobuf-dev protobuf-compiler libssl-dev zlib1g-dev nlohmann-json3-dev
     deps=$(mktemp -d)
