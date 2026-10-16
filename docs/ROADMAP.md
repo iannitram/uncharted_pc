@@ -38,6 +38,13 @@ crashes in a handful of groups
       the seven C++ GPU tests, on lavapipe. `test_probe.py` also finds `bb-probe.exe` on Windows.
 - [x] CI ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml)): the Linux build and every
       test ([`tools/ci_linux.sh`](../tools/ci_linux.sh)), plus a Windows MSYS2 CLANG64 build.
+      Both are green.
+- [x] The Windows build works with today's MSYS2 again. Current clang and libc++ no longer
+      include standard headers transitively, which broke FidelityFX, sirit and shadPS4
+      (`gpu/shim/libcxx_compat.h`). A new warning also hit a dead variable in
+      `runtime_services.c`.
+- [x] Programs linked with the GPU library no longer abort at start on a Linux account
+      without `~/.local/share`.
 - [x] The last "Bloodborne" default names removed from the loader and GPU library.
 - [x] [`Research/`](../Research/README.md): architecture, the game and engine, graphics,
       similar projects, licensing, porting worklist.
