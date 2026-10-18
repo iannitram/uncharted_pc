@@ -143,6 +143,15 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   cutscenes, gameplay) and one U2 gameplay run, the games never changed the video-out flip
   rate from "every vblank". Photo mode was not reached (scripted menu input dropped presses), so
   its 30 Hz request is still read, not measured.
+- **FSR 4 and DLSS (Ian, 2026-10-18).** Test both as anti-aliasing and upscaling options:
+  - FSR 4: fetch its model files with `tools/fetch_fsr4_assets.sh` (the official source the
+    script uses). Then compare it with anti-aliasing off on Uncharted 1 at 800p/60 and at 1080p:
+    noise or not (FSR 3.1 renders gameplay as noise on RADV, issue Supermedo#351), FPS, frame time.
+    Without the assets it falls back to FSR 3.1 today.
+  - DLSS: test it through the hack project saved in Kaylee's queue, on Hyperion (NVIDIA tests run
+    there only, Ian 2026-10-18).
+  - Done when each has a measured row (picture correct or not, FPS, frame time) per machine it can
+    run on.
 - **First-launch shader preparation (Ian, 2026-10-16):** like God of War or The Last of Us
   Part I on Steam, show a one-time "preparing shaders" screen the first time a game starts,
   then play without compile stutter. Today shaders are translated and compiled while playing;
