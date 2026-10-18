@@ -12,6 +12,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <time.h>
+#include <unistd.h>
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -204,7 +205,7 @@ typedef struct { const char *name; int initialized, status; } Dialog;
 static Dialog dialogs[]={{"CommonDialog",0,0},{"MsgDialog",0,0},{"SaveDataDialog",0,0},
                          {"NpProfileDialog",0,0},{"NpCommerceDialog",0,0},{"ImeDialog",0,0},
                          {"ErrorDialog",0,0},{"InvitationDialog",0,0}};
-static int common_initialized;
+static int common_initialized __attribute__((unused));
 static ABI int32_t common_init(void) { common_initialized=1; return 0; }
 static int32_t dialog_init(int i) {
     if (dialogs[i].initialized) return (int32_t)0x80B80004;

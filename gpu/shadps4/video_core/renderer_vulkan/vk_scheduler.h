@@ -5,11 +5,13 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdio>
 #include <cstring>
 #include <condition_variable>
 #include <deque>
 #include <functional>
 #include <memory>
+#include <source_location>
 #include <span>
 #include <utility>
 #include <vector>
@@ -614,6 +616,11 @@ public:
         return storage + offset;
     }
 
+    /// Storage for data too large for the chunk, freed with the chunk's commands.
+    void* AllocateOverflow(size_t bytes) {
+        return overflow.emplace_back(std::make_unique_for_overwrite<std::byte[]>(bytes)).get();
+    }
+
     void Execute(vk::CommandBuffer cmdbuf) {
         for (CommandBase* command = first; command;) {
             CommandBase* const next = command->next;
@@ -623,6 +630,7 @@ public:
         }
         first = last = nullptr;
         used = 0;
+        overflow.clear();
     }
 
     [[nodiscard]] bool Empty() const noexcept {
@@ -661,6 +669,7 @@ private:
 
     alignas(64) std::byte storage[Capacity];
     size_t used = 0;
+    std::vector<std::unique_ptr<std::byte[]>> overflow;
     CommandBase* first{};
     CommandBase* last{};
 };
@@ -749,11 +758,18 @@ public:
             return;
         }
         if (!record_chunk->Push(std::forward<Func>(func))) {
-            full_chunks.push_back(std::move(record_chunk));
-            record_chunk = AcquireChunk();
+            RetireChunk();
             const bool pushed = record_chunk->Push(std::forward<Func>(func));
             ASSERT(pushed);
         }
+    }
+
+    /// bbport: replaces the current chunk with a fresh one. The replacement is taken first, so
+    /// `record_chunk` is never null: code that re-enters the recording side (a guest memory
+    /// fault handled inline on this thread) used to find it null between the two steps.
+    void RetireChunk() {
+        auto next = AcquireChunk();
+        full_chunks.push_back(std::exchange(record_chunk, std::move(next)));
     }
 
     /// True when Record() defers commands (and RecordData() copies into chunks).
@@ -768,24 +784,40 @@ public:
         if (!IsRecordingDeferred()) {
             return;
         }
-        ASSERT(bytes + 1024 <= RecordChunk::Capacity);
+        if (bytes + 1024 > RecordChunk::Capacity) {
+            bytes = 0; // RecordData puts it in the chunk's overflow storage; keep room for the command
+        }
         if (RecordChunk::Capacity - record_chunk->Size() < bytes + 1024) {
-            full_chunks.push_back(std::move(record_chunk));
-            record_chunk = AcquireChunk();
+            RetireChunk();
         }
     }
 
     /// Copies `data` into recording storage that lives until the command that uses it has
     /// been recorded (the same chunk). With threaded recording off, returns `data` itself.
     template <typename T>
-    std::span<const T> RecordData(std::span<const T> data) {
+    std::span<const T> RecordData(std::span<const T> data,
+                                  std::source_location where = std::source_location::current()) {
         if (!IsRecordingDeferred() || data.empty()) {
             return data;
         }
         // Room for the data and the command that follows it, so both stay in one chunk.
         const size_t bytes = data.size_bytes();
         ReserveRecordData(bytes + alignof(T));
-        auto* dst = static_cast<T*>(record_chunk->Allocate(bytes, alignof(T)));
+        void* storage = nullptr;
+        if (RecordChunk::Capacity - record_chunk->Size() >= bytes + alignof(T) + 1024) {
+            storage = record_chunk->Allocate(bytes, alignof(T));
+        }
+        if (!storage) {
+            // More than a chunk holds (thousands of copy regions or barriers): heap storage owned
+            // by the same chunk, so it lives until the command has been recorded.
+            static std::atomic<bool> logged{false};
+            if (!logged.exchange(true, std::memory_order_relaxed)) {
+                std::fprintf(stderr, "Recording: %zu bytes of command data from %s:%u, over a chunk\n",
+                             bytes, where.file_name(), unsigned(where.line()));
+            }
+            storage = record_chunk->AllocateOverflow(bytes);
+        }
+        auto* dst = static_cast<T*>(storage);
         std::memcpy(dst, data.data(), bytes);
         return {dst, data.size()};
     }

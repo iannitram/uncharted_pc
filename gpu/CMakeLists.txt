@@ -2,6 +2,13 @@
 # drivers, adapted to the native_probe runtime through shims in shim/.
 cmake_minimum_required(VERSION 3.24)
 project(bbgpu LANGUAGES C CXX)
+# Newer libc++ (clang 21+) no longer includes these transitively; the shadPS4, sirit and FFX
+# sources rely on them (std::abort, _countof, swprintf_s, log2, placement new, ...).
+if(WIN32)
+    foreach(header cstdlib cstring cstdio cstdint cmath cwchar new limits utility algorithm)
+        add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include ${header}>")
+    endforeach()
+endif()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -160,7 +167,11 @@ add_library(bbgpu ${BBGPU_KIND} ${VIDEO_CORE} ${RECOMPILER} ${COMMON} ${SHIM_SOU
 add_dependencies(bbgpu host_shaders)
 # bbport co-op: PS4 network and PSN libraries with the shadNet client, from shadp2p
 # (github.com/Wozzardman/shadp2p, GPL-2.0), for private Bloodborne co-op servers.
-find_package(Protobuf CONFIG REQUIRED)
+find_package(Protobuf CONFIG QUIET)
+if (NOT Protobuf_FOUND)
+    # Linux fork: distributions with protobuf 3.x (Debian) ship no CMake package.
+    find_package(Protobuf REQUIRED)
+endif()
 set(SHADNET_PROTO_OUT "${CMAKE_CURRENT_BINARY_DIR}/shadnet_proto_gen")
 file(MAKE_DIRECTORY "${SHADNET_PROTO_OUT}")
 add_custom_command(
@@ -187,12 +198,13 @@ target_link_libraries(bbnet PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB)
 if (WIN32)
     target_sources(bbnet PRIVATE third_party/wepoll/wepoll.c)
     target_include_directories(bbnet PRIVATE third_party/wepoll)
-    find_path(MINIUPNPC_INCLUDE miniupnpc.h PATH_SUFFIXES miniupnpc REQUIRED)
-    find_library(MINIUPNPC_LIBRARY NAMES libminiupnpc.a miniupnpc REQUIRED)
-    target_include_directories(bbnet PRIVATE "${MINIUPNPC_INCLUDE}")
     target_compile_definitions(bbnet PRIVATE MINIUPNP_STATICLIB)
-    target_link_libraries(bbnet PRIVATE "${MINIUPNPC_LIBRARY}")
 endif()
+# Linux fork: UPnP is needed on every platform, not only Windows.
+find_path(MINIUPNPC_INCLUDE miniupnpc.h PATH_SUFFIXES miniupnpc REQUIRED)
+find_library(MINIUPNPC_LIBRARY NAMES libminiupnpc.a miniupnpc REQUIRED)
+target_include_directories(bbnet PRIVATE "${MINIUPNPC_INCLUDE}")
+target_link_libraries(bbnet PRIVATE "${MINIUPNPC_LIBRARY}")
 target_compile_definitions(bbnet PRIVATE BOOST_ASIO_STANDALONE NDEBUG)
 target_compile_options(bbnet PRIVATE -Wno-deprecated-declarations -Wno-missing-field-initializers)
 target_link_libraries(bbnet PUBLIC Vulkan::Headers fmt::fmt Boost::headers magic_enum::magic_enum
@@ -233,6 +245,8 @@ if (WIN32)
     target_include_directories(bbgpu PRIVATE third_party/xbyak)
     target_link_libraries(bbgpu PUBLIC Vulkan::Vulkan ws2_32 bcrypt ntdll synchronization winmm)
 else()
+    # Linux fork: the xbyak submodule, as on Windows (no system package needed).
+    target_include_directories(bbgpu PRIVATE third_party/xbyak)
     target_link_libraries(bbgpu PUBLIC PkgConfig::X11)
 endif()
 

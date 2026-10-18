@@ -30,6 +30,7 @@ namespace Vulkan {
 std::mutex Scheduler::submit_mutex;
 
 extern void (*g_gpu_stall_report)();
+extern void (*g_gpu_checkpoint_report)();
 bool (*g_draw_pipe_busy)() = nullptr;
 
 namespace {
@@ -50,6 +51,10 @@ std::vector<std::pair<const Scheduler*, const Instance*>> g_schedulers;
 } // namespace
 
 void Scheduler::ReportStall() {
+    // Linux fork: while the GPU is still stuck, the checkpoints point at the command it is on.
+    if (g_gpu_checkpoint_report) {
+        g_gpu_checkpoint_report();
+    }
     std::scoped_lock lk{g_recent_mutex};
     for (const auto& [scheduler, inst] : g_schedulers) {
         const VkSemaphore timeline = scheduler->work_semaphore.Handle();
@@ -295,14 +300,17 @@ void Scheduler::KickRecording(bool force) {
     if (full_chunks.empty() && record_chunk->Empty()) {
         return;
     }
+    // bbport: the replacement is taken before the current chunk is handed over, so record_chunk
+    // is never null (see RetireChunk). AcquireChunk() takes recorder_mutex itself.
+    std::unique_ptr<RecordChunk> next = record_chunk->Empty() ? nullptr : AcquireChunk();
     bool wake;
     {
         std::scoped_lock lk{recorder_mutex};
         for (auto& chunk : full_chunks) {
             recorder_queue.push_back(std::move(chunk));
         }
-        if (!record_chunk->Empty()) {
-            recorder_queue.push_back(std::move(record_chunk));
+        if (next) {
+            recorder_queue.push_back(std::exchange(record_chunk, std::move(next)));
         }
         wake = recorder_sleeping;
         queued_chunks.store(recorder_queue.size(), std::memory_order_release);
@@ -453,6 +461,7 @@ void Scheduler::AllocateWorkerCommandBuffers() {
 
 void Scheduler::SubmitExecution(SubmitInfo& info) {
     std::scoped_lock lk{submit_mutex};
+#ifdef _WIN32 // Linux fork: these diagnostics use Windows calls
     // bbport: BB_SUBMIT_THREADS=1 names each thread that submits through this scheduler (once).
     static const bool submit_threads = std::getenv("BB_SUBMIT_THREADS") != nullptr;
     if (submit_threads) {
@@ -492,6 +501,7 @@ void Scheduler::SubmitExecution(SubmitInfo& info) {
             std::printf("\n");
         }
     }
+#endif
     const u64 signal_value = work_semaphore.NextTick();
 
 #if TRACY_GPU_ENABLED
@@ -553,7 +563,10 @@ void Scheduler::SubmitExecution(SubmitInfo& info) {
     }
     ImGui::Core::TextureManager::Submit();
     auto submit_result = instance.GetGraphicsQueue().submit(submit_info, info.fence);
-    ASSERT_MSG(submit_result != vk::Result::eErrorDeviceLost, "Device lost during submit");
+    if (submit_result == vk::Result::eErrorDeviceLost) {
+        std::printf("Device lost during submit\n");
+        DeviceLost(instance.GetDevice());
+    }
 
     work_semaphore.Refresh();
     AllocateWorkerCommandBuffers();
