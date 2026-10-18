@@ -3,6 +3,16 @@
 #include <unistd.h>
 #include "../src/runtime_pad.c"
 
+// The pad code reads the mouse and the shown camera from the GPU library's window
+// (gpu/shim/window.cpp, vk_camera_motion.cpp); this test has no window, so no mouse.
+void bbgpu_mouse_configure(int look) { (void)look; }
+int bbgpu_mouse_sample(float* dx, float* dy, uint32_t* buttons, int* wheel) {
+    *dx = *dy = 0; *buttons = 0; *wheel = 0; return 0;
+}
+int bbgpu_camera_yaw(float* yaw_degrees, double* age_seconds) {
+    (void)yaw_degrees; (void)age_seconds; return 0;
+}
+
 static int capture;
 int bbgpu_overlay_captures_input(void) { return capture; }
 uintptr_t runtime_lookup(const RuntimeExport *table, size_t count, const char *name) {
@@ -24,6 +34,9 @@ int main(void) {
     assert(fd>=0);
     close(fd);
     setenv("BB_PAD_FILE",path,1);
+    /* A scripted run ignores host controllers unless BB_PAD_HOST=1 (runtime_pad.c sample_host);
+     * this test also checks the virtual controller below. */
+    setenv("BB_PAD_HOST","1",1);
     setenv("SDL_VIDEODRIVER","dummy",1);
     /* Only the virtual test controller is a gamepad, whatever is plugged in. */
     SDL_SetHint(SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT,"0x1d50/0x6189");
