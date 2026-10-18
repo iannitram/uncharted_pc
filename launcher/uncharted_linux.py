@@ -44,6 +44,17 @@ def steam_deck():
         return False
 
 
+def deck_frame_rate():
+    """Steam Deck mode's default frame rate: 60 on every handheld (Ian, 2026-10-18: "I would
+    prefer 60, always for steamdeck/legion go"). Measured on the Legion Go 8APU1: U1 57-59, U2 and
+    U3 60 FPS at 1280x800, anti-aliasing off, 20 W. Not measured on the Steam Deck (a weaker GPU)
+    or the ROG Flow Z13. 30 stays selectable, and a saved choice is kept."""
+    return '60'
+
+
+DECK_FRAME_RATES = ('30', '60')
+
+
 def clean_env():
     """The environment for programs outside this one: a frozen launcher (PyInstaller) points
     LD_LIBRARY_PATH at its own libraries, which xdg-open or Steam must not get."""
@@ -387,17 +398,22 @@ def default_saves(settings, data_dir=None):
 
 # Steam Deck mode shows its values in these settings while it is on (deck_environment enforces
 # the locked ones at launch); turning it off restores what the player had.
-DECK_SETTINGS = {'frame_rate': '30', 'window_size': '1280x800', 'present_mode': 'Fifo', 'fullscreen': True,
-                 'anti_aliasing': 'off', 'frame_generation': 'off'}
-DECK_LOCKED = ('frame_rate', 'window_size', 'present_mode', 'fullscreen')
+# The frame rate stays a choice in Steam Deck mode, 30 or 60 (deck_environment caps it at 60).
+DECK_SETTINGS = {'frame_rate': deck_frame_rate(), 'window_size': '1280x800', 'present_mode': 'Fifo',
+                 'fullscreen': True, 'anti_aliasing': 'off', 'frame_generation': 'off'}
+DECK_LOCKED = ('window_size', 'present_mode', 'fullscreen')
 
 
 def deck_environment(settings, env):
-    """Steam Deck mode: what the Deck needs to hold 30 FPS. Applied before the player's own
-    Environment entries, which can override any of it."""
+    """Steam Deck mode: what a handheld needs for a steady 30 or 60 FPS. Applied before the
+    player's own Environment entries, which can override any of it."""
     if not settings.get('steam_deck'):
         return
-    env['BB_VBLANK_HZ'] = '30'           # a steady 30 instead of an uneven 15-25
+    # The player's choice, 30 or 60 (default 60); anything higher is capped at 60.
+    rate = str(settings.get('frame_rate') or DECK_SETTINGS['frame_rate'])
+    if rate not in DECK_FRAME_RATES:
+        rate = '60' if rate.isdigit() and int(rate) > 60 else DECK_SETTINGS['frame_rate']
+    env['BB_VBLANK_HZ'] = rate
     env['BB_WINDOW_SIZE'] = '1280x800'   # the Deck's screen: no 1080p output pass to scale down
     env['BB_PRESENT_MODE'] = 'Fifo'      # gamescope paces FIFO best
     env['BB_FULLSCREEN'] = '1'
