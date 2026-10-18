@@ -54,6 +54,23 @@ Our own baseline (Phase 0 below) replaces this table with measurements.
 
 ## Phases
 
+### First goal: code maps (Ian, 2026-10-17)
+Before Phase 0, map the code so every later session starts from a short, checked guide
+instead of re-reading 900 files. The index is [`maps/overview.md`](maps/overview.md)
+(written 2026-10-17, read from the code, nothing run): what each part is, how a game starts,
+and where Linux and Windows differ. Next, the six module maps it lists, each in
+`docs/maps/`: loader, executable preparation, the OS-facing runtime (the Linux seams),
+the game-facing runtime, the GPU shim and our changes inside the vendored shadPS4 code,
+and launch plus build.
+- Rules: every claim is checked against the code and marked read or measured; vendored code
+  (`gpu/shadps4/`, `gpu/third_party/`) is mapped only by its `bbport:` changes; statements
+  taken from the Bloodborne-era docs say "inherited from Bloodborne, not verified for Uncharted".
+- The local Qwen model may draft module maps from a brief that carries the facts from the
+  overview; Claude reviews every draft before it lands (on 2026-10-17, 7 of 41 Qwen maps and
+  translations for the Craft apps were rejected and most others needed corrections).
+- Done when the six module maps exist and each has been checked against the code.
+
+
 ### Phase 0: baseline with stock shadPS4 (Strix Halo)
 - Install the latest shadPS4 release on the Strix Halo, install the dump, and play each
   game for about 15 minutes.
@@ -101,7 +118,7 @@ Our own baseline (Phase 0 below) replaces this table with measurements.
 
 ## Documentation
 
-- Done: this roadmap; the old Russian one archived.
+- Done: this roadmap; the old Russian one archived; the overview code map (`maps/overview.md`).
 - To do: translate every remaining Russian document in `docs/` to English (16 of the 19 files
   are mostly or partly Russian; only `parallel_gpu.md` and `original-readme/` are English),
   marking Bloodborne-only statements as "inherited from Bloodborne, not verified for
