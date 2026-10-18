@@ -1,0 +1,33 @@
+Licences and third-party notices
+================================
+
+This program is free software under the GNU General Public License, version 2 or (at your
+option) any later version: see LICENSE next to the launcher. Its source, at the exact commit
+this package was built from, and the versions of the libraries it was built with are listed in
+SOURCE.txt in this folder.
+
+The folders here hold the licence of every third-party component in the package:
+- msys2/      the MSYS2 CLANG64 libraries next to bb-probe.exe in bin\ (SDL3, FFmpeg and its
+              codecs, the Vulkan loader, protobuf, OpenSSL, zlib, ...), one folder per package.
+              The FFmpeg build is licensed under the GPL version 3 or later.
+- source/     components built into bb-probe.exe from source: shadPS4's renderer (GPL-2.0-or-later),
+              Dear ImGui, sirit, xbyak, magic_enum, miniz, half, LibAtrac9, FSR-Vulkan and the
+              AMD FidelityFX SDK, cpp-httplib, wepoll, nlohmann-json, and the DejaVu font.
+- python/     the Python runtime inside the launcher: CPython, Tcl/Tk, Pillow, PyInstaller.
+
+Not covered by the GPL
+----------------------
+- NVIDIA DLSS. bin\nvngx_dlss.dll and bin\nvngx_dlssg.dll are NVIDIA's proprietary runtime,
+  redistributed under NVIDIA-DLSS-LICENSE.txt. bin\bbport_dlss.dll is built from MIT-licensed
+  source (bbport_dlss-LICENSE.txt), but it links NVIDIA's DLSS SDK library, so the binary is
+  also subject to NVIDIA's licence. These files are optional: deleting them only turns DLSS off.
+  This product uses NVIDIA DLSS. NVIDIA, GeForce RTX and DLSS are trademarks and/or registered
+  trademarks of NVIDIA Corporation in the U.S. and other countries.
+- AMD FSR 4. The fsr4_shaders\ folder holds the FSR 4 (v07, INT8) model and shaders built from
+  AMD's FidelityFX SDK source, distributed under AMD's MIT notice (LICENSE-FSR4-v07.txt there).
+  AMD, FidelityFX and FSR are trademarks of Advanced Micro Devices, Inc.
+
+No game files, keys or official artwork are included. This project is not affiliated with or
+endorsed by Sony Interactive Entertainment, Naughty Dog, Bluepoint Games, NVIDIA or AMD.
+"Uncharted" is a trademark of Sony Interactive Entertainment LLC, used only to name the game
+this program works with.

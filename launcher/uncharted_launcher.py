@@ -1169,6 +1169,17 @@ class Launcher:
                   lambda: threading.Thread(target=self.check_update, args=(True,), daemon=True).start()
                   ).pack(side='left')
         self.pill(holder, _('Releases page'), lambda: webbrowser.open(RELEASES_PAGE)).pack(side='left', padx=(8, 0))
+        self.section(f, _('About and licences'))
+        self.note(f, _('Port by SuperMedo, built on bbport by deadinside28 and the shadPS4 renderer. Free '
+                       'software under the GNU GPL v2 or later. This product uses NVIDIA DLSS and AMD '
+                       'FidelityFX FSR. NVIDIA, GeForce RTX and DLSS are trademarks of NVIDIA Corporation; '
+                       'AMD, FidelityFX and FSR are trademarks of Advanced Micro Devices, Inc. Not affiliated '
+                       'with Sony Interactive Entertainment, Naughty Dog, NVIDIA or AMD.'), top=2)
+        card = self.target(f)
+        holder = self.tk.Frame(card, bg=CARD)
+        holder.grid(row=self.next_row(card), column=0, columnspan=2, sticky='w', pady=(12, 0))
+        self.pill(holder, _('Licences and notices'),
+                  lambda: self.open_path(PORT_DIR / 'licenses')).pack(side='left')
 
     def build_log(self):
         tk = self.tk

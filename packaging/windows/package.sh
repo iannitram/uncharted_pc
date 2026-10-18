@@ -59,8 +59,12 @@ ldd "$dest/bin/bb-probe.exe" "$dest/bin/bb-gpu-capabilities.exe" |
 cp scripts/prepare.py scripts/link_modules.py scripts/link_libc.py scripts/content_profile.py "$dest/scripts/"
 cp run.py LICENSE "$dest/"
 cp packaging/windows/README-Uncharted.txt "$dest/README.txt"
-mkdir -p "$dest/licenses"
-cp packaging/windows/licenses/*.txt "$dest/licenses/" 2>/dev/null || true
+# Licences (packaging/windows/THIRD-PARTY-NOTICES.txt explains the layout), and SOURCE.txt: the
+# commit and library versions this package was built from (the GPL's source offer).
+lic="$dest/licenses"
+mkdir -p "$lic/msys2" "$lic/source" "$lic/python"
+cp packaging/windows/THIRD-PARTY-NOTICES.txt "$lic/README.txt"
+cp packaging/windows/licenses/*.txt "$lic/source/" 2>/dev/null || true
 # FSR 4 (the v07 INT8 model) when its assets are in fsr4_shaders/ (tools/fetch_fsr4_assets.sh).
 if [[ -d fsr4_shaders ]]; then cp -r fsr4_shaders "$dest/"; fi
 # DLSS and DLSS Frame Generation (NVIDIA RTX): the MSVC-built bridge and NVIDIA's runtimes, next
@@ -68,18 +72,51 @@ if [[ -d fsr4_shaders ]]; then cp -r fsr4_shaders "$dest/"; fi
 if [[ -f out/bbport_dlss.dll && -f out/nvngx_dlss.dll ]]; then
     cp out/bbport_dlss.dll out/nvngx_dlss.dll "$dest/bin/"
     if [[ -f out/nvngx_dlssg.dll ]]; then cp out/nvngx_dlssg.dll "$dest/bin/"; fi
-    cp out/NVIDIA-DLSS-LICENSE.txt "$dest/licenses/"
-    cp gpu/dlss_bridge/LICENSE.txt "$dest/licenses/bbport_dlss-LICENSE.txt"
+    cp out/NVIDIA-DLSS-LICENSE.txt "$lic/"
+    cp gpu/dlss_bridge/LICENSE.txt "$lic/bbport_dlss-LICENSE.txt"
 else
     echo "DLSS bridge not built (packaging/windows/build_dlss.sh): no DLSS in this package" >&2
 fi
-for license in gpu/third_party/wepoll/LICENSE:wepoll gpu/third_party/httplib/LICENSE:cpp-httplib; do
-    if [[ -f ${license%%:*} ]]; then cp "${license%%:*}" "$dest/licenses/${license##*:}-LICENSE.txt"; fi
+# Components built from source into bb-probe.exe.
+for license in gpu/shadps4/LICENSE:shadPS4 gpu/third_party/imgui/LICENSE.txt:imgui \
+               gpu/third_party/sirit/LICENSE.txt:sirit gpu/third_party/xbyak/COPYRIGHT:xbyak \
+               gpu/third_party/magic_enum/LICENSE:magic_enum gpu/third_party/miniz/LICENSE:miniz \
+               gpu/third_party/half/LICENSE.txt:half third_party/LibAtrac9/LICENSE:LibAtrac9 \
+               gpu/third_party/fsr-vulkan/LICENSE.txt:FSR-Vulkan gpu/third_party/fonts/LICENSE-DejaVu.txt:DejaVu \
+               gpu/third_party/wepoll/LICENSE:wepoll gpu/third_party/httplib/LICENSE:cpp-httplib; do
+    if [[ -f ${license%%:*} ]]; then cp "${license%%:*}" "$lic/source/${license##*:}-LICENSE.txt"
+    else echo "licence missing: ${license%%:*}" >&2; fi
 done
-for package in protobuf abseil-cpp openssl miniupnpc zlib; do
-    license=/clang64/share/licenses/$package/LICENSE
-    if [[ -f $license ]]; then cp "$license" "$dest/licenses/$package-LICENSE.txt"; fi
+# Every MSYS2 package that owns a shipped DLL (or is built in: VMA, SPIR-V headers), with its
+# version for SOURCE.txt.
+packages=$( { for dll in "$dest"/bin/*.dll; do pacman -Qqo "/clang64/bin/$(basename "$dll")" 2>/dev/null; done
+              pacman -Qq mingw-w64-clang-x86_64-vulkan-memory-allocator mingw-w64-clang-x86_64-spirv-headers \
+                         mingw-w64-clang-x86_64-boost mingw-w64-clang-x86_64-fmt 2>/dev/null; } | sort -u)
+for package in $packages; do
+    short=${package#mingw-w64-clang-x86_64-}
+    if [[ -d /clang64/share/licenses/$short ]]; then cp -r "/clang64/share/licenses/$short" "$lic/msys2/"
+    else echo "licence missing: MSYS2 package $package" >&2; fi
 done
+out/pyenv/Scripts/python.exe packaging/windows/collect_licenses.py "$(cygpath -w "$lic")"
+{
+    echo "Source of this package"
+    echo "======================"
+    echo
+    echo "Program: GNU GPL v2 or later. Source: https://github.com/iannitram/uncharted_pc"
+    echo "Commit:  $(git rev-parse HEAD)$(git diff --quiet --ignore-submodules=dirty HEAD -- . ':!dist' ':!out' || echo ' (with local changes)')"
+    echo "Built:   $(date -u +%Y-%m-%d)"
+    echo
+    echo "Submodules (source in their own repositories, at these commits):"
+    git submodule status --recursive | sed 's/^[ +-]/  /'
+    echo
+    echo "MSYS2 CLANG64 packages linked into or shipped with bb-probe.exe. Their exact sources are"
+    echo "published by MSYS2: https://packages.msys2.org/ (search the package name; the source"
+    echo "package of each version is linked there)."
+    for package in $packages; do echo "  $(pacman -Q "$package")"; done
+    echo
+    echo "On request, the maintainer will provide the corresponding source of any GPL component"
+    echo "of this package for three years from the build date, via the repository's issue tracker."
+} > "$lic/SOURCE.txt"
 find "$dest" -name __pycache__ -prune -exec rm -r {} +
 mkdir -p dist
 rm -f dist/uncharted-windows.zip
