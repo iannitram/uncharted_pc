@@ -45,19 +45,13 @@ def steam_deck():
 
 
 def deck_frame_rate():
-    """Steam Deck mode's default frame rate. 60 on the Legion Go, MEASURED to hold it (8APU1:
-    U1 57-59, U2 and U3 60 FPS at 1280x800, anti-aliasing off, 20 W; 2026-10-18), and 60 on the
-    ROG Flow Z13, NOT measured (a much stronger GPU, Ian's machine for these games). 30
-    everywhere else, the Steam Deck included (weaker GPU, not measured)."""
-    try:
-        dmi = ' '.join(Path(f'/sys/class/dmi/id/{name}').read_text().strip()
-                       for name in ('product_name', 'product_version'))
-    except OSError:
-        return '30'
-    return '60' if any(model in dmi for model in DECK_60_MODELS) else '30'
+    """Steam Deck mode's default frame rate: 60 on every handheld (Ian, 2026-10-18: "I would
+    prefer 60, always for steamdeck/legion go"). Measured on the Legion Go 8APU1: U1 57-59, U2 and
+    U3 60 FPS at 1280x800, anti-aliasing off, 20 W. Not measured on the Steam Deck (a weaker GPU)
+    or the ROG Flow Z13. 30 stays selectable, and a saved choice is kept."""
+    return '60'
 
 
-DECK_60_MODELS = ('Legion Go', 'ROG Flow Z13')
 DECK_FRAME_RATES = ('30', '60')
 
 
@@ -415,7 +409,7 @@ def deck_environment(settings, env):
     player's own Environment entries, which can override any of it."""
     if not settings.get('steam_deck'):
         return
-    # A steady 30 instead of an uneven 15-25 on the Deck; 60 where the handheld holds it.
+    # The player's choice, 30 or 60 (default 60); anything higher is capped at 60.
     rate = str(settings.get('frame_rate') or DECK_SETTINGS['frame_rate'])
     if rate not in DECK_FRAME_RATES:
         rate = '60' if rate.isdigit() and int(rate) > 60 else DECK_SETTINGS['frame_rate']
