@@ -32,7 +32,7 @@ if [[ ${1:-} == --deps ]]; then
         libvulkan-dev mesa-vulkan-drivers glslang-tools \
         libboost-dev libfmt-dev libzydis-dev libxxhash-dev libx11-dev \
         libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxss-dev libxkbcommon-dev \
-        libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev \
+        libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
     deps=$(mktemp -d)
     git clone -q --depth 1 -b "$SDL_TAG" https://github.com/libsdl-org/SDL.git "$deps/sdl"
     cmake -S "$deps/sdl" -B "$deps/sdl/b" -G Ninja -DCMAKE_BUILD_TYPE=Release -DSDL_TESTS=OFF \
