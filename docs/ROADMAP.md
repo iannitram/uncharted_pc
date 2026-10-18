@@ -19,6 +19,11 @@ Ground rules:
 - No game files, dumps or keys in the repository. Each machine uses its own dump of the
   collection (CUSA02343 / CUSA02320).
 - Every claim in a report says whether it was measured or only read from the code.
+- **Reverse-engineering output stays private** (Ian, 2026-10-18: "the output will stay private.
+  this is just for us. About preserving my own library that i have paid for multiple times over
+  at this point."). Disassembly, decompiled code, and notes or patch files that quote or locate
+  the games' code are kept on Hyperion, outside this repository, its bundles and the vault. What
+  lands here is our own engine code and the plan, never game code.
 - Their GitHub workflows came with the merge: `sync-upstream.yml` (every 6 hours, force-pushes an
   `upstream` branch and merges into `main`) and `build.yml` (releases on pushes to `main`). They only
   run from the default branch, so they are inert on `linux`. **Do not merge `linux` into our fork's
@@ -65,6 +70,39 @@ packaging (Linux launcher included).
   translations for the Craft apps were rejected and most others needed corrections).
 - Done when the module maps exist and each has been checked against the code.
 
+## Measured on the Legion Go (2026-10-18)
+
+Legion Go (Ryzen Z1 Extreme, Radeon 780M, RADV PHOENIX, Mesa 26.2.0-devel), SteamOS 3.8, Desktop
+Mode; `linux` at f0a21af; game CUSA02320 (APP_VER 01.00, package 01.02). Measured unless marked.
+
+- **Build and tests:** builds in the craft-build container (LTO on). 5 C tests, 84 Python tests and
+  the 7 GPU test targets pass (GPU tests in the container and on the host). The host needs four
+  libraries from the build (libfmt, libZydis, libZycore, libminiupnpc), which `package.sh` bundles.
+- **All three games boot** (run.py from source, scripted input):
+  - Uncharted 1: collection menu, New Game, cutscenes and gameplay; saves and Continue work.
+  - Uncharted 2: cutscene and gameplay.
+  - Uncharted 3: the London bar opening; no crash in 5 minutes.
+- **Frame rate:**
+  - Steam Deck mode (anti-aliasing off, 30 Hz, 1280x800): a steady 30.0 FPS in all three
+    (U1 frame pacing stddev 0.02 ms).
+  - U1 gameplay at 1080p/60 Hz with anti-aliasing off: 59.6-60 FPS, with the GPU thread only
+    2.5 % idle at about 1,100 draws per frame. The port's GPU translation is the limit, not the
+    game's code.
+- **First-run shader stutter:** cold-cache compiles per game:
+  - U1 title: 113 (worst frame 50 ms).
+  - U2: 489, 867 ms in total; worst stall 367 ms.
+  - U3: 380; worst stall 533 ms.
+  - Warm cache: 0 compiles, so the cache is reused.
+- **FSR 3.1 renders gameplay as full-screen noise on RADV PHOENIX** (HUD fine, nothing in the log),
+  at any window size and with or without the shadPS4 #5257 NaN port. Off and Deck mode are clean.
+  Report: `Workspaces/Uncharted/reports/2026-10-18-fsr31-noise-radv-phoenix.md` (Ian's vault).
+- `bb-gpu-capabilities`: RADV PHOENIX lacks D32S8 blits, so live resolution changes fall back to
+  the startup patch (a preset change needs a restart).
+- The built-in controller is held by InputPlumber in Desktop Mode and SDL does not see it.
+- Memory is the tight part: in gameplay `bb-probe` held 2.0-2.8 GB resident on top of graphics
+  memory taken from the same 15 GB, and with Steam and a browser open the free memory fell to
+  1.5 GB.
+
 ### Phase 0: baseline on our machines (Strix Halo, then Legion Go)
 - Build this branch on the Strix Halo (`bash build.sh`, in the craft-build container if the host
   lacks the libraries) and also try their released AppImage. Install the dump.
@@ -87,6 +125,20 @@ keep merging their `main` (and check it builds) before starting new work, so we 
 ### Phase 3: 60 FPS on the Strix Halo
 - Measure per game, find the bottleneck, tune. Done when each game holds 60 FPS in a defined test
   route.
+- **Profile the GPU thread first (2026-10-18).** On the Legion Go the GPU thread is nearly saturated
+  at 1080p/60 with anti-aliasing off. `BB_FRAME_STATS=1` plus `perf` (user space, our own process)
+  on U1 gameplay: where the time goes per draw, then tune the hot path in our own code.
+- **Unlock 60 FPS in the games themselves (Ian, 2026-10-18: "Would love to unlock 60fps").**
+  Where a game ties its logic or animation to 30 FPS, we need a game-side patch, like the
+  Bloodborne-era "Uncap FPS" patch in `patches/`.
+  - Finding the frame-step code needs the game's executables read with REA (reverse-engineering
+    tools behind Ghidra, IDA or Hopper). It runs only on Hyperion, where it is already connected;
+    nothing is installed on the handhelds.
+  - The output stays private (ground rules above).
+  - Start with one concrete question per game: U2 and U3 in Deck mode first, then 60 on the
+    Strix Halo.
+  - Done when each game runs its logic at 60 with no speed-up or physics change, checked in a
+    defined route.
 - **First-launch shader preparation (Ian, 2026-10-16):** like God of War or The Last of Us
   Part I on Steam, show a one-time "preparing shaders" screen the first time a game starts,
   then play without compile stutter. Today shaders are translated and compiled while playing;
@@ -96,23 +148,28 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   shaders a full play route uses, keyed by shader hash; (3) at first launch, find those
   shaders in the player's own dump and compile them before the game starts, with a progress
   bar; (4) redo the step automatically after a driver change. Open question: whether the
-  game's shaders can be found in the dump without running the game (not yet looked at). Do
+  game's shaders can be found in the dump without running the game. Ian wants this
+  (2026-10-18: "Would love to unlock ... the shaders preload"), and the open question is now a
+  job for REA on Hyperion: find how the games store and load their shader binaries, to read
+  them from the player's own dump. Step 1 is partly measured on the Legion Go (above: up to
+  489 compiles and a 533 ms stall on a cold first run). Do
   not ship translated or compiled shaders in the repository. Also check whether Steam's own
   shader pre-caching helps when this is added as a non-Steam shortcut (not known).
 
 ### Phase 4: the Legion Go
 - Their Steam Deck mode is the starting point (also AMD, also SteamOS). Measure on the Legion Go,
   tune Deck mode or add a Legion Go profile.
+- Started 2026-10-18: all three games boot and hold 30 FPS in Deck mode (measurements above).
+  Still to do: the built-in controller (Game Mode, or an InputPlumber gamepad profile), long soak
+  runs per game, and the AppImage on the device.
 - Done when the AppImage runs on the Legion Go at a playable frame rate and a clean install is
   documented.
 
 ## Documentation
 
 - Done: this roadmap; the old Russian one archived; the overview code map (`maps/overview.md`).
-- To do: translate every remaining Russian document in `docs/` to English (16 of the 19 files
-  are mostly or partly Russian; only `parallel_gpu.md` and `original-readme/` are English),
-  marking Bloodborne-only statements as "inherited from Bloodborne, not verified for
-  Uncharted". Suitable as homework for the local Qwen model, then reviewed.
+- Done 2026-10-18: the English translations of the Russian design notes and history (from Qwen's
+  homework branch, reviewed; originals under `docs/ru/`), plus the `Research/` reports of 10-16.
 - Done upstream: install instructions for Linux and the Steam Deck (their README: AppImage,
   one-line installer). To do: notes for our two machines once Phase 0 has measured them.
 
@@ -122,4 +179,9 @@ keep merging their `main` (and check it builds) before starting new work, so we 
 - Settled: the Linux launcher exists (`launcher/uncharted_linux.py`, spacepepperoni).
 - Whether to send anything of ours to spacepepperoni, and how (Ian's call, one change at a time).
 - `run.sh` is still Bloodborne's; drop it or point it at Uncharted once Phase 0 shows which
-  launch path we use.
+  launch path we use. (2026-10-18: `run.py` launches all three games on Linux.)
+- FSR 3.1 noise on RADV (report above). Our side logs the driver at FSR start and warns off a
+  validated list (fix/fsr-driver-log-1018). spacepepperoni's issues are turned off, so whether to
+  send it as a pull request is Ian's call.
+- `package.sh` stopped on Arch and SteamOS (the loader listed by path): fixed on our side
+  (fix/package-sh-loader-1018); same question for upstream.
