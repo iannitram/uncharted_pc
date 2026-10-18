@@ -45,9 +45,10 @@ def steam_deck():
 
 
 def deck_frame_rate():
-    """Steam Deck mode's default frame rate: 60 on handhelds measured to hold it (Legion Go
-    8APU1: U1 57-59, U2 and U3 60 FPS at 1280x800, anti-aliasing off, 20 W; 2026-10-18) and on
-    the ROG Flow Z13; 30 everywhere else, the Steam Deck included (weaker GPU, not measured)."""
+    """Steam Deck mode's default frame rate. 60 on the Legion Go, MEASURED to hold it (8APU1:
+    U1 57-59, U2 and U3 60 FPS at 1280x800, anti-aliasing off, 20 W; 2026-10-18), and 60 on the
+    ROG Flow Z13, NOT measured (a much stronger GPU, Ian's machine for these games). 30
+    everywhere else, the Steam Deck included (weaker GPU, not measured)."""
     try:
         dmi = ' '.join(Path(f'/sys/class/dmi/id/{name}').read_text().strip()
                        for name in ('product_name', 'product_version'))
