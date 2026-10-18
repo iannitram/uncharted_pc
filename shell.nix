@@ -1,4 +1,4 @@
-# Build environment: `nix-shell native_probe/shell.nix --run 'bash native_probe/run.sh'`
+# Linux build environment for the GPU library and bb-probe: `nix-shell shell.nix --run 'bash build.sh'`
 { pkgs ? import <nixpkgs> {} }:
 pkgs.mkShell {
   packages = with pkgs; [
@@ -6,7 +6,5 @@ pkgs.mkShell {
     vulkan-headers vulkan-loader sdl3
     # GPU library (gpu/): shadPS4 video core dependencies
     ffmpeg-headless boost fmt magic-enum robin-map xxhash vulkan-memory-allocator glslang spirv-cross xbyak zydis spirv-headers miniz libx11 libxcb xorgproto wayland
-    # Online play (bbnet): shadNet protocol, HTTPS, UPnP
-    protobuf openssl zlib nlohmann_json miniupnpc
   ];
 }

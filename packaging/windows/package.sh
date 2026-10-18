@@ -63,7 +63,7 @@ cp packaging/windows/README-Package.txt "$dest/README.txt"
 lic="$dest/licenses"
 mkdir -p "$lic/msys2" "$lic/source" "$lic/python"
 cp packaging/windows/THIRD-PARTY-NOTICES.txt "$lic/README.txt"
-cp packaging/windows/licenses/*.txt "$lic/source/" 2>/dev/null || true
+
 # FSR 4 (the v07 INT8 model) when its assets are in fsr4_shaders/ (tools/fetch_fsr4_assets.sh).
 if [[ -d fsr4_shaders ]]; then cp -r fsr4_shaders "$dest/"; fi
 # DLSS and DLSS Frame Generation (NVIDIA RTX): the MSVC-built bridge and NVIDIA's runtimes, next
@@ -81,8 +81,7 @@ for license in gpu/shadps4/LICENSE:shadPS4 gpu/third_party/imgui/LICENSE.txt:img
                gpu/third_party/sirit/LICENSE.txt:sirit gpu/third_party/xbyak/COPYRIGHT:xbyak \
                gpu/third_party/magic_enum/LICENSE:magic_enum gpu/third_party/miniz/LICENSE:miniz \
                gpu/third_party/half/LICENSE.txt:half third_party/LibAtrac9/LICENSE:LibAtrac9 \
-               gpu/third_party/fsr-vulkan/LICENSE.txt:FSR-Vulkan gpu/third_party/fonts/LICENSE-DejaVu.txt:DejaVu \
-               gpu/third_party/wepoll/LICENSE:wepoll gpu/third_party/httplib/LICENSE:cpp-httplib; do
+               gpu/third_party/fsr-vulkan/LICENSE.txt:FSR-Vulkan gpu/third_party/fonts/LICENSE-DejaVu.txt:DejaVu; do
     if [[ -f ${license%%:*} ]]; then cp "${license%%:*}" "$lic/source/${license##*:}-LICENSE.txt"
     else echo "licence missing: ${license%%:*}" >&2; fi
 done

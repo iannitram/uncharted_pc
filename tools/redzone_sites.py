@@ -1,4 +1,4 @@
-"""List the eboot stores that run below the red zone on Windows: patches/redzone.json.
+"""List an executable's stores that run below the red zone on Windows: patches/redzone/<exe>.json.
 
 Where Windows saves extended state in the compact XSAVE layout (Intel 12th gen and later), an
 exception's frame holds the AVX registers up to 0x28 bytes below rsp, over the System V red
@@ -6,9 +6,12 @@ zone, so a leaf function's store that faults on a GPU-tracked page and is resume
 locals the function keeps there (link_modules.protect_red_zones). A site is a run of a red-zone
 leaf's instructions, at least 5 bytes for a jmp, holding its stores through non-stack pointers;
 nothing inside it may be a branch target, rip-relative, segment-prefixed or change rsp.
-Functions with jump tables or community patches (patches/Bloodborne.xml) are left out.
+Functions with jump tables, or patched by an optional community patch XML (--patches), are left
+out. The table records the executable's SHA-256: link_modules.py applies it to that file only.
 
-Developer tool (pip install capstone): python tools/redzone_sites.py <game dir with eboot.bin>
+Developer tool (pip install capstone):
+    python tools/redzone_sites.py <game dir> [--exe big2-ps4_Shipping.elf] [--patches file.xml]
+One table per executable and game version (U1 and the menu: eboot.bin; U2, U3: big2/big3).
 """
 import argparse
 import hashlib
@@ -33,8 +36,8 @@ RED_ZONE_RSP = re.compile(rb'[\x44\x4c\x54\x5c\x64\x6c\x74\x7c]\x24[\x80-\xff]',
 FRAME_POINTER = bytes.fromhex('4889e5')  # mov rbp, rsp
 
 
-def load(game):
-    elf, _, ph, _, _ = parse_self((game / 'eboot.bin').read_bytes())
+def load(game, exe):
+    elf, _, ph, _, _ = parse_self((game / exe).read_bytes())
     loads = [p for p in ph if p['type'] == 1]
     image = bytearray(max(p['vaddr'] + p['memsz'] for p in loads))
     for p in loads:
@@ -49,8 +52,10 @@ def load(game):
     return bytes(image), [s for s in starts if text['vaddr'] <= s < end] + [end]
 
 
-def patched_addresses():
-    lines = ET.parse(ROOT / 'patches' / 'Bloodborne.xml').iter('Line')
+def patched_addresses(path):
+    if not path:
+        return []
+    lines = ET.parse(path).iter('Line')
     return sorted(int(line.get('Address'), 16) - 0x400000 for line in lines)
 
 
@@ -141,10 +146,14 @@ def analyse(md, image, start, end):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('game', type=Path)
-    p.add_argument('-o', '--out', type=Path, default=ROOT / 'patches' / 'redzone.json')
+    p.add_argument('--exe', default='eboot.bin', help='executable in the game folder')
+    p.add_argument('--patches', type=Path, help='community patch XML whose functions are left out')
+    p.add_argument('-o', '--out', type=Path, help='default: patches/redzone/<exe without suffix>.json')
     a = p.parse_args()
-    image, starts = load(a.game)
-    patched = patched_addresses()
+    a.out = a.out or ROOT / 'patches' / 'redzone' / f'{Path(a.exe).stem}.json'
+    a.out.parent.mkdir(parents=True, exist_ok=True)
+    image, starts = load(a.game, a.exe)
+    patched = patched_addresses(a.patches)
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
     md.detail = True
     sites, functions, skipped, uncovered = [], 0, [], []
@@ -166,7 +175,8 @@ def main():
         sites += found
         uncovered += missing
     a.out.write_text(json.dumps(dict(
-        eboot='Bloodborne 01.09', text_sha256=hashlib.sha256(image[starts[0]:starts[-1]]).hexdigest(),
+        exe=a.exe, exe_sha256=hashlib.sha256((a.game / a.exe).read_bytes()).hexdigest(),
+        text_sha256=hashlib.sha256(image[starts[0]:starts[-1]]).hexdigest(),
         functions=functions, skipped=skipped, uncovered_stores=uncovered,
         sites=sites), separators=(',', ':')) + '\n', encoding='ascii')
     print(f'{len(sites)} sites in {functions} red-zone leaf functions; {len(uncovered)} stores uncovered; '

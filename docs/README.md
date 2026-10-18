@@ -22,7 +22,7 @@ are in [`ru/`](ru/), at the same paths.
 | [motion_vectors.md](motion_vectors.md) | Camera and per-object motion vectors | [Graphics: key takeaways](../Research/graphics-upscaling-and-performance.md#key-takeaways-for-uncharted_pc) |
 | [DEPTH_ADAPTIVE_TAA.md](DEPTH_ADAPTIVE_TAA.md) | The port's own TAA | — |
 | [TEMPORAL_REVIEW_2026-10-01.md](TEMPORAL_REVIEW_2026-10-01.md) | Review of TAA and upscaler inputs | — |
-| [MODS.md](MODS.md) | File mods and third-party patches (Bloodborne) | [Architecture: Bloodborne leftovers](../Research/codebase-architecture.md#uncharted-specific-vs-bloodborne-leftovers) |
+| [MODS.md](MODS.md) | File mods and third-party patches (Bloodborne; removed 2026-10-18) | [Architecture: Bloodborne leftovers](../Research/codebase-architecture.md#uncharted-specific-vs-bloodborne-leftovers) |
 
 ## Logs and change notes
 

@@ -6,13 +6,11 @@ a guest leaf function whose store faults on a GPU-tracked page loses its locals 
 attack-trail crash at 0x28ce9b5). The Windows test runs that sequence for real: a vectored
 handler unprotects the page as the GPU tracker does.
 """
-from paths import ROOT
+import paths  # noqa: F401 (puts scripts/ on sys.path)
 import ctypes
-import json
 import os
 import struct
 import unittest
-import xml.etree.ElementTree as ET
 from link_modules import LEA_DOWN, LEA_UP, protect_red_zones
 
 SENTINEL = 0x1122334455667788
@@ -51,30 +49,6 @@ class TrampolineBytes(unittest.TestCase):
         self.assertEqual(protect_red_zones(image, [[STORE, 'c70102000000', [-6]]], 0x100), (b'', 0))
         self.assertEqual(protect_red_zones(image, leaf(0)[1], 0x100, skip=[STORE + 3]), (b'', 0))
         self.assertEqual(image, leaf(0)[0])
-
-
-class SiteTable(unittest.TestCase):
-    sites = json.loads((ROOT / 'patches' / 'redzone.json').read_text())['sites']
-
-    def test_attack_trail_stores_are_covered(self):
-        # 0x28ce7b0 writes trail vertices with live locals at [rsp-0x6c, rsp); 0x28ce9b5 then
-        # loaded a NULL pointer from the overwritten [rsp-0x60].
-        covered = set()
-        for offset, original, lengths in self.sites:
-            pos = offset
-            for length in lengths:
-                if length < 0:
-                    covered.add(pos)
-                pos += abs(length)
-        for store in (0x28cedfe, 0x28cee33, 0x28cee68, 0x28cee72):
-            self.assertIn(store, covered)
-
-    def test_sites_do_not_overlap_community_patches(self):
-        lines = ET.parse(ROOT / 'patches' / 'Bloodborne.xml').iter('Line')
-        patched = sorted(int(line.get('Address'), 16) - 0x400000 for line in lines)
-        for offset, original, _ in self.sites:
-            end = offset + len(original) // 2
-            self.assertFalse(any(offset - 8 < p < end for p in patched), hex(offset))
 
 
 @unittest.skipUnless(os.name == 'nt', 'Windows exception dispatch')

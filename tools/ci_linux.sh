@@ -7,13 +7,12 @@
 #   bash tools/ci_linux.sh --deps   # Ubuntu 24.04: install packages, build the missing ones
 #   bash tools/ci_linux.sh          # build and test
 #
-# Ubuntu 24.04 lacks SDL3 and a recent enough Vulkan-Headers, robin-map, VMA and miniupnpc;
+# Ubuntu 24.04 lacks SDL3 and a recent enough Vulkan-Headers, robin-map and VMA;
 # --deps builds the pinned versions below into /usr/local (sudo when not root).
 set -euo pipefail
 cd -- "$(dirname -- "$0")/.."
 
 SDL_TAG=release-3.2.24
-MINIUPNPC_TAG=miniupnpc_2_2_8
 VULKAN_HEADERS_REV=c46850864f4661461b0f6cb9922c058ffea4915e   # Vulkan-Docs 1.4.365
 ROBIN_MAP_REV=91362aab8f2c63ef90bf7c21fb2c3283ded5ae48
 VMA_REV=bfb2ca99e1e7e9684dc06546b552ee3eff4b10aa
@@ -34,17 +33,12 @@ if [[ ${1:-} == --deps ]]; then
         libboost-dev libfmt-dev libzydis-dev libxxhash-dev libx11-dev \
         libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxfixes-dev libxss-dev libxkbcommon-dev \
         libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev \
-        libprotobuf-dev protobuf-compiler libssl-dev zlib1g-dev nlohmann-json3-dev
     deps=$(mktemp -d)
     git clone -q --depth 1 -b "$SDL_TAG" https://github.com/libsdl-org/SDL.git "$deps/sdl"
     cmake -S "$deps/sdl" -B "$deps/sdl/b" -G Ninja -DCMAKE_BUILD_TYPE=Release -DSDL_TESTS=OFF \
         -DSDL_EXAMPLES=OFF >/dev/null
     ninja -C "$deps/sdl/b" >/dev/null
     sudo_if_needed ninja -C "$deps/sdl/b" install >/dev/null
-    git clone -q --depth 1 -b "$MINIUPNPC_TAG" https://github.com/miniupnp/miniupnp.git "$deps/miniupnp"
-    cmake -S "$deps/miniupnp/miniupnpc" -B "$deps/miniupnp/b" -G Ninja -DUPNPC_BUILD_SHARED=OFF \
-        -DUPNPC_BUILD_TESTS=OFF -DUPNPC_BUILD_SAMPLE=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON >/dev/null
-    sudo_if_needed ninja -C "$deps/miniupnp/b" install >/dev/null
     fetch_rev https://github.com/KhronosGroup/Vulkan-Headers.git "$VULKAN_HEADERS_REV" "$deps/vkh"
     fetch_rev https://github.com/Tessil/robin-map.git "$ROBIN_MAP_REV" "$deps/robin"
     fetch_rev https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git "$VMA_REV" "$deps/vma"
@@ -52,10 +46,6 @@ if [[ ${1:-} == --deps ]]; then
         cmake -S "$deps/$d" -B "$deps/$d/b" >/dev/null
         sudo_if_needed cmake --install "$deps/$d/b" >/dev/null
     done
-    # Ubuntu's protobuf has no CMake package config; gpu/CMakeLists.txt asks for one.
-    sudo_if_needed mkdir -p /usr/local/lib/cmake/Protobuf
-    echo 'include(${CMAKE_ROOT}/Modules/FindProtobuf.cmake)' |
-        sudo_if_needed tee /usr/local/lib/cmake/Protobuf/ProtobufConfig.cmake >/dev/null
     sudo_if_needed ldconfig
     rm -rf "$deps"
     exit 0

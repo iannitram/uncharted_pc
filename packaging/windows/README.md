@@ -1,7 +1,8 @@
-# bbport on Windows
+# NDC Native on Windows: building
 
-The port builds and runs natively on 64-bit Windows 10 (1903+) / 11 with the same sources as
-on Linux. Players: see `README-Windows.txt` (it ships in the package).
+The port builds and runs natively on 64-bit Windows 10 (1903+) / 11. Players: see
+`README-Package.txt` (it ships in the package as README.txt). CI builds it on every pull request
+(`.github/workflows/ci.yml`).
 
 ## Build
 
@@ -14,8 +15,7 @@ pacman -S --needed git patch \
   mingw-w64-clang-x86_64-{toolchain,cmake,ninja,pkgconf,python} \
   mingw-w64-clang-x86_64-{vulkan-headers,vulkan-loader,vulkan-memory-allocator,glslang} \
   mingw-w64-clang-x86_64-{sdl3,fmt,boost,robin-map,xxhash,ffmpeg,zydis} \
-  mingw-w64-clang-x86_64-{spirv-tools,spirv-headers,spirv-cross} \
-  mingw-w64-clang-x86_64-{protobuf,openssl,zlib,miniupnpc,nlohmann-json}
+  mingw-w64-clang-x86_64-{spirv-tools,spirv-headers,spirv-cross}
 ```
 
 magic_enum, miniz and xbyak (not packaged by MSYS2) are submodules under `gpu/third_party/`.
@@ -23,36 +23,36 @@ Then, in the repository:
 
 ```bash
 git submodule update --init --recursive
-bash build.sh                      # out/bb-probe.exe, out/bb-gpu-capabilities.exe
-BB_GAME_DIR=F:/path/to/CUSA03173 python run.py
-python launcher/bbport_launcher_win.py
-bash packaging/windows/package.sh  # dist/bbport-windows/ and .zip: Bloodborne.exe + DLLs
+bash build.sh                      # out/bb-probe.exe, out/bb-gpu-capabilities.exe, out/bb-play.exe
+BB_GAME_DIR=F:/path/to/CUSA02343 BB_EXE=u2 python run.py
+python launcher/uncharted_launcher.py
+bash packaging/windows/package.sh  # dist/ndc-native-windows/ and .zip
 ```
 
-`run.py` is the Windows `run.sh` (same variables; works from a plain Windows Python too).
+`run.py` prepares the chosen executable (`BB_EXE` = `u1`, `u2`, `u3`) and starts `bb-probe.exe`;
+when the game switches executables (the collection menu starting U2 or U3), it prepares and
+starts that one. From a source tree it adds `C:\msys64\clang64\bin` (or `$MSYS2_ROOT`) to
+`PATH` for the DLLs.
+
 The package freezes the launcher with PyInstaller (a private venv in `out/pyenv`, from a
-python.org Python) into `Bloodborne.exe`, which also runs `run.py` (`--run`), the preparation
+python.org Python) into `NDC Native.exe`, which also runs `run.py` (`--run`), the preparation
 scripts (`--script`) and the game without the window (`--play`): players need no Python.
-`Play Bloodborne.exe` (`packaging/windows/play.c`) is a small native program that runs
-`Bloodborne.exe --play` from its folder and waits for it, for players who want to start the
-game directly with the saved settings.
-`patches.py` applies the 1.09 patches only to a 1.09 game (`BB_FORCE_PATCHES=1` overrides);
-`run.py` then runs other versions at 30 FPS with live resolution changes.
-From a source tree it adds `C:\msys64\clang64\bin` (or `$MSYS2_ROOT`) to `PATH` for the DLLs.
-`bash tools/fetch_fsr4_assets.sh` works in the CLANG64 shell as on Linux.
+`Play NDC Native.exe` (`packaging/windows/play.c`) runs `NDC Native.exe --play` from its folder
+and waits for it, for shortcuts and Steam. The package's `licenses` folder is assembled by
+`package.sh` (see `THIRD-PARTY-NOTICES.txt`), with `SOURCE.txt` naming the commit and library
+versions.
+
+FSR 4: `bash tools/fetch_fsr4_assets.sh` fetches the v07 INT8 assets into `fsr4_shaders/`, which
+the package ships when present.
 
 DLSS (optional): `DLSS_SDK_ROOT=<checkout of github.com/NVIDIA/DLSS> bash
 packaging/windows/build_dlss.sh` builds `bbport_dlss.dll` (`gpu/dlss_bridge`, the only code that
 uses the NVIDIA SDK, compiled with MSVC 2022) and copies it with `nvngx_dlss.dll` next to
-`out/bb-probe.exe`; `package.sh` ships both when present. The renderer loads the bridge at run
-time (`vk_dlss.cpp`), adds the Vulkan extensions NGX asks for, and DLSS gets the same inputs as
-FSR 3 (scene color, depth, render-pixel motion vectors, jitter). `BB_DLSS=0` turns it off.
+`out/bb-probe.exe`; `package.sh` ships both when present, with NVIDIA's licence. The renderer
+loads the bridge at run time (`vk_dlss.cpp`). `BB_DLSS=0` turns it off.
 
-The launcher texts are written in English with the Russian beside them; the other languages
-are in `launcher/bbport_lang.py` (one list per language in the order of `KEYS`; a missing or
-empty text falls back to English). The icon (`launcher/bloodborne.ico`/`.png`) is drawn by
-`packaging/windows/make_icon.py` and built into `Bloodborne.exe`, `bb-probe.exe` (the game
-window) and `bb-gpu-capabilities.exe`.
+The icon (`launcher/uncharted.ico`/`.png`, original artwork) is drawn by
+`packaging/windows/make_uncharted_icon.py` and built into the executables.
 
 ## What is different from Linux
 
@@ -65,7 +65,7 @@ window) and `bb-gpu-capabilities.exe`.
 | Guest thread stacks from `runtime_low_map` | Windows allocates them, fully committed (`pthread_attr_setstacksize`): guest code has no stack probes and would skip the guard page. The main thread stack is 16 MiB committed. |
 | glibc `nanosleep`, monotonic condition variables | High-resolution waitable timers (`compat_sleep_ns`; winpthreads' sleep rounds to 15.6 ms); semaphore deadlines use `CLOCK_REALTIME` (winpthreads rejects monotonic condition variables). |
 | `libbbgpu.so` | `libbbgpu.a`, linked into `bb-probe.exe` by CMake (`gpu/CMakeLists.txt`), with a manifest for UTF-8 paths and long paths. |
-| `execlp bash run.sh` (in-game restart) | `run.py` puts its command line in `BB_RESTART_COMMAND`; the new launch waits for the old process (`--after PID`). The launcher keeps the game in a job object. |
+| In-game restart: `sh -c "$BB_RESTART_COMMAND"` | `run.py` puts its command line in `BB_RESTART_COMMAND`; the new launch waits for the old process (`--after PID`). The launcher keeps the game in a job object. |
 | Mod overlay with symlinks | Symlinks when allowed (Developer Mode), else junctions for folders and hard links for files. |
 
 Diagnostics added on the way: `BB_FRAME_DUMP_TRIGGER=<file>` writes the guest display buffer
@@ -73,5 +73,5 @@ and the presented image of the next frame to `BB_DUMP_DIR` (raw 32-bit pixels), 
 works for menus and movies.
 
 Not ported: the watchdog/`--timeout` thread dumps (Linux signals), userfaultfd tracking
-(`BB_UFFD`), MangoHud, PGO (GCC flags), the GTK launcher (`launcher/bbport_launcher_win.py`, Tkinter, replaces it), and
-the `tests/` programs (several use Linux-only APIs).
+(`BB_UFFD`), MangoHud and PGO (GCC flags). The C test programs run on Linux in CI
+(`tools/ci_linux.sh`).

@@ -48,7 +48,6 @@ jobs:
             vulkan-headers:p vulkan-loader:p vulkan-memory-allocator:p glslang:p
             sdl3:p fmt:p boost:p robin-map:p xxhash:p ffmpeg:p zydis:p
             spirv-tools:p spirv-headers:p spirv-cross:p
-            protobuf:p openssl:p zlib:p miniupnpc:p nlohmann-json:p
       - name: Build bb-probe.exe
         run: bash build.sh
       - name: Build log on failure

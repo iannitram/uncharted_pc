@@ -383,45 +383,9 @@ void Menu() {
          "post-processing stays at 1080p, noticeably slower on the Steam Deck and older GPUs. "
          "Off: everything renders at the preset's resolution; changes need a restart. Auto turns "
          "it on for strong discrete GPUs. Applies after restarting the game.");
-    // Model detail and the effect switches are community patches (patches.py), applied only when
-    // the loader was given a patch image (Bloodborne); the Uncharted games start without one.
-    static const bool game_patches = [] {
-        const char* value = std::getenv("BB_GAME_PATCHES");
-        return value && value[0] == '1';
-    }();
-    if (game_patches) {
-        ImGui::SeparatorText("Game effects (after restart)");
-        static const char* lods[] = {"Highest (-2)", "As in the game", "Lower (1)", "Lowest (2)"};
-        static constexpr int lod_values[] = {-2, 0, 1, 2};
-        int lod_index = 1;
-        for (int i = 0; i < 4; ++i) {
-            if (lod_values[i] == s.model_lod) lod_index = i;
-        }
-        if (ImGui::BeginCombo("Model detail", lods[lod_index])) {
-            for (int i = 0; i < 4; ++i) {
-                if (ImGui::Selectable(lods[i], i == lod_index)) {
-                    Store(s.model_lod, lod_values[i], true);
-                }
-            }
-            ImGui::EndCombo();
-        }
-        for (int e = 0; e < BbSettings::EffectCount; ++e) {
-            Checkbox(BbSettings::Effects[e].label, s.effects[e]);
-        }
-        Hint("Effects are switched on and off by game patches at start (patches/Bloodborne.xml). "
-             "Motion blur and shadows of dynamic lights cost noticeable GPU time.");
-        Hint("Free camera: hold Cross and press L3 (keyboard: Space + Z). "
-             "Debug menu: left touchpad / Tab. Needs DbgFont14h.ccm and DbgFont14h.tpf "
-             "in dvdroot_ps4/font from Nexus mod #253. Right touchpad: Backspace.");
-    }
-
     bool restart = s.object_motion != s.startup_object_motion ||
-                   s.model_lod != s.startup_model_lod ||
                    s.live_resolution != s.startup_live_resolution ||
                    BbSettings::ResolutionNeedsRestart();
-    for (int e = 0; game_patches && e < BbSettings::EffectCount; ++e) {
-        restart |= s.effects[e] != s.startup_effects[e];
-    }
     if (restart) {
         ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.3f, 1.0f),
                            "Changes apply after restarting the game");

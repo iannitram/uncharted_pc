@@ -22,7 +22,9 @@ from link_libc import encode_id
 
 DEFAULT_MODULES = ('libc.prx', 'libSceFios2.prx')
 FS_LOAD = bytes.fromhex('64488b042500000000')  # mov rax, fs:[0]
-RED_ZONE_SITES = Path(__file__).resolve().parent.parent / 'patches' / 'redzone.json'
+# One red-zone table per executable (tools/redzone_sites.py), applied only to the file it was made
+# from: patches/redzone/<executable without suffix>.json.
+RED_ZONE_DIR = Path(__file__).resolve().parent.parent / 'patches' / 'redzone'
 LEA_DOWN = bytes.fromhex('488d642480')        # lea rsp, [rsp-0x80]
 LEA_UP = bytes.fromhex('488da42480000000')    # lea rsp, [rsp+0x80]
 
@@ -259,9 +261,13 @@ def link(game, out, module_names=DEFAULT_MODULES, exe='eboot.bin', red_zones=os.
         base = (base + modsize + 65535) & ~65535
 
     red_zone_sites = 0
-    if red_zones and RED_ZONE_SITES.is_file():
-        sites = json.loads(RED_ZONE_SITES.read_text())['sites']
-        code, red_zone_sites = protect_red_zones(image, sites, base, sorted(r[0] for r in relocs))
+    zones_file = RED_ZONE_DIR / f'{Path(exe).stem}.json'
+    zones = json.loads(zones_file.read_text()) if red_zones and zones_file.is_file() else None
+    if zones and zones.get('exe_sha256') not in (None, main['sha256']):
+        print(f'Red zone: {exe} is not the build its table was made from; table not applied')
+        zones = None
+    if zones:
+        code, red_zone_sites = protect_red_zones(image, zones['sites'], base, sorted(r[0] for r in relocs))
         if code:
             image.extend(bytes(base - len(image)) + code)
             segments.append((base, len(code), 5))

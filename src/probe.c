@@ -700,9 +700,9 @@ static void patch_eop_tick_wait(uint64_t image_size) {
     }
     if (!patched) printf("Frame pacing: EOP tick check not found\n");
 }
-/* Restarts the game through run.sh (the settings menu: a new render resolution is a patch
- * applied at start). Descriptors are closed first so the old GPU device and its memory are
- * released before the new process opens its own. */
+/* Restarts the game with BB_RESTART_COMMAND, the launch command line (the settings menu: some
+ * settings apply at start). On Linux descriptors are closed first so the old GPU device and its
+ * memory are released before the new process opens its own. */
 void runtime_restart(void) {
     fflush(NULL);
 #ifdef _WIN32
@@ -723,9 +723,11 @@ void runtime_restart(void) {
     /* The new launch waits for this process's GPU device to go away (run.py --after). */
     TerminateProcess(GetCurrentProcess(),0);
 #else
-    puts("Runtime: restarting through run.sh");
+    const char *command=getenv("BB_RESTART_COMMAND");
+    if (!command || !*command) { fputs("runtime_restart: BB_RESTART_COMMAND is not set\n",stderr); _exit(1); }
+    printf("Runtime: restarting: %s\n",command);
     syscall(SYS_close_range, 3u, ~0u, 0u);
-    execlp("bash", "bash", "run.sh", (char *)NULL);
+    execl("/bin/sh", "sh", "-c", command, (char *)NULL);
     perror("runtime_restart: exec");
     _exit(1);
 #endif
@@ -785,11 +787,6 @@ int main(int argc, char **argv) {
         snprintf(sfo,sizeof(sfo),"%s/sce_sys/param.sfo",app0);
         if (sfo_value(sfo,"INSTALL_DIR_SAVEDATA",id,sizeof(id),NULL) || sfo_value(sfo,"TITLE_ID",id,sizeof(id),NULL))
             runtime_savedata_configure(id);
-        char serial[16]="", title[128]="", version[16]="";
-        sfo_value(sfo,"TITLE_ID",serial,sizeof(serial),NULL);
-        sfo_value(sfo,"TITLE",title,sizeof(title),NULL);
-        sfo_value(sfo,"APP_VER",version,sizeof(version),NULL);
-        bbnet_configure(app0,serial,title,version);
     }
     bbgpu_register_kernel();
 #ifdef _WIN32
@@ -975,15 +972,7 @@ int main(int argc, char **argv) {
         }
         memcpy(image + relocs[i].target, &value, 8);
     }
-    if (patch_file) {
-        apply_patches(patch_file, segments, ns, relocs, nr);
-        /* The in-game menu shows the patch-driven game effects (Bloodborne) only when they apply. */
-#ifdef _WIN32
-        _putenv_s("BB_GAME_PATCHES", "1");
-#else
-        setenv("BB_GAME_PATCHES", "1", 1);
-#endif
-    }
+    if (patch_file) apply_patches(patch_file, segments, ns, relocs, nr);
     install_guest_hooks(segments, ns);
     {
         uint64_t image_end=0;

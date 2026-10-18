@@ -8,11 +8,11 @@ SOURCE.txt in this folder.
 
 The folders here hold the licence of every third-party component in the package:
 - msys2/      the MSYS2 CLANG64 libraries next to bb-probe.exe in bin\ (SDL3, FFmpeg and its
-              codecs, the Vulkan loader, protobuf, OpenSSL, zlib, ...), one folder per package.
+              codecs, the Vulkan loader, ...), one folder per package.
               The FFmpeg build is licensed under the GPL version 3 or later.
 - source/     components built into bb-probe.exe from source: shadPS4's renderer (GPL-2.0-or-later),
               Dear ImGui, sirit, xbyak, magic_enum, miniz, half, LibAtrac9, FSR-Vulkan and the
-              AMD FidelityFX SDK, cpp-httplib, wepoll, nlohmann-json, and the DejaVu font.
+              AMD FidelityFX SDK, and the DejaVu font.
 - python/     the Python runtime inside the launcher: CPython, Tcl/Tk, Pillow, PyInstaller.
 
 Not covered by the GPL
