@@ -158,6 +158,56 @@ class ExternalPatchTests(unittest.TestCase):
             writes = compile_external(external_selection(found, config), SEGMENTS)
             self.assertEqual(writes, [(0x2000, (0x12345678).to_bytes(4, 'little'))])
 
+    def test_collection_patches_follow_the_executable_and_version(self):
+        # Synthetic file in the shadPS4 format (no game data): one patch per executable.
+        ndc = """<?xml version="1.0"?>
+<Patch>
+  <TitleID><ID>CUSA02320</ID><ID>CUSA02343</ID></TitleID>
+  <Metadata Title="NDC" Name="One" Author="x" PatchVer="1.0" AppVer="01.02" AppElf="eboot.bin" isEnabled="true">
+    <PatchList><Line Type="bytes" Address="0x00401000" Value="90"/></PatchList>
+  </Metadata>
+  <Metadata Title="NDC" Name="Two" Author="x" PatchVer="1.0" AppVer="01.02" AppElf="big2-ps4_Shipping.elf" isEnabled="true">
+    <PatchList><Line Type="bytes" Address="0x00402000" Value="90"/></PatchList>
+  </Metadata>
+  <Metadata Title="NDC" Name="Three" Author="x" PatchVer="1.0" AppVer="01.00" AppElf="big3-ps4_Shipping.elf" isEnabled="true">
+    <PatchList><Line Type="bytes" Address="0x00403000" Value="90"/></PatchList>
+  </Metadata>
+</Patch>"""
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            (folder / 'ndc.xml').write_text(ndc)
+            versions = {'01.02', '01.00'}  # the dump's VERSION and APP_VER
+            for elf, name, offset in (('eboot.bin', 'One', 0x1000),
+                                      ('big2-ps4_Shipping.elf', 'Two', 0x2000),
+                                      ('big3-ps4_Shipping.elf', 'Three', 0x3000)):
+                found = external_patches(folder, versions, app_elf=elf)
+                self.assertEqual([key for key, _, _ in found], [f'ndc.xml/{name}'])
+                writes = compile_external(external_selection(found, None), SEGMENTS)
+                self.assertEqual(writes, [(offset, b'\x90')])
+            # Another version of the dump gets nothing; Bloodborne's default is unchanged.
+            self.assertEqual(external_patches(folder, {'01.09'}, app_elf='eboot.bin'), [])
+            self.assertEqual(external_patches(folder), [])
+
+    def test_a_patch_for_one_game_does_not_reach_another(self):
+        # The Mac's case (2026-10-18): a U1-only eboot.bin patch, and Uncharted 2 dumped on its
+        # own, run from its folder's eboot.bin under another title ID.
+        u1_only = """<?xml version="1.0"?>
+<Patch>
+  <TitleID><ID>CUSA02320</ID></TitleID>
+  <Metadata Title="NDC" Name="U1 only" Author="x" PatchVer="1.0" AppVer="01.02" AppElf="eboot.bin" isEnabled="true">
+    <PatchList><Line Type="bytes" Address="0x00401000" Value="90"/></PatchList>
+  </Metadata>
+</Patch>"""
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            (folder / 'u1.xml').write_text(u1_only)
+            # run.py names the game being run, not the file it found (see test_run_patches).
+            self.assertEqual(external_patches(folder, {'01.02'}, app_elf='big2-ps4_Shipping.elf'), [])
+            # A dump under a title ID the file does not list gets nothing either.
+            self.assertEqual(external_patches(folder, {'01.02'}, app_elf='eboot.bin', title_id='CUSA02343'), [])
+            # The collection's own U1 still gets it.
+            self.assertEqual(len(external_patches(folder, {'01.02'}, app_elf='eboot.bin', title_id='CUSA02320')), 1)
+
     def test_built_in_file_is_not_external(self):
         self.assertEqual(external_patches(XML.parent), [])
 

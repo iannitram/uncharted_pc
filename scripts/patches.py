@@ -61,6 +61,26 @@ def game_app_version(game):
         return None
 
 
+def game_versions(game):
+    """The versions a patch's AppVer may name for this dump: param.sfo's VERSION (the update,
+    "01.02") and APP_VER ("01.00"); empty when it cannot be read."""
+    try:
+        from prepare import sfo
+        values = sfo((Path(game) / 'sce_sys/param.sfo').read_bytes())
+    except (OSError, ValueError, ImportError):
+        return set()
+    return {v for v in (values.get('VERSION'), values.get('APP_VER')) if v}
+
+
+def game_title_id(game):
+    """param.sfo's TITLE_ID ("CUSA02320"), or None when it cannot be read."""
+    try:
+        from prepare import sfo
+        return sfo((Path(game) / 'sce_sys/param.sfo').read_bytes()).get('TITLE_ID')
+    except (OSError, ValueError, ImportError):
+        return None
+
+
 def validate_patch_requirements(names, game):
     if 'Restore Debug Camera' in names and 'Enemy Control' in names:
         raise ValueError('Restore Debug Camera conflicts with Enemy Control; enable only one')
@@ -209,11 +229,19 @@ def compile_patches(xml, names, app_version, segments):
 
 # Third-party patch files (shadPS4/GoldHEN XML) in the data directory's patches/ folder.
 BLOODBORNE_IDS={'CUSA00207','CUSA00208','CUSA00900','CUSA01363','CUSA03173','CUSA03023'}
+# Uncharted: The Nathan Drake Collection (all three games share these title IDs).
+NDC_IDS={'CUSA02320','CUSA02343','CUSA02344','CUSA02826'}
+# The collection's executables, as patch files name them in AppElf (base 0x400000 for each).
+NDC_ELFS=('eboot.bin','big2-ps4_Shipping.elf','big3-ps4_Shipping.elf')
 
 
-def external_patches(directory, app_version='01.09', exclude=Path(__file__).resolve().parent.parent/'patches/Bloodborne.xml'):
-    """[(key, file, metadata)] of eboot patches for this version in directory/*.xml.
-    key is "<file name>/<patch name>" (the launcher's selection, patches.json)."""
+def external_patches(directory, app_version='01.09', exclude=Path(__file__).resolve().parent.parent/'patches/Bloodborne.xml',
+                     app_elf='eboot.bin', title_id=None):
+    """[(key, file, metadata)] of patches for this executable and version in directory/*.xml.
+    key is "<file name>/<patch name>" (the launcher's selection, patches.json). app_version may
+    be one version or a set of them (the dump's VERSION and APP_VER). With title_id (the dump's
+    TITLE_ID), a file that lists title IDs must list that one."""
+    versions={app_version} if isinstance(app_version,str) else set(app_version)
     found=[]
     directory=Path(directory)
     for path in sorted(directory.glob('*.xml')) if directory.is_dir() else []:
@@ -224,9 +252,10 @@ def external_patches(directory, app_version='01.09', exclude=Path(__file__).reso
             print(f'Patches: {path.name}: {error}',file=sys.stderr)
             continue
         ids={e.text.strip() for e in root.iter('ID') if e.text}
-        if ids and not ids&BLOODBORNE_IDS: continue
+        if ids and not ids&(BLOODBORNE_IDS|NDC_IDS): continue
+        if title_id and ids and title_id not in ids: continue
         for meta in root.iter('Metadata'):
-            if meta.get('AppVer')==app_version and meta.get('AppElf','eboot.bin')=='eboot.bin':
+            if meta.get('AppVer') in versions and meta.get('AppElf','eboot.bin')==app_elf:
                 found.append((f'{path.name}/{meta.get("Name")}',path,meta))
     return found
 
@@ -278,7 +307,21 @@ def main():
     p.add_argument('--output-res',default='',help='output resolution WxH (the upscaler\'s; the UI stays 1920x1080)')
     p.add_argument('--print-scaled',action='store_true',
                    help='print "RENDER OUTPUT" (WxH) when bbport.ini selects an output other than 1080p')
+    p.add_argument('--app-elf',default='eboot.bin',help='the executable the patches are for (AppElf)')
+    p.add_argument('--external-only',action='store_true',
+                   help='only the third-party patches for --app-elf and the dump\'s version (Uncharted)')
     a=p.parse_args()
+    if a.external_only:
+        writes=[]
+        if a.patches_dir:
+            found=external_patches(a.patches_dir,game_versions(a.game_dir),a.xml,a.app_elf,game_title_id(a.game_dir))
+            writes=compile_external(external_selection(found,a.patches_config),
+                                    eboot_segments((a.out/'eboot.elf').read_bytes()))
+        blob=struct.pack('<8sQQ',b'BBPATCH2',EBOOT_BASE,len(writes))
+        for offset,data in writes: blob+=struct.pack('<QQ',offset,len(data))+data
+        (a.out/'patches.bin').write_bytes(blob)
+        print(f'Patches: {a.app_elf}: {len(writes)} writes from external patches')
+        return
     if a.print_scaled:
         sizes=scaled_sizes(read_settings(a.settings))
         if sizes: print(f'{sizes[0][0]}x{sizes[0][1]} {sizes[1][0]}x{sizes[1][1]}')

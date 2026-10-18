@@ -118,6 +118,19 @@ def locate(env, name):
     return folder, name
 
 
+def patch_arguments(env, exe, game, out):
+    """patches.py arguments for the game being run, or [] without BB_PATCHES_DIR. AppElf is the
+    collection's name for the game (eboot.bin, big2-ps4_Shipping.elf, big3-ps4_Shipping.elf), also
+    when a game dumped on its own runs from its folder's eboot.bin: a patch for Uncharted 1's
+    eboot.bin must not reach Uncharted 2 or 3."""
+    patches_dir = env.get('BB_PATCHES_DIR', '')
+    if not patches_dir or not Path(patches_dir).is_dir():
+        return []
+    return ['--external-only', '--app-elf', exe, '--game-dir', str(game), '--out', str(out),
+            '--patches-dir', patches_dir,
+            '--patches-config', env.get('BB_PATCHES_CONFIG', str(Path(patches_dir) / 'patches.json'))]
+
+
 def prepare(game, exe, out):
     """boot-linked.bin for one executable, kept until the executable or the scripts change."""
     out.mkdir(parents=True, exist_ok=True)
@@ -226,6 +239,12 @@ def main():
         env['BB_RESTART_COMMAND'] = (subprocess.list2cmdline if WINDOWS else shlex.join)([sys.executable, *this, '--after', str(os.getpid()), *args])
         command = [str(probe), str(out / 'boot-linked.bin'), '--content-profile', str(out / 'content.bin'),
                    '--app0', str(game), '--user', str(user_dir), '--timeout', env.get('BB_TIMEOUT', '0')]
+        # Third-party patches (shadPS4/GoldHEN XML) for this executable, only when a folder is set:
+        # BB_PATCHES_DIR, selection in BB_PATCHES_CONFIG (patches.json) or each patch's isEnabled.
+        patches = patch_arguments(env, exe, game, out)
+        if patches:
+            run_script('patches.py', *patches)
+            command += ['--patches', str(out / 'patches.bin')]
         if guest_argv:
             command += ['--guest-argv', str(guest_argv)]
         loadexec.unlink(missing_ok=True)

@@ -89,7 +89,7 @@ Mode; `linux` at f0a21af; game CUSA02320 (APP_VER 01.00, package 01.02). Measure
     2.5 % idle at about 1,100 draws per frame. The port's GPU translation is the limit, not the
     game's code.
 - **First-run shader stutter:** cold-cache compiles per game:
-  - U1 title: 113 (worst frame 50 ms).
+  - U1 title: 113 in two 5-second windows, 193.5 ms (worst frame 50 ms).
   - U2: 489, 867 ms in total; worst stall 367 ms.
   - U3: 380; worst stall 533 ms.
   - Warm cache: 0 compiles, so the cache is reused.
@@ -99,6 +99,8 @@ Mode; `linux` at f0a21af; game CUSA02320 (APP_VER 01.00, package 01.02). Measure
 - `bb-gpu-capabilities`: RADV PHOENIX lacks D32S8 blits, so live resolution changes fall back to
   the startup patch (a preset change needs a restart).
 - The built-in controller is held by InputPlumber in Desktop Mode and SDL does not see it.
+- **20 W is the design target** (Ian, 2026-10-18): at 30 W the Legion Go overheats and shuts off
+  even with full fans, so it stays power-limited by design, and CPU spin takes power from the GPU.
 - Memory is the tight part: in gameplay `bb-probe` held 2.0-2.8 GB resident on top of graphics
   memory taken from the same 15 GB, and with Steam and a browser open the free memory fell to
   1.5 GB.
@@ -128,17 +130,19 @@ keep merging their `main` (and check it builds) before starting new work, so we 
 - **Profile the GPU thread first (2026-10-18).** On the Legion Go the GPU thread is nearly saturated
   at 1080p/60 with anti-aliasing off. `BB_FRAME_STATS=1` plus `perf` (user space, our own process)
   on U1 gameplay: where the time goes per draw, then tune the hot path in our own code.
-- **Unlock 60 FPS in the games themselves (Ian, 2026-10-18: "Would love to unlock 60fps").**
-  Where a game ties its logic or animation to 30 FPS, we need a game-side patch, like the
-  Bloodborne-era "Uncap FPS" patch in `patches/`.
-  - Finding the frame-step code needs the game's executables read with REA (reverse-engineering
-    tools behind Ghidra, IDA or Hopper). It runs only on Hyperion, where it is already connected;
-    nothing is installed on the handhelds.
-  - The output stays private (ground rules above).
-  - Start with one concrete question per game: U2 and U3 in Deck mode first, then 60 on the
-    Strix Halo.
-  - Done when each game runs its logic at 60 with no speed-up or physics change, checked in a
-    defined route.
+- **60 FPS: port-side performance, not a game unlock (Ian, 2026-10-18: "Would love to unlock
+  60fps").** Reverse engineering on Hyperion (REA, static; output private) found nothing to
+  unlock. All three games run at 60 on the PS4 and step their logic by measured frame time
+  (U2: the CPU clock delta, capped at 100 ms per step; U3 built the same way). Only photo mode
+  (all three) and one tweak setting in U2/U3 ask the video output for 30 Hz, and the port obeys.
+  So 60 FPS is the port's own speed (see the profiling item above), plus:
+  - an optional port setting to ignore a 30 Hz request (photo mode), off by default;
+  - above 60 is not a goal: U3's cloth is inferred to be at risk, and the port's own comments
+    mention a GPU hang near 80 FPS.
+  Measured on the Legion Go (a flip-rate log line on a test build): in four U1 runs (menus,
+  cutscenes, gameplay) and one U2 gameplay run, the games never changed the video-out flip
+  rate from "every vblank". Photo mode was not reached (scripted menu input dropped presses), so
+  its 30 Hz request is still read, not measured.
 - **First-launch shader preparation (Ian, 2026-10-16):** like God of War or The Last of Us
   Part I on Steam, show a one-time "preparing shaders" screen the first time a game starts,
   then play without compile stutter. Today shaders are translated and compiled while playing;
@@ -151,7 +155,14 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   game's shaders can be found in the dump without running the game. Ian wants this
   (2026-10-18: "Would love to unlock ... the shaders preload"), and the open question is now a
   job for REA on Hyperion: find how the games store and load their shader binaries, to read
-  them from the player's own dump. Step 1 is partly measured on the Legion Go (above: up to
+  them from the player's own dump. Answer (REA, 2026-10-18, details private): no shaders are in
+  the executables; they are in the game data, built-ins in `.psarc` archives and materials in
+  `.pak` files, each binary ending in an "OrbShdr" footer whose shader hash is the port's cache
+  key. A streamed census of the dump (Legion Go, read-only, counts only) found 270,245 footers,
+  34,010 unique shaders (U1 3,451, U2 8,689, U3 23,058; 518 in all three games, 670 in two or more), 268,553 of them in `.pak`
+  files. So every shader can be listed without running the game; whole pipelines still need
+  state that appears only in play, so the plan is to record a route and match hashes at first
+  launch. Step 1 is partly measured on the Legion Go (above: up to
   489 compiles and a 533 ms stall on a cold first run). Do
   not ship translated or compiled shaders in the repository. Also check whether Steam's own
   shader pre-caching helps when this is added as a non-Steam shortcut (not known).
