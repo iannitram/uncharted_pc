@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
-"""Launcher for the Windows port of Uncharted: The Nathan Drake Collection (Tkinter).
+"""NDC Native: launcher for the native Windows port of Uncharted: The Nathan Drake Collection (Tkinter).
 
 Chooses the game folder, which of the three games to start, the display and console options,
 and runs run.py with them as environment variables. Launcher options live in
 %APPDATA%/uncharted-launcher/settings.json.
 
-Frozen with PyInstaller the same Uncharted.exe also runs the game without the window
+Frozen with PyInstaller the same NDC Native.exe also runs the game without the window
 (`--play`), run.py (`--run`) and the preparation scripts (`--script`), so a packaged port
 needs no Python installation.
 """
@@ -34,7 +34,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 DATA_DIR = Path(os.environ.get('BB_DATA_DIR', PORT_DIR))
 CONFIG_DIR = Path(os.environ.get('APPDATA', Path.home())) / 'uncharted-launcher'
 CONFIG_FILE = CONFIG_DIR / 'settings.json'
-NAME = 'Uncharted'
+NAME = 'NDC Native'
+# The launcher's executable in a package (packaging/windows/package.sh).
+LAUNCHER_EXE = 'NDC Native.exe'
 AUTHOR = 'SuperMedo'
 # This build; GitHub release tags are v<VERSION> (their digits are compared).
 VERSION = '0.3.3'
@@ -353,7 +355,7 @@ class Launcher:
         self.card_hot = None
         self.info = None
         self.update_box = None
-        root.title(f'{NAME} — The Nathan Drake Collection for Windows · by {AUTHOR}')
+        root.title(f'{NAME} — for Uncharted: The Nathan Drake Collection · port by {AUTHOR}')
         root.configure(bg=BG)
         self.dpi = root.winfo_fpixels('1i') / 96.0
         root.geometry(f'{self.px(1180)}x{self.px(860)}')
@@ -378,19 +380,8 @@ class Launcher:
             pass
 
     def load_fonts(self):
-        """Cinzel for headings (Uncharted-style capitals); Segoe UI for body text."""
-        from uncharted_fonts import font_path
-
-        self.brand_family = 'Cinzel'
-        for name in ('Cinzel-Regular.ttf', 'Cinzel-SemiBold.ttf', 'Cinzel-Bold.ttf'):
-            path = font_path(name)
-            if path:
-                try:
-                    ctypes.windll.gdi32.AddFontResourceExW(str(path), 0x10, 0)
-                except (AttributeError, OSError):
-                    pass
-        if not font_path('Cinzel-Bold.ttf'):
-            self.brand_family = 'Georgia'
+        """Segoe UI throughout: a plain system font, nothing styled after the game's logo."""
+        self.brand_family = 'Segoe UI Semibold'
         self.font_brand_xl = (self.brand_family, 24, 'bold')
         self.font_brand_lg = (self.brand_family, 18, 'bold')
         self.font_brand_md = (self.brand_family, 13, 'bold')
@@ -638,12 +629,11 @@ class Launcher:
         side.pack(side='left', fill='y')
         side.pack_propagate(False)
         brand_wrap = side_w - 36
-        tk.Label(side, text='UNCHARTED', bg=BG, fg=GOLD, font=self.font_brand_lg, anchor='w').pack(
+        tk.Label(side, text=NAME, bg=BG, fg=GOLD, font=self.font_brand_lg, anchor='w').pack(
             anchor='w', padx=18, pady=(28, 0))
-        tk.Label(side, text='NATHAN DRAKE', bg=BG, fg=MUTED, font=self.font_brand_sm, anchor='w').pack(
-            anchor='w', padx=18, pady=(8, 0))
-        tk.Label(side, text='COLLECTION', bg=BG, fg=MUTED, font=self.font_brand_sm, anchor='w').pack(
-            anchor='w', padx=18, pady=(1, 0))
+        tk.Label(side, text=_('for Uncharted: The Nathan Drake Collection'), bg=BG, fg=MUTED,
+                 font=self.font_ui_sm, anchor='w', wraplength=brand_wrap, justify='left').pack(
+            anchor='w', padx=18, pady=(6, 0))
         tk.Label(side, text=_('by {}').format(AUTHOR), bg=BG, fg=TEXT, font=self.font_ui_md,
                  anchor='w', wraplength=brand_wrap, justify='left').pack(anchor='w', padx=18, pady=(10, 0))
         tk.Label(side, text=_('version {}').format(VERSION), bg=BG, fg='#5c564c', font=self.font_ui_sm,
@@ -1431,11 +1421,11 @@ class Launcher:
                 with zipfile.ZipFile(archive) as package:
                     package.extractall(UPDATE_DIR / 'new')
                 archive.unlink()
-                new = next((p.parent for p in (UPDATE_DIR / 'new').rglob('Uncharted.exe')), None)
+                new = next((p.parent for p in (UPDATE_DIR / 'new').rglob(LAUNCHER_EXE)), None)
                 if not new:
-                    raise OSError('Uncharted.exe is missing from the download')
+                    raise OSError(f'{LAUNCHER_EXE} is missing from the download')
                 # The new launcher copies itself over this installation once this one has closed.
-                subprocess.Popen([str(new / 'Uncharted.exe'), '--install-update', str(PORT_DIR), str(os.getpid())],
+                subprocess.Popen([str(new / LAUNCHER_EXE), '--install-update', str(PORT_DIR), str(os.getpid())],
                                  cwd=str(new), stdin=subprocess.DEVNULL, creationflags=NO_WINDOW)
                 self.ui_calls.put(self.close)
             except (OSError, zipfile.BadZipFile) as failure:
@@ -1453,7 +1443,7 @@ class Launcher:
         self.messagebox.showinfo(NAME, _('Shader cache cleared. The next start stutters for a while as it is rebuilt.'))
 
     def shortcut(self):
-        """Uncharted.lnk on the desktop."""
+        """NDC Native.lnk on the desktop."""
         if FROZEN:
             target, arguments, icon = sys.executable, '', f'{sys.executable},0'
         else:
@@ -1461,7 +1451,7 @@ class Launcher:
             target = str(pythonw if pythonw.exists() else sys.executable)
             arguments, icon = Path(__file__).resolve(), PORT_DIR / 'launcher' / 'uncharted.ico'
         script = ('$s=(New-Object -ComObject WScript.Shell).CreateShortcut([Environment]::GetFolderPath("Desktop")'
-                  '+"\\Uncharted.lnk");'
+                  '+"\\NDC Native.lnk");'
                   f'$s.TargetPath="{target}";$s.WorkingDirectory="{PORT_DIR}";$s.IconLocation="{icon}";'
                   + (f"$s.Arguments='\"{arguments}\"';" if arguments else '') + '$s.Save()')
         result = subprocess.run(['powershell', '-NoProfile', '-Command', script], capture_output=True,
@@ -1472,7 +1462,7 @@ class Launcher:
             self.messagebox.showerror(NAME, result.stderr.decode(errors='replace')[:400])
 
     def add_to_steam(self):
-        """The collection in the Steam library (a non-Steam game that starts Uncharted.exe --play)."""
+        """The collection in the Steam library (a non-Steam game that starts NDC Native.exe --play)."""
         import bbport_steam
         steam = bbport_steam.steam_folder()
         configs = bbport_steam.user_configs(steam) if steam else []
@@ -1584,7 +1574,7 @@ def install_update(target, wait_pid):
                                                  'releases page.'), NAME, 0x10)
         webbrowser.open(RELEASES_PAGE)
         return 1
-    subprocess.Popen([str(target / 'Uncharted.exe')], cwd=str(target))
+    subprocess.Popen([str(target / LAUNCHER_EXE)], cwd=str(target))
     return 0
 
 

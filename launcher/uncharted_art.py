@@ -167,7 +167,7 @@ _BANNER = None
 
 def art_directories():
     """Where covers are looked for, first match per file wins: the art folder next to
-    Uncharted.exe (frozen) and launcher/art, the player's own covers that are never distributed;
+    NDC Native.exe (frozen) and launcher/art, the player's own covers that are never distributed;
     then the covers that come with the port (launcher/covers, bundled as covers)."""
     here = Path(__file__).resolve().parent
     bundle = Path(getattr(sys, '_MEIPASS', here))
@@ -252,8 +252,8 @@ def poster_tile(key, width, height, title, subtitle, *, selected=False, hover=Fa
     text_w = max(24, width - 28)
     try:
         from uncharted_fonts import font_path
-        bold = font_path('Cinzel-SemiBold.ttf') or font_path('Cinzel-Bold.ttf')
-        regular = font_path('Cinzel-Regular.ttf')
+        bold = font_path('bold')
+        regular = font_path('regular')
     except OSError:
         bold = regular = None
     title_font = _fit_font(bold, title, text_w, max(12, min(18, width // 16)))

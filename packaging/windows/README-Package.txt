@@ -1,5 +1,5 @@
-Uncharted: The Nathan Drake Collection for Windows
-===================================================
+NDC Native - a native Windows port of Uncharted: The Nathan Drake Collection
+============================================================================
 
 A native port: the original PS4 game code runs directly on Windows. No game files are
 included. You need your own decrypted dump of the collection (CUSA02343, CUSA02320, ...;
@@ -13,14 +13,14 @@ Requirements
   Nothing else: Python and the libraries are inside this folder.
 
 Starting
-- Uncharted.exe opens the launcher. On the Game page choose your game folder, pick
+- NDC Native.exe opens the launcher. On the Game page choose your game folder, pick
   Drake's Fortune, Among Thieves or Drake's Deception on the Play page and press PLAY.
-- Play Uncharted.exe starts the game straight away with the settings saved in the
-  launcher, without opening it (for shortcuts and Steam). Uncharted.exe --play does the same.
+- Play NDC Native.exe starts the game straight away with the settings saved in the
+  launcher, without opening it (for shortcuts and Steam). NDC Native.exe --play does the same.
 - Play page -> "Add to Steam" adds the collection to your Steam library, with its cover
   from your game folder. "Desktop shortcut" puts it on the desktop.
 - Your own covers: put u1.jpg, u2.jpg and u3.jpg (and a wide collection_banner.jpg for the
-  top of the Play page) in a folder named art next to Uncharted.exe. Updates keep it.
+  top of the Play page) in a folder named art next to NDC Native.exe. Updates keep it.
 - Display page -> Frame rate: 60 FPS as on PS4, or 120 FPS. Gameplay keeps its normal speed
   and the cutscene videos still play at 60. Higher rates are experimental. Above your
   display's refresh rate use the Mailbox or Immediate presentation.
@@ -38,7 +38,7 @@ Starting
   free it. Insert opens the in-game settings menu. Bindings are saved in input.ini.
 
 Data
-- Saves and shader caches: user\ next to Uncharted.exe (the launcher can pick another folder).
+- Saves and shader caches: user\ next to NDC Native.exe (the launcher can pick another folder).
 - Launcher options: %APPDATA%\uncharted-launcher. Generated files (prepared game image): out\.
 - The log of the last run: user\last_run.log (the launcher's Log page shows it live).
 
@@ -55,4 +55,7 @@ Known problems
 - Uncharted 3: green or black shapes can flash for one frame on some characters (also in
   shadPS4). Not fixed yet.
 
-Port by SuperMedo.
+Port by SuperMedo; this build is from the fork at https://github.com/iannitram/uncharted_pc.
+Licences and third-party notices: the licenses folder (Advanced page -> Licences and notices).
+Not affiliated with Sony Interactive Entertainment or Naughty Dog. "Uncharted" is a trademark
+of Sony Interactive Entertainment LLC, used only to name the game this program works with.

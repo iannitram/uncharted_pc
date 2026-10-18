@@ -1,12 +1,15 @@
-# Uncharted: The Nathan Drake Collection for Windows
+# NDC Native
 
-**Uncharted 1, 2 and 3 from the PS4 collection running natively on Windows 10 and 11, by [SuperMedo](https://github.com/Supermedo).** Mohammed Albarghouthi
+**A native Windows port of *Uncharted: The Nathan Drake Collection* (PS4).** Uncharted 1, 2 and 3
+run on Windows 10 and 11. The port is by [SuperMedo](https://github.com/Supermedo) (Mohammed
+Albarghouthi, [original repository](https://github.com/Supermedo/uncharted_pc)); this is a fork
+with the changes listed in the [roadmap](docs/ROADMAP.md).
 
-Same idea as my [Bloodborne port](https://github.com/Supermedo/bloodborne_pc): the original PS4 game
-code runs directly on your PC and the graphics are translated to Vulkan. Unpack the zip, start
-`Uncharted.exe`, pick your game folder, choose a game and press **PLAY**.
+The original PS4 game code runs directly on your PC, and the graphics are translated to Vulkan,
+as in SuperMedo's [Bloodborne port](https://github.com/Supermedo/bloodborne_pc). Unpack the zip,
+start `NDC Native.exe`, pick your game folder, choose a game and press **PLAY**.
 
-**[Download the latest version](https://github.com/Supermedo/uncharted_pc/releases/latest)** · **[Join the Discord](https://discord.gg/s3RgH6cRfJ)**
+**[Download the latest version](https://github.com/iannitram/uncharted_pc/releases/latest)** · **[Discord of the original port](https://discord.gg/s3RgH6cRfJ)**
 
 > **No game files are included.** You need your own decrypted dump of the collection
 > (CUSA02343, CUSA02320, ...: the folder with eboot.bin, big2-ps4_Shipping.elf,
@@ -54,7 +57,7 @@ code runs directly on your PC and the graphics are translated to Vulkan. Unpack 
 ## Building
 
 MSYS2 CLANG64 on Windows: `bash build.sh` builds `out\bb-probe.exe`, and
-`bash packaging/windows/package.sh` makes `dist\uncharted-windows` and the zip.
+`bash packaging/windows/package.sh` makes `dist\ndc-native-windows` and the zip.
 
 Linux (Ubuntu 24.04): `bash tools/ci_linux.sh --deps` installs the dependencies, and
 `bash tools/ci_linux.sh` builds the GPU library and `bb-probe`, then runs every test. The C++ GPU
@@ -86,9 +89,11 @@ FSR 4 assets from [FireBurn/Q2RTX](https://github.com/FireBurn/Q2RTX), the
 [xbyak](https://github.com/herumi/xbyak),
 [Vulkan Memory Allocator](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator),
 [MSYS2](https://www.msys2.org) / [LLVM](https://llvm.org), [PyInstaller](https://pyinstaller.org),
-[Pillow](https://python-pillow.org) and the Cinzel font (SIL Open Font License).
+[Pillow](https://python-pillow.org). The licence of every component is in the `licenses` folder of the download.
 
-NVIDIA, GeForce RTX and DLSS are trademarks of NVIDIA Corporation. The default covers and the
+"Uncharted" is a trademark of Sony Interactive Entertainment LLC, used here only to name the
+game this program works with. NVIDIA, GeForce RTX and DLSS are trademarks of NVIDIA Corporation;
+AMD, FidelityFX and FSR are trademarks of Advanced Micro Devices, Inc. The default covers and the
 icon are original artwork; no official art is included.
 
 ## License

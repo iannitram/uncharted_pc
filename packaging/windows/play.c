@@ -1,5 +1,5 @@
-/* Play Uncharted.exe: starts the game with the settings saved by the launcher, without opening
- * the launcher (it runs `Uncharted.exe --play` from its own folder and waits for it, so Steam
+/* Play NDC Native.exe: starts the game with the settings saved by the launcher, without opening
+ * the launcher (it runs `NDC Native.exe --play` from its own folder and waits for it, so Steam
  * and other front ends see the game running). Extra arguments are passed on. */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -15,14 +15,14 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR arguments, int
     wchar_t *slash = wcsrchr(dir, L'\\');
     if (slash)
         *slash = 0;
-    swprintf(exe, 32768, L"%ls\\Uncharted.exe", dir);
+    swprintf(exe, 32768, L"%ls\\NDC Native.exe", dir);
     swprintf(line, 32768, L"\"%ls\" --play%ls%ls", exe, arguments && *arguments ? L" " : L"",
              arguments ? arguments : L"");
 
     STARTUPINFOW startup = {.cb = sizeof(startup)};
     PROCESS_INFORMATION process;
     if (!CreateProcessW(exe, line, NULL, NULL, FALSE, 0, NULL, dir, &startup, &process)) {
-        MessageBoxW(NULL, L"Uncharted.exe was not found next to this file.", L"Uncharted",
+        MessageBoxW(NULL, L"NDC Native.exe was not found next to this file.", L"NDC Native",
                     MB_OK | MB_ICONERROR);
         return 1;
     }
