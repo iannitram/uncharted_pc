@@ -21,5 +21,9 @@ void runtime_restart() { std::abort(); }
 uint64_t runtime_process_time_counter() { return runtime_process_time_us() * 1000; }
 int32_t* runtime_errno() { std::abort(); }
 int runtime_memory_write_backing(uintptr_t, const void*, uint64_t) { std::abort(); }
+// Guest threads for the network glue (gpu/bbnet/bbnet_glue.cpp); the parameter types do not
+// matter to the linker for extern "C" names, and no renderer test starts one.
+int32_t runtime_thread_spawn(void**, void*, void*, uint64_t, const char*) { std::abort(); }
+int32_t runtime_thread_join_spawned(void*, void**) { std::abort(); }
 }
 
