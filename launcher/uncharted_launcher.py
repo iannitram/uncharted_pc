@@ -38,8 +38,10 @@ NAME = 'Uncharted'
 AUTHOR = 'SuperMedo'
 # This build; GitHub release tags are v<VERSION> (their digits are compared).
 VERSION = '0.3.3'
-RELEASES_API = 'https://api.github.com/repos/Supermedo/uncharted_pc/releases/latest'
-RELEASES_PAGE = 'https://github.com/Supermedo/uncharted_pc/releases/latest'
+# Updates come from this fork's releases (iannitram/uncharted_pc), verified by SHA-256
+# (update_check.py). The original port is github.com/Supermedo/uncharted_pc.
+RELEASES_API = 'https://api.github.com/repos/iannitram/uncharted_pc/releases/latest'
+RELEASES_PAGE = 'https://github.com/iannitram/uncharted_pc/releases/latest'
 UPDATE_DIR = Path(tempfile.gettempdir()) / 'uncharted-update'
 # Never copied over an installation by an update (the package does not hold them either).
 USER_FILES = ('user', 'out', 'art', 'bbport.ini', 'input.ini', 'last_run.log')
@@ -1344,7 +1346,7 @@ class Launcher:
     def check_update(self, manual=False):
         """Helper thread: asks GitHub for the newest release and offers it when it is newer."""
         try:
-            version, url, page = latest_release()
+            version, asset, page = latest_release()
         except (OSError, ValueError, KeyError) as failure:
             if manual:
                 self.ui_calls.put(lambda error=failure: self.messagebox.showerror(
@@ -1353,12 +1355,12 @@ class Launcher:
 
         def show():
             if version_tuple(version) > version_tuple(VERSION):
-                self.offer_update(version, url, page)
+                self.offer_update(version, asset, page)
             elif manual:
                 self.messagebox.showinfo(NAME, _('You have the latest version ({}).').format(VERSION))
         self.ui_calls.put(show)
 
-    def offer_update(self, version, url, page):
+    def offer_update(self, version, asset, page):
         if self.update_box:
             return
         tk = self.tk
@@ -1369,7 +1371,7 @@ class Launcher:
         self.update_label.pack(anchor='w', padx=12, pady=(10, 8))
         buttons = tk.Frame(box, bg=CARD)
         buttons.pack(anchor='w', padx=12, pady=(0, 12))
-        self.update_button = self.pill(buttons, _('Update'), lambda: self.install_update(version, url, page),
+        self.update_button = self.pill(buttons, _('Update'), lambda: self.install_update(version, asset, page),
                                        kind='primary', padding=(14, 6))
         self.update_button.pack(side='left')
         self.pill(buttons, _("What's new"), lambda: webbrowser.open(page), padding=(12, 6)).pack(
@@ -1379,11 +1381,12 @@ class Launcher:
         if not self.process:
             self.status.configure(text=text, fg=GOLD)
 
-    def install_update(self, version, url, page):
+    def install_update(self, version, asset, page):
         if self.process:
             self.messagebox.showinfo(NAME, _('Close the game before updating.'))
             return
-        if not FROZEN or not url:  # a source tree updates with git
+        # A source tree updates with git; a release without a verifiable package from its page.
+        if not FROZEN or not asset:
             webbrowser.open(page)
             return
         if not self.messagebox.askyesno(NAME, _(
@@ -1400,16 +1403,20 @@ class Launcher:
                 shutil.rmtree(UPDATE_DIR, ignore_errors=True)
                 UPDATE_DIR.mkdir(parents=True, exist_ok=True)
                 archive = UPDATE_DIR / 'update.zip'
-                request = urllib.request.Request(url, headers={'User-Agent': 'uncharted-launcher'})
+                from update_check import Hasher
+                hasher = Hasher(asset)
+                request = urllib.request.Request(asset['url'], headers={'User-Agent': 'uncharted-launcher'})
                 with urllib.request.urlopen(request, timeout=60) as response, open(archive, 'wb') as out:
                     total, done, shown = int(response.headers.get('Content-Length') or 0), 0, -1
                     while chunk := response.read(1 << 20):
                         out.write(chunk)
+                        hasher.update(chunk)
                         done += len(chunk)
                         percent = done * 100 // total if total else 0
                         if percent != shown:
                             shown = percent
                             self.ui_calls.put(lambda p=percent: progress(p))
+                hasher.check()  # never extract a file that is not the release's package
                 with zipfile.ZipFile(archive) as package:
                     package.extractall(UPDATE_DIR / 'new')
                 archive.unlink()
@@ -1535,15 +1542,13 @@ def version_tuple(text):
 
 
 def latest_release():
-    """(version, zip URL, page URL) of the newest GitHub release."""
+    """(version, package asset or None, page URL) of the newest GitHub release."""
+    from update_check import package_asset, release_version
     request = urllib.request.Request(RELEASES_API, headers={'Accept': 'application/vnd.github+json',
                                                             'User-Agent': 'uncharted-launcher'})
     with urllib.request.urlopen(request, timeout=15) as response:
         release = json.load(response)
-    version = '.'.join(re.findall(r'\d+', release['tag_name']))
-    url = next((asset['browser_download_url'] for asset in release.get('assets', [])
-                if asset.get('name', '').lower().endswith('.zip')), None)
-    return version, url, release.get('html_url') or RELEASES_PAGE
+    return release_version(release), package_asset(release), release.get('html_url') or RELEASES_PAGE
 
 
 def install_update(target, wait_pid):
