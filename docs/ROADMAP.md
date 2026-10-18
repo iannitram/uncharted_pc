@@ -89,7 +89,7 @@ Mode; `linux` at f0a21af; game CUSA02320 (APP_VER 01.00, package 01.02). Measure
     2.5 % idle at about 1,100 draws per frame. The port's GPU translation is the limit, not the
     game's code.
 - **First-run shader stutter:** cold-cache compiles per game:
-  - U1 title: 113 (worst frame 50 ms).
+  - U1 title: 113 in two 5-second windows, 193.5 ms (worst frame 50 ms).
   - U2: 489, 867 ms in total; worst stall 367 ms.
   - U3: 380; worst stall 533 ms.
   - Warm cache: 0 compiles, so the cache is reused.
@@ -99,6 +99,8 @@ Mode; `linux` at f0a21af; game CUSA02320 (APP_VER 01.00, package 01.02). Measure
 - `bb-gpu-capabilities`: RADV PHOENIX lacks D32S8 blits, so live resolution changes fall back to
   the startup patch (a preset change needs a restart).
 - The built-in controller is held by InputPlumber in Desktop Mode and SDL does not see it.
+- **20 W is the design target** (Ian, 2026-10-18): at 30 W the Legion Go overheats and shuts off
+  even with full fans, so it stays power-limited by design, and CPU spin takes power from the GPU.
 - Memory is the tight part: in gameplay `bb-probe` held 2.0-2.8 GB resident on top of graphics
   memory taken from the same 15 GB, and with Steam and a browser open the free memory fell to
   1.5 GB.
@@ -157,7 +159,7 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   the executables; they are in the game data, built-ins in `.psarc` archives and materials in
   `.pak` files, each binary ending in an "OrbShdr" footer whose shader hash is the port's cache
   key. A streamed census of the dump (Legion Go, read-only, counts only) found 270,245 footers,
-  34,010 unique shaders (U1 3,451, U2 8,689, U3 23,058; 670 shared), 268,553 of them in `.pak`
+  34,010 unique shaders (U1 3,451, U2 8,689, U3 23,058; 518 in all three games, 670 in two or more), 268,553 of them in `.pak`
   files. So every shader can be listed without running the game; whole pipelines still need
   state that appears only in play, so the plan is to record a route and match hashes at first
   launch. Step 1 is partly measured on the Legion Go (above: up to
