@@ -13,11 +13,32 @@ shared with two projects that kept moving after the Uncharted port split off:
   in `gpu/shadps4` has diverged a lot
   ([codebase-architecture.md](codebase-architecture.md#technical-debt-and-risks)).
 
-**Nothing on this page has been ported.** An attempt to cherry-pick the Bloodborne commits in
-this session was stopped by the session's safety policy: bringing code in from another
-repository needs the maintainer's explicit go-ahead. The tables below are the worklist for when
-that is given. The "Applies" column comes from a read-only `git apply --check` against this
-branch:
+## Status (2026-10-18)
+
+The maintainer approved the port, and it is done on branch `claude/epic-brown-rournp`. Each
+ported commit is a cherry-pick with `-x`, so its message names the source commit. Every commit
+was built, and the whole Linux test suite and the Windows build ran after it.
+
+- **Ported:**
+  - every engine fix in the first table, except the two marked "has own fix";
+  - from Bloodborne 1.9 to 1.9.1: `acfe3a8` (VRAM budget on 4 GB NVIDIA cards), `5f65e2d` (a VRAM
+    reserve for the game's memory instead of moving textures out) and `7c9ebcb` (guest memory
+    larger than Windows' commit limit);
+  - the red-zone trampolines of `bc893e2`. The mechanism is in, but the site list is Bloodborne's.
+    Each site is checked byte for byte, so it never applies to Uncharted's executables. Uncharted
+    needs its own list, which `tools/redzone_sites.py` generates from the game files.
+- **Ported by hand:** shadPS4 PR #5257 (GCN NaN semantics).
+- **Resolved, keeping Uncharted's code:** conflicts where Uncharted had already solved the same
+  problem: the texture collector's kept images, the SRT walker lock, and the libc++ compat header.
+- **Not ported:**
+  - `087bbf3`, Bloodborne 1.9's update of the shadPS4 layer to 0.20.1 (126 files): too large to
+    merge blind into Uncharted's heavily changed renderer;
+  - the Bloodborne-only frame generation, mods and launcher commits that came with it;
+  - the legacy-CPU translation (`e750af8`), which needs plans made from the Uncharted
+    executables;
+  - shadPS4 PRs #4882/#5140 (flip/EOP ordering), which are not merged upstream.
+
+The "Applies" column below is from the read-only `git apply --check` made before the port:
 
 - **clean**: the patch applies on its own.
 - **conflicts**: the patch needs manual merging, often because it builds on an earlier commit in

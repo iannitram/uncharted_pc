@@ -45,6 +45,19 @@ crashes in a handful of groups
       `runtime_services.c`.
 - [x] Programs linked with the GPU library no longer abort at start on a Linux account
       without `~/.local/share`.
+- [x] **Ported 2026-10-18** ([details](../Research/porting-candidates.md#status-2026-10-18)):
+  - 35 commits from SuperMedo's Bloodborne port (1.7 to 1.9.1), covering:
+    - VRAM exhaustion: allocating past the budget, a system-memory fallback for guest memory,
+      a VRAM reserve, and a texture collector that evicts again;
+    - device lost on pre-RDNA3 AMD cards;
+    - SRT walker and scheduler crashes;
+    - frame limiter pacing;
+    - retrying device creation without DLSS when that fails;
+    - atomic save writes;
+    - a clear message on CPUs without AVX/BMI1/MOVBE/LZCNT;
+    - red-zone trampolines (the mechanism; Uncharted's site list still needs the game files).
+  - shadPS4's GCN NaN fix (PR #5257), the likely cause of the U3 green/black flashes. It needs
+    checking in game, on Sully's shirt in Cartagena.
 - [x] The last "Bloodborne" default names removed from the loader and GPU library.
 - [x] [`Research/`](../Research/README.md): architecture, the game and engine, graphics,
       similar projects, licensing, porting worklist.
@@ -53,11 +66,9 @@ crashes in a handful of groups
 
 These block or shape later items. Each needs a yes or no.
 
-1. **Port fixes from SuperMedo's Bloodborne port?** It shares this engine code, and 30-odd of its
-   1.7–1.8.2 commits fix crashes that Uncharted users report. The worklist is
-   [porting-candidates.md](../Research/porting-candidates.md). Bringing in code from another
-   repository needs the maintainer's go-ahead, so none has been ported yet. The same question
-   applies to shadPS4 changes.
+1. ~~**Port fixes from SuperMedo's Bloodborne port and shadPS4?**~~ Approved on 2026-10-18 and
+   done; see "Done on this branch" and
+   [porting-candidates.md](../Research/porting-candidates.md#status-2026-10-18).
 2. **Where does this fork's updater update from?** It points at `Supermedo/uncharted_pc`, so
    users of a build from this fork silently get upstream builds
    ([legal](../Research/legal-licensing-distribution.md#auto-updater-security)).
@@ -79,14 +90,14 @@ log line or a test that shows it fixed.
 
 | Problem | Lead | Next step |
 |---|---|---|
-| **Out of video memory on 2–4 GB cards** | Allocations made "within budget" end the process on failure, and the budget is read once. The games bind `0xffffffff`-sized buffers, about 2.7 GiB once clamped ([graphics](../Research/graphics-upscaling-and-performance.md#vram-pressure-on-4-gb-gpus), [technical](../Research/uncharted-collection-technical.md#known-problems-mapped-to-research)). The Bloodborne port has fixes: `44e7644` (allocate past the budget) and `96502c8` (fall back to system memory) | Port those two (decision 1). Turn on `VK_EXT_memory_budget` in VMA, evict and retry instead of asserting, and log VRAM by category once a minute (`5dc1f11`). Bound the huge descriptors. Add an automatic 4 GB profile: no frame generation, no FSR 4, smaller history buffers |
+| **Out of video memory on 2–4 GB cards** | Allocations made "within budget" end the process on failure, and the budget is read once. The games bind `0xffffffff`-sized buffers, about 2.7 GiB once clamped ([graphics](../Research/graphics-upscaling-and-performance.md#vram-pressure-on-4-gb-gpus), [technical](../Research/uncharted-collection-technical.md#known-problems-mapped-to-research)). The Bloodborne port has fixes: `44e7644` (allocate past the budget) and `96502c8` (fall back to system memory) | **Ported** with `5dc1f11` (VRAM log), `acfe3a8` (VMA uses `VK_EXT_memory_budget`) and `5f65e2d` (VRAM reserve). Still to do: evict and retry instead of asserting, and bound the huge descriptors. Add an automatic 4 GB profile: no frame generation, no FSR 4, smaller history buffers |
 | **`m_gfxEopTick` assertion** (still reported on 0.3.3) | Naughty Dog's three-frame pipeline checks that the GPU finished a frame before reusing its slot ([technical](../Research/uncharted-collection-technical.md#frame-centric-pipelining-and-frameparams)). shadPS4 found a flip that is signalled before its end-of-pipe packet (PR #4882, #5140). The Bloodborne port's `76f5b5f` is in the same area | Check the flip/EOP order in `gnmdriver`/`videoout`. Log how often and how long the 0.3.2 wait spins, which tells shader-compile lag apart from a steady ordering bug |
-| **Guest fault at `0xd9c59b`** (U2/U3 openings, U3 London bar) and the **U2 `iSubMesh` streaming assertion**, both on US 1.02 | Windows writes exception frames over the System V red zone, which corrupts guest leaf-function locals on page-protection faults. This is confirmed for this collection in shadPS4 (#5038, PR #4802). The Bloodborne port's `bc893e2` has trampolines for it ([porting](../Research/porting-candidates.md#mechanisms-that-need-data-for-uncharted)) | Symbolize `0xd9c59b`: is it a frameless leaf function? Port the trampoline mechanism and generate red-zone sites for the three executables with `tools/redzone_sites.py`. Reproduce on 1.00 and on a non-US 1.02 |
-| **Steam Deck `vk_scheduler` assertions, device lost** | `acdfdf0` (record chunk never null), `3a7cde8` (stable texture slots), `3d43d8f` and `4f30202` (object motion on pre-RDNA3 AMD) | Port (decision 1) |
+| **Guest fault at `0xd9c59b`** (U2/U3 openings, U3 London bar) and the **U2 `iSubMesh` streaming assertion**, both on US 1.02 | Windows writes exception frames over the System V red zone, which corrupts guest leaf-function locals on page-protection faults. This is confirmed for this collection in shadPS4 (#5038, PR #4802). The Bloodborne port's `bc893e2` has trampolines for it ([porting](../Research/porting-candidates.md#mechanisms-that-need-data-for-uncharted)) | Symbolize `0xd9c59b`: is it a frameless leaf function? The trampoline mechanism is **ported**; generate red-zone sites for the three executables with `tools/redzone_sites.py`. Reproduce on 1.00 and on a non-US 1.02 |
+| **Steam Deck `vk_scheduler` assertions, device lost** | `acdfdf0` (record chunk never null), `3a7cde8` (stable texture slots), `3d43d8f` and `4f30202` (object motion on pre-RDNA3 AMD) | **Ported**; needs confirming on a Steam Deck |
 | **Intel iGPU crashes** | The HD 630 black screen is fixed in 0.3.3, but the HD 520 crashes inside Intel's driver ([graphics](../Research/graphics-upscaling-and-performance.md#intel-gen9-igpu-vulkan-driver-issues)) | Separate driver crashes from guest crashes in the log. Use conservative defaults on Gen9: no frame generation, no FSR 4 |
-| **Old CPUs: `0xC000001D`** (upstream #144) | The game needs AVX, BMI1, MOVBE and LZCNT. The Bloodborne port's `1dd8471` checks this at start, and `e750af8` translates the instructions | Port the check first. Translation needs a plan for each Uncharted executable |
-| **DLSS driver failure stops the game** (upstream #148) | `3e3b760`: create the device again without DLSS's extensions | Port |
-| **Saves corrupted by a crash mid-write** | `f7ea858`: write to a copy, then rename | Port |
+| **Old CPUs: `0xC000001D`** (upstream #144) | The game needs AVX, BMI1, MOVBE and LZCNT. The Bloodborne port's `1dd8471` checks this at start, and `e750af8` translates the instructions | **Check ported.** Translation needs a plan for each Uncharted executable |
+| **DLSS driver failure stops the game** (upstream #148) | `3e3b760`: create the device again without DLSS's extensions | **Ported** |
+| **Saves corrupted by a crash mid-write** | `f7ea858`: write to a copy, then rename | **Ported** |
 
 Also for stability:
 
@@ -103,10 +114,10 @@ Also for stability:
 ## 2. Graphics correctness and performance
 
 - [ ] **U3 one-frame green/black flashes.** shadPS4 PR #5257 fixes the NaN semantics of
-      `V_CMP_N*`, `MIN3/MAX3/MED3` and saturate. This fork still uses ordered compares there
+      `V_CMP_N*`, `MIN3/MAX3/MED3` and saturate
       ([graphics](../Research/graphics-upscaling-and-performance.md#shader-translation-flicker-and-nan-bugs)).
-      Port it behind a switch, bump the shader cache version, and A/B it on Sully's shirt in
-      Cartagena. If it doesn't help, capture the flash frame in RenderDoc and compare the cloth
+      **Ported 2026-10-18**, and the shader cache version is bumped. Next, check Sully's shirt in
+      Cartagena. If the flashes remain, capture the flash frame in RenderDoc and compare the cloth
       vertex buffers with the previous frame
       ([technical](../Research/uncharted-collection-technical.md#known-problems-mapped-to-research)).
 - [ ] **First-run shader hitches.** Save the driver `VkPipelineCache` too, and prewarm from a
