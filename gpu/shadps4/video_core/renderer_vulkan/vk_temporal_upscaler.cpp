@@ -440,6 +440,16 @@ bool TemporalUpscaler::EnsureResources(u32 w, u32 h, u32 ow, u32 oh, bool hdr) {
     device_info.queueFamilyIndex = instance.GetGraphicsQueueFamilyIndex();
     device_info.shaderFloat16Enabled = instance.IsShaderFloat16Enabled();
     device_info.subgroupSizeControlEnabled = instance.IsSubgroupSizeControlEnabled();
+    // Experiment (FSR noise on RADV PHOENIX, 2026-10-19): BB_FSR_FP16=0 / BB_FSR_SUBGROUP_CONTROL=0
+    // hide the device feature from FSR, so it picks its 32-bit / default-wave shader variants.
+    if (const char* e = std::getenv("BB_FSR_FP16"); e && e[0] == '0') {
+        device_info.shaderFloat16Enabled = VK_FALSE;
+        std::printf("Upscaler: experiment: FSR told shaderFloat16 is off\n");
+    }
+    if (const char* e = std::getenv("BB_FSR_SUBGROUP_CONTROL"); e && e[0] == '0') {
+        device_info.subgroupSizeControlEnabled = VK_FALSE;
+        std::printf("Upscaler: experiment: FSR told subgroupSizeControl is off\n");
+    }
     device_info.synchronization2Enabled = VK_TRUE;
     device_info.shaderStorageImageWriteWithoutFormatEnabled = VK_TRUE;
 
