@@ -215,22 +215,19 @@ TemporalUpscaler::TemporalUpscaler(const Instance& instance_, Scheduler& schedul
         enabled = false;
     }
     if (enabled) {
+        // The driver FSR runs on, at its start: a fault in the FSR pass leaves no other trace
+        // in the log (gameplay as noise on RADV PHOENIX, 2026-10-18). On a driver FSR 3.1 has
+        // not been checked on, the default is Off (the player's choice is kept).
+        const auto driver_id = static_cast<unsigned>(instance.GetDriverID());
+        // GetDriverVersionName only reads the properties; it is just not const.
+        const std::string driver = std::string(instance.GetModelName()) + ", driver " +
+                                   const_cast<Instance&>(instance).GetDriverVersionName();
+        BbSettings::ConfigureDriverDefault(driver_id, driver.c_str());
         std::printf("Upscaler: FSR 3.1 available (%s) on scene color before compute shader "
                     "%016llx\n",
                     BbSettings::Get().upscaler != BbSettings::UpscalerOff ? "on" : "off",
                     static_cast<unsigned long long>(trigger_hash));
-        // The driver FSR runs on, at its start: a fault in the FSR pass leaves no other trace
-        // in the log (gameplay as noise on RADV PHOENIX, 2026-10-18).
-        const auto driver_id = static_cast<unsigned>(instance.GetDriverID());
-        std::printf("Upscaler: FSR 3.1 on %s, driver %s (id %u)\n",
-                    std::string(instance.GetModelName()).c_str(),
-                    // GetDriverVersionName only reads the properties; it is just not const.
-                    const_cast<Instance&>(instance).GetDriverVersionName().c_str(), driver_id);
-        if (BbSettings::Get().upscaler == BbSettings::UpscalerFsr3 &&
-            !BbSettings::FsrDriverValidated(driver_id)) {
-            std::printf("Upscaler: WARNING: FSR 3.1 has not been checked on this driver; if the "
-                        "scene shows noise or garbage, set anti-aliasing to Off\n");
-        }
+        std::printf("Upscaler: FSR 3.1 on %s (id %u)\n", driver.c_str(), driver_id);
         std::fflush(stdout);
     }
 }
