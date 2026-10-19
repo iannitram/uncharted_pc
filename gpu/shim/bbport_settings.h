@@ -93,6 +93,10 @@ struct Values {
     std::atomic<int> dlssg_max_multiplier{1};
     std::atomic<const char*> frame_gen_problem{nullptr};
 
+    /// The player's ini or BB_UPSCALER named the upscaler (else the default may change with the
+    /// driver: ConfigureDriverDefault).
+    bool upscaler_chosen = false;
+
     /// Startup settings for the explicit BB_RENDER_RES compatibility patch only.
     int startup_preset = NativeAA;
     int startup_upscaler = UpscalerFsr3;
@@ -109,6 +113,12 @@ Values& Get();
 void Load();
 /// Checks the loaded choice before the first frame; unsupported FSR 4 uses FSR 3.1.
 void ConfigureUpscalerSupport(bool fsr4, bool fsr411);
+/// The upscaler a start uses: FSR 3.1 is the default only on a driver it has been checked on;
+/// elsewhere the default is Off (noise on RADV PHOENIX, 2026-10-19). A choice the player made
+/// (ini or BB_UPSCALER) is kept.
+int DriverDefaultUpscaler(int current, bool chosen, bool driver_validated);
+/// After device creation: applies DriverDefaultUpscaler for this driver and logs the decision.
+void ConfigureDriverDefault(unsigned driver_id, const char* driver_name);
 /// After device creation: DLSS availability; a DLSS setting falls back to FSR 3.1 without it.
 void ConfigureDlssSupport(bool available, const char* problem);
 /// Startup-patched scene dimensions cannot change until run.sh prepares a new image.

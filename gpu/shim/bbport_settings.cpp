@@ -28,6 +28,7 @@ void Set(Values& v, const std::string& key, const std::string& value) {
         for (int u = 0; u < UpscalerCount; ++u) {
             if (value == UpscalerName(u)) {
                 v.upscaler = u;
+                v.upscaler_chosen = true;
             }
         }
     } else if (key == "frame_gen") {
@@ -112,6 +113,7 @@ void Load() {
     // Environment overrides (scripts, A/B tests).
     if (const char* env = std::getenv("BB_UPSCALER")) {
         v.upscaler = UpscalerOff;
+        v.upscaler_chosen = true;
         for (int u = 0; u < UpscalerCount; ++u) {
             if (std::strcmp(env, UpscalerName(u)) == 0) v.upscaler = u;
         }
@@ -150,6 +152,29 @@ void ConfigureUpscalerSupport(bool fsr4, bool fsr411) {
         std::printf("Upscaler: %s unsupported on this GPU; falling back to FSR 3.1 before the first frame\n",
                     UpscalerName(requested));
         v.upscaler = UpscalerFsr3;
+    }
+}
+
+int DriverDefaultUpscaler(int current, bool chosen, bool driver_validated) {
+    return !chosen && !driver_validated && current == UpscalerFsr3 ? UpscalerOff : current;
+}
+
+void ConfigureDriverDefault(unsigned driver_id, const char* driver_name) {
+    auto& v = Get();
+    const bool validated = FsrDriverValidated(driver_id);
+    const int before = v.upscaler;
+    const int now = DriverDefaultUpscaler(before, v.upscaler_chosen, validated);
+    if (now != before) {
+        v.upscaler = now;
+        v.startup_upscaler = now;
+        std::printf("Upscaler: decision: anti-aliasing Off by default: FSR 3.1 has not been checked "
+                    "on %s (driver id %u); turn it on in the menu (Insert / L3+R3) to try it\n",
+                    driver_name, driver_id);
+    } else if (before == UpscalerFsr3 && !validated) {
+        std::printf("Upscaler: decision: FSR 3.1 kept (the player chose it) on %s (driver id %u), "
+                    "which it has not been checked on; if the scene shows noise or garbage, set "
+                    "anti-aliasing to Off\n",
+                    driver_name, driver_id);
     }
 }
 
