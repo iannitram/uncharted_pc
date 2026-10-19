@@ -91,7 +91,3 @@ SteamOS 3.8.28 (measured) has all of them **except four**: `libfmt.so.11`, `libZ
 ## 6. Fixed: host memory grew during play
 
 Measured on 2026-10-19: before the fix the process heap grew by about 37 MiB per minute for as long as the game ran (Uncharted 3, normal and stereo). The cause was in the bundled shadPS4 video core: finished nested command-buffer tasks (IndirectBuffer, IndirectBufferConst) were never destroyed. shadPS4 fixed it upstream in 12c5978f (#5258, "liverpool: free the frames of nested indirect buffer tasks"). The same three lines are on `linux` since uncharted_pc#3 (305c3fa); with them the heap stays flat (107-110 MiB over 15 minutes, measured on a Z13).
-
-## 7. Known issue: FSR 3.1 noise on RADV PHOENIX
-
-On the Radeon 780M (RADV PHOENIX, e.g. the Legion Go) FSR 3.1 renders gameplay as full-screen noise (measured on the Legion Go; the port's log says nothing). FSR 3.1 is the default anti-aliasing, so set anti-aliasing to Off on that GPU until uncharted_pc#4 (anti-aliasing Off by default on a driver FSR 3.1 has not been checked on) is merged. On the Radeon 8060S (RADV STRIX_HALO) FSR 3.1 renders correctly (measured on a Z13).
