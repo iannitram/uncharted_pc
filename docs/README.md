@@ -7,6 +7,10 @@ out of. The engine code they describe (loader, runtime, renderer, upscalers) is 
 that runs Uncharted. They were written in Russian and translated on 2026-10-16. The originals
 are in [`ru/`](ru/), at the same paths.
 
+## Building
+
+- [BUILDING_LINUX.md](BUILDING_LINUX.md): building and running on Linux from source, with every dependency's minimum and tested version.
+
 ## Plans
 
 - [ROADMAP.md](ROADMAP.md): goals, phases and open items (Uncharted on Linux, on spacepepperoni's fork).
