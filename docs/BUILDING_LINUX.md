@@ -29,7 +29,7 @@ How the port (`bb-probe` and `gpu/libbbgpu.so`) was built from source and run on
 | FFmpeg (libavformat, libavcodec, libavutil, libswscale, libswresample) | the build links `libavcodec.so.61`, `libavutil.so.59`, `libswresample.so.5`, `libswscale.so.8`: FFmpeg 7.x | 7.1.1 | system |
 | Vulkan loader | Vulkan 1.3 device (README) | 1.4.321.0 | system |
 | Vulkan headers | newer than some distributions ship (`build.sh` comment) | v1.4.344 | **bundled** (`third_party/Vulkan-Headers`) |
-| VulkanMemoryAllocator | not stated | header 3.3.0 | system package, or only the header `vk_mem_alloc.h` (see 4) |
+| VulkanMemoryAllocator | not stated | header 3.3.0 (Z13); 3.2.1 also builds (Legion Go) | system package, or only the header `vk_mem_alloc.h` (see 4) |
 | Boost | not stated | 1.88.0 | system |
 | fmt | links `libfmt.so.11`: fmt 11 | 11.2.0 | system |
 | robin-map (tsl) | not stated | 1.3.0 | system |
@@ -72,7 +72,7 @@ BB_GAME_DIR=<your dump folder> BB_EXE=u3 python3 run.py
 ## 4. Known problems
 
 - **System miniz 3.0.2 breaks the build** (measured): `cache_storage.cpp:106: 'MZ_ZIP_FLAG_READ_ALLOW_WRITING' was not declared in this scope`. CMake prefers a system miniz when it finds one, so remove the package (`pacman -R miniz` on Arch); the bundled copy is then used.
-- **No VulkanMemoryAllocator package** in some distribution snapshots (measured, the Arch archive snapshot of 2025-07-28): CMake stops at `Could not find VMA_INCLUDE_DIR using the following files: vk_mem_alloc.h`. Install the package, or put the single header from VulkanMemoryAllocator (tested: 3.3.0) in any folder and point CMake at it: `CMAKE_INCLUDE_PATH=<that folder> bash ./build.sh`.
+- **No VulkanMemoryAllocator package** in some distribution snapshots (measured, the Arch archive snapshot of 2025-07-28): CMake stops at `Could not find VMA_INCLUDE_DIR using the following files: vk_mem_alloc.h`. Install the package, or put the single header from VulkanMemoryAllocator (tested: 3.3.0 and 3.2.1) in any folder and point CMake at it: `CMAKE_INCLUDE_PATH=<that folder> bash ./build.sh`.
 - **miniupnpc** is required (`find_path(MINIUPNPC_INCLUDE ...)`) even though nothing on the build line names it; install it before the first build.
 
 ## 5. Running on a machine other than the build machine
@@ -88,6 +88,6 @@ SteamOS 3.8.28 (measured) has all of them **except four**: `libfmt.so.11`, `libZ
 | Kernel | not stated | 6.18.50-valve2 (SteamOS) |
 | Memory | about 8 GB free (README) | lowest free during a 30-minute run: 43 GB of 62 GB |
 
-## 6. Known issue: host memory grows during play
+## 6. Fixed: host memory grew during play
 
-Measured on 2026-10-19: the process heap grows by about 37 MiB per minute for as long as the game runs (Uncharted 3, normal and stereo). The cause is in the bundled shadPS4 video core: finished nested command-buffer tasks (IndirectBuffer, IndirectBufferConst) are never destroyed. shadPS4 fixed it upstream in 12c5978f (#5258, "liverpool: free the frames of nested indirect buffer tasks"); the same three-line change, measured on a Z13 on 2026-10-19, keeps the heap flat (107-110 MiB over 15 minutes, against +37 MiB per minute without it). It is on branch `z13/nested-task-leak` (561bc14) until it is merged into `linux`.
+Measured on 2026-10-19: before the fix the process heap grew by about 37 MiB per minute for as long as the game ran (Uncharted 3, normal and stereo). The cause was in the bundled shadPS4 video core: finished nested command-buffer tasks (IndirectBuffer, IndirectBufferConst) were never destroyed. shadPS4 fixed it upstream in 12c5978f (#5258, "liverpool: free the frames of nested indirect buffer tasks"). The same three lines are on `linux` since uncharted_pc#3 (305c3fa); with them the heap stays flat (107-110 MiB over 15 minutes, measured on a Z13).
