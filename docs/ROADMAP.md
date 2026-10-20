@@ -124,7 +124,40 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   (`up/*`) before starting, so we do not duplicate a fix in progress.
 - Done when each game plays 30 minutes without a crash on the Strix Halo, measured.
 
-### Phase 3: 60 FPS on the Strix Halo
+### Phase 3: launcher integration (install, update, per-machine settings)
+The Craft launcher installs and updates the port on a fresh machine (Linux/SteamOS and Windows),
+then detects the hardware and applies the best settings for it. Three target machines, by hardware:
+a Legion Go handheld (Ryzen Z1 Extreme, 20 W Deck profile), a ROG Flow Z13 (Ryzen AI Max, Strix
+Halo) and a Windows desktop with an RTX 3090 Ti.
+- **Port and game dump.** The launcher downloads the port, then downloads the owner's own dump from
+  the owner's private Nextcloud server (WebDAV), checks it (sizes and hashes), and installs it beside
+  the port. The game data never enters the repo, a release or a build artifact.
+- **Sign-in:** the one hand step besides installing the launcher. It signs in to that Nextcloud once,
+  with an app password the owner creates, kept in the OS keychain (Windows Credential Manager, the
+  Secret Service on SteamOS); never in a file or the repo. Server address, paths, user
+  name and dump file names live in local config only.
+- **Linux/SteamOS:** fetch the port's release, fetch the dump, pick the settings profile
+  (Deck mode and the 20 W profile on the Legion Go; the Strix Halo profile on the Z13), keep the port
+  updated.
+- **Windows:** upstream already has Windows support (Supermedo/uncharted_pc#304; ours stacked on top
+  is #444). Our part: build and package it for the launcher, and test it on the Windows desktop.
+- **macOS: not in this phase** (decided 2026-10-20, after a read-only feasibility check; not
+  measured). A Mac mini M1 with 8 GB is not a target as the port stands:
+  - the port maps guest memory at fixed addresses (0x1000000000 to 0xfc00000000), a range macOS on
+    Apple Silicon refuses for fixed mappings, under Rosetta 2 too; shadPS4 works around it game by
+    game (shadps4-emu/shadPS4#4157, shadps4-emu/shadPS4#4694);
+  - the port's runtime is Linux-only (`memfd_create`, `MAP_FIXED_NOREPLACE`, `arch_prctl` for guest
+    thread-local storage) and has no macOS path;
+  - memory and graphics: the port holds 2.0 to 2.8 GB resident plus graphics memory, too tight for
+    8 GB shared; shadPS4 on macOS runs as x86-64 under Rosetta only and needs geometry and
+    tessellation shaders that MoltenVK lacks.
+  The Mac waits for a bigger Mac or another approach.
+- **Hardware detection:** the launcher reads CPU, GPU, memory and OS and maps them to a settings
+  profile per machine, with a manual override.
+- Done when a freshly wiped Z13 and Windows desktop each go from installing the launcher
+  to playing Uncharted 1 with no hand steps except installing the launcher and the one-time sign-in.
+
+### Phase 4: 60 FPS on the Strix Halo
 - Measure per game, find the bottleneck, tune. Done when each game holds 60 FPS in a defined test
   route.
 - **Profile the GPU thread first (2026-10-18).** On the Legion Go the GPU thread is nearly saturated
@@ -176,7 +209,7 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   not ship translated or compiled shaders in the repository. Also check whether Steam's own
   shader pre-caching helps when this is added as a non-Steam shortcut (not known).
 
-### Phase 4: the Legion Go
+### Phase 5: the Legion Go
 - Their Steam Deck mode is the starting point (also AMD, also SteamOS). Measure on the Legion Go,
   tune Deck mode or add a Legion Go profile.
 - Started 2026-10-18: all three games boot and hold 30 FPS in Deck mode (measurements above).
