@@ -129,9 +129,14 @@ The Craft launcher installs and updates the port on a fresh machine (Linux/Steam
 then detects the hardware and applies the best settings for it. Four target machines, by hardware:
 a Legion Go handheld (Ryzen Z1 Extreme, 20 W Deck profile), a ROG Flow Z13 (Ryzen AI Max, Strix
 Halo), a Windows desktop with an RTX 3090 Ti, and a Mac mini M1 with 8 GB.
-- **The launcher downloads only the port.** The game always comes from the player's own dump, which
-  the launcher asks for: never downloaded, never bundled.
-- **Linux/SteamOS:** fetch the port's release, ask for the dump folder, pick the settings profile
+- **Port and game dump.** The launcher downloads the port, then downloads the owner's own dump from
+  the owner's private Nextcloud server (WebDAV), checks it (sizes and hashes), and installs it beside
+  the port. The game data never enters the repo, a release or a build artifact.
+- **Sign-in:** the one hand step besides installing the launcher. It signs in to that Nextcloud once,
+  with an app password the owner creates, kept in the OS keychain (macOS Keychain, Windows Credential
+  Manager, the Secret Service on SteamOS); never in a file or the repo. Server address, paths, user
+  name and dump file names live in local config only.
+- **Linux/SteamOS:** fetch the port's release, fetch the dump, pick the settings profile
   (Deck mode and the 20 W profile on the Legion Go; the Strix Halo profile on the Z13), keep the port
   updated.
 - **Windows:** upstream already has Windows support (Supermedo/uncharted_pc#304; ours stacked on top
@@ -143,7 +148,7 @@ Halo), a Windows desktop with an RTX 3090 Ti, and a Mac mini M1 with 8 GB.
 - **Hardware detection:** the launcher reads CPU, GPU, memory and OS and maps them to a settings
   profile per machine, with a manual override.
 - Done when a freshly wiped Z13, Windows desktop and Mac mini each go from installing the launcher
-  to playing Uncharted 1 with no hand steps except pointing at the dump.
+  to playing Uncharted 1 with no hand steps except installing the launcher and the one-time sign-in.
 
 ### Phase 4: 60 FPS on the Strix Halo
 - Measure per game, find the bottleneck, tune. Done when each game holds 60 FPS in a defined test
