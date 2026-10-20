@@ -21,7 +21,7 @@ icon.convert('RGBA').save('launcher/uncharted.png')
 EOF
 hidden=()
 for module in argparse base64 collections hashlib json re shlex shutil struct tempfile zlib \
-              uncharted_art uncharted_fonts uncharted_widgets uncharted_linux bbport_steam PIL.ImageTk PIL._tkinter_finder; do
+              uncharted_art uncharted_fonts uncharted_widgets uncharted_linux uncharted_logs bbport_steam PIL.ImageTk PIL._tkinter_finder; do
     hidden+=(--hidden-import "$module")
 done
 out/pyenv/bin/python -m PyInstaller --noconfirm --clean --log-level WARN --windowed \
@@ -45,6 +45,9 @@ ldd out/bb-probe out/gpu/libbbgpu.so out/bb-gpu-capabilities | awk '/=> \// {pri
     while read -r name path; do
         # Arch and SteamOS list the loader as /lib64/ld-linux-x86-64.so.2 => ...: match by file name.
         name=$(basename -- "$name")
+        # The GPU library is bin/gpu's stripped copy (bb-probe's RUNPATH): an unstripped second
+        # copy here, first on LD_LIBRARY_PATH, was the one loaded and added 60 MB to the AppImage.
+        [[ $name == libbbgpu.so ]] && continue
         [[ $name =~ $system ]] || cp -L "$path" "$dest/bin/lib/$name"
     done
 cp scripts/prepare.py scripts/link_modules.py scripts/link_libc.py scripts/content_profile.py "$dest/scripts/"

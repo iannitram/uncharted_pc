@@ -9,25 +9,18 @@
 <img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/361582f1-7221-4f99-9a67-1748343836ad" />
 
 
-⚠️Uncharted 1: Ingame, seems stable. Unconfirmed if fully playable
+✅Uncharted 1: Confirmed fully playable. You may encounter some visual glitches.
 
-⚠️Uncharted 2: Ingame, some physics glitches. Unconfirmed if fully playable
+⚠️Uncharted 2: Some visual and physics glitches, unconfirmed if fully playable
 
 ❌Uncharted 3: Crashes often. Not yet fully playable
 
-## Install
+## Distributions tested
+✅ Confirmed Working: SteamOS 3.7, Fedora 44, Debian 13
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/spacepepperoni/uncharted_Linux/main/install.sh | sh
-```
+⚠️ Investigating Issues: CachyOS
 
-## Uninstall
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/spacepepperoni/uncharted_Linux/main/install.sh | sh -s -- --uninstall
-```
-
-## Appimage
+## Download
 1. Download **[Uncharted-x86_64.AppImage](https://github.com/spacepepperoni/uncharted_Linux/releases/latest/download/Uncharted-x86_64.AppImage)**.
 2. Right-click it, open **Properties → Permissions** and tick **Is executable** (or
    **Allow executing file as program**).
