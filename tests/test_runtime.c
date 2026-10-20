@@ -325,6 +325,43 @@ static void rw_timeouts(void) {
     assert(rw_unlock(&f.lock)==0);
     fixture_destroy(&f);
 }
+/* Guest FPU state (Uncharted 3 Citadel NaN in look-at, issue #230): guest threads and fibers must
+ * both start with the PS4's MXCSR 0x9fc0 (flush to zero, denormals are zero) and x87 control word
+ * 0x037f. The thread is created from a thread holding the host default 0x1f80, as in the game. */
+typedef struct { uint32_t mxcsr; uint16_t fpucw; int flushed; } FpuSeen;
+static FpuSeen thread_fpu, fiber_fpu;
+static void fpu_read(FpuSeen *seen) {
+    __asm__ volatile("stmxcsr %0" : "=m"(seen->mxcsr));
+    __asm__ volatile("fnstcw %0" : "=m"(seen->fpucw));
+    volatile float tiny=1e-40f; /* a denormal: DAZ reads it as zero */
+    seen->flushed=(tiny*1.0f==0.0f);
+}
+static void *ABI fpu_thread_entry(void *unused) { (void)unused; fpu_read(&thread_fpu); return NULL; }
+static void ABI fpu_fiber_entry(uint64_t init,uint64_t run) {
+    (void)init; (void)run;
+    fpu_read(&fiber_fpu);
+    GET(int32_t (ABI *)(uint64_t,uint64_t *),"B0ZX2hx9DMw#libSceFiber")(0,NULL);
+    abort();
+}
+typedef int32_t (ABI *ThreadCreate)(void **,void **,void *(ABI *)(void *),void *,const char *);
+typedef int32_t (ABI *ThreadJoin)(void *,void **);
+typedef int32_t (ABI *FiberInit)(void *,const char *,void (ABI *)(uint64_t,uint64_t),uint64_t,void *,uint64_t,const void *,uint32_t);
+typedef int32_t (ABI *FiberRun)(void *,uint64_t,uint64_t *);
+static void guest_fpu_state(void) {
+    unsetenv("BB_GUEST_MXCSR");
+    const uint32_t host=0x1f80;
+    __asm__ volatile("ldmxcsr %0" : : "m"(host)); /* what a thread inherits from the host */
+    void *thread=NULL;
+    assert(GET(ThreadCreate,"6UgtwV+0zb4#p#J")(&thread,NULL,fpu_thread_entry,NULL,"fpu")==0);
+    assert(GET(ThreadJoin,"onNY9Byn-W8#p#J")(thread,NULL)==0);
+    fprintf(stderr,"guest thread: mxcsr=%#x fpucw=%#x denormal flushed=%d\n",thread_fpu.mxcsr,thread_fpu.fpucw,thread_fpu.flushed);
+    assert(thread_fpu.mxcsr==0x9fc0 && thread_fpu.fpucw==0x037f && thread_fpu.flushed);
+    static _Alignas(16) unsigned char fiber[256]; static _Alignas(16) unsigned char stack[16384];
+    assert(GET(FiberInit,"hVYD7Ou2pCQ#libSceFiber")(fiber,"fpu",fpu_fiber_entry,0,stack,sizeof(stack),NULL,0x03500000u)==0);
+    assert(GET(FiberRun,"a0LLrZWac0M#libSceFiber")(fiber,0,NULL)==0);
+    fprintf(stderr,"fiber: mxcsr=%#x fpucw=%#x denormal flushed=%d\n",fiber_fpu.mxcsr,fiber_fpu.fpucw,fiber_fpu.flushed);
+    assert(fiber_fpu.mxcsr==0x9fc0 && fiber_fpu.fpucw==0x037f && fiber_fpu.flushed);
+}
 int main(int argc,char **argv) {
     runtime_start(0); assert(runtime_resolve("bzQExy189ZI#q#q",0)==0);
     runtime_start(1);
@@ -351,7 +388,7 @@ int main(int argc,char **argv) {
     if (argc>1 && !strcmp(argv[1],"--rwlock-concurrency")) { rw_concurrency(); return 0; }
     if (argc>1 && !strcmp(argv[1],"--rwlock-timeouts")) { rw_timeouts(); return 0; }
     libc_support(); posix_mutexes(); wall_time(); exit_handlers(); guards(); mutexes(); direct_memory(); memory_primitives();
-    rw_lifecycle(); rw_concurrency(); rw_timeouts();
-    puts("PASS: callback lifecycle, guard ABI, mutex errors, shared direct memory, memory primitives, resolver scope");
+    rw_lifecycle(); rw_concurrency(); rw_timeouts(); guest_fpu_state();
+    puts("PASS: callback lifecycle, guard ABI, mutex errors, shared direct memory, memory primitives, resolver scope, guest thread and fiber FPU state");
     return 0;
 }
