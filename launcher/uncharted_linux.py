@@ -415,6 +415,7 @@ def deck_environment(settings, env):
         rate = '60' if rate.isdigit() and int(rate) > 60 else DECK_SETTINGS['frame_rate']
     env['BB_VBLANK_HZ'] = rate
     env['BB_WINDOW_SIZE'] = '1280x800'   # the Deck's screen: no 1080p output pass to scale down
+    env['BB_RENDER_720P'] = '1'          # the games render at 1280x720 (scripts/render_size.py)
     env['BB_PRESENT_MODE'] = 'Fifo'      # gamescope paces FIFO best
     env['BB_FULLSCREEN'] = '1'
     env['BB_FRAME_STATS'] = '1'          # frame time breakdown in last_run.log (tuning the Deck)

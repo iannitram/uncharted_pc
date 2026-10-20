@@ -131,6 +131,22 @@ def patch_arguments(env, exe, game, out):
             '--patches-config', env.get('BB_PATCHES_CONFIG', str(Path(patches_dir) / 'patches.json'))]
 
 
+def render_size_arguments(env, out, merge=None):
+    """render_size.py arguments for the scene size the environment asks for (Steam Deck mode:
+    BB_RENDER_720P=1; BB_RENDER_SIZE=WxH), or [] to keep the game's own 1920x1080. `merge` is a
+    patch file from the third-party patches, which the new file keeps."""
+    sys.path.insert(0, str(PORT / 'scripts'))
+    try:
+        import render_size
+    finally:
+        sys.path.pop(0)
+    size = render_size.decide(env)
+    if not size:
+        return []
+    args = [str(out / 'eboot.elf'), str(out / 'render-size.bin'), f'{size[0]}x{size[1]}']
+    return args + ['--merge', str(merge)] if merge else args
+
+
 def prepare(game, exe, out):
     """boot-linked.bin for one executable, kept until the executable or the scripts change."""
     out.mkdir(parents=True, exist_ok=True)
@@ -242,9 +258,22 @@ def main():
         # Third-party patches (shadPS4/GoldHEN XML) for this executable, only when a folder is set:
         # BB_PATCHES_DIR, selection in BB_PATCHES_CONFIG (patches.json) or each patch's isEnabled.
         patches = patch_arguments(env, exe, game, out)
+        patch_file = None
         if patches:
             run_script('patches.py', *patches)
-            command += ['--patches', str(out / 'patches.bin')]
+            patch_file = out / 'patches.bin'
+        # Linux fork: the scene size (Steam Deck mode renders at 1280x720). The port's output
+        # size does not reach the games, so the game's own video setup is patched; when that
+        # cannot be done the game says so and starts at its usual 1080p.
+        size_args = render_size_arguments(env, out, patch_file)
+        if size_args:
+            try:
+                run_script('render_size.py', *size_args)
+                patch_file = out / 'render-size.bin'
+            except SystemExit:
+                print('Render size: not available for this executable; rendering at 1080p')
+        if patch_file:
+            command += ['--patches', str(patch_file)]
         if guest_argv:
             command += ['--guest-argv', str(guest_argv)]
         loadexec.unlink(missing_ok=True)
