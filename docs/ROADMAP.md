@@ -12,17 +12,16 @@ running SteamOS: a Strix Halo machine (main test and debug box) and a Legion Go
 Ground rules:
 
 - **Our `linux` branch builds on spacepepperoni's Linux fork** (`spacepepperoni/uncharted_Linux`,
-  merged 2026-10-17 at c06843d, Ian's decision). That fork already builds and runs the collection
+  merged 2026-10-17 at c06843d, the owner's decision). That fork already builds and runs the collection
   on Linux and the Steam Deck and keeps merging SuperMedo's releases. We merge it (and through
   it SuperMedo) instead of redoing its work. Our own work stays on `linux`.
-- Nothing goes to SuperMedo or spacepepperoni without Ian saying so, one change at a time.
+- Nothing goes to SuperMedo or spacepepperoni without the owner saying so, one change at a time.
 - No game files, dumps or keys in the repository. Each machine uses its own dump of the
   collection (CUSA02343 / CUSA02320).
 - Every claim in a report says whether it was measured or only read from the code.
-- **Reverse-engineering output stays private** (Ian, 2026-10-18: "the output will stay private.
-  this is just for us. About preserving my own library that i have paid for multiple times over
-  at this point."). Disassembly, decompiled code, and notes or patch files that quote or locate
-  the games' code are kept on Hyperion, outside this repository, its bundles and the vault. What
+- **Reverse-engineering output stays private** (decided 2026-10-18: the output stays private; it is for
+  the owner's own use, to preserve a library they bought). Disassembly, decompiled code, and notes or patch files that quote or locate
+  the games' code are kept privately, outside this repository and its releases. What
   lands here is our own engine code and the plan, never game code.
 - Their GitHub workflows came with the merge: `sync-upstream.yml` (every 6 hours, force-pushes an
   `upstream` branch and merges into `main`) and `build.yml` (releases on pushes to `main`). They only
@@ -55,7 +54,7 @@ point with commits we have not looked at.
 
 ## Phases
 
-### First goal: code maps (Ian, 2026-10-17)
+### First goal: code maps (decided 2026-10-17)
 Before anything else, map the code so every later session starts from a short, checked guide
 instead of re-reading 900 files. The index is [`maps/overview.md`](maps/overview.md) (updated
 2026-10-17 for the merged Linux fork; read from the code, nothing run). Next, the module maps it
@@ -95,11 +94,11 @@ Mode; `linux` at f0a21af; game CUSA02320 (APP_VER 01.00, package 01.02). Measure
   - Warm cache: 0 compiles, so the cache is reused.
 - **FSR 3.1 renders gameplay as full-screen noise on RADV PHOENIX** (HUD fine, nothing in the log),
   at any window size and with or without the shadPS4 #5257 NaN port. Off and Deck mode are clean.
-  Report: `Workspaces/Uncharted/reports/2026-10-18-fsr31-noise-radv-phoenix.md` (Ian's vault).
+  Report kept privately.
 - `bb-gpu-capabilities`: RADV PHOENIX lacks D32S8 blits, so live resolution changes fall back to
   the startup patch (a preset change needs a restart).
 - The built-in controller is held by InputPlumber in Desktop Mode and SDL does not see it.
-- **20 W is the design target** (Ian, 2026-10-18): at 30 W the Legion Go overheats and shuts off
+- **20 W is the design target** (decided 2026-10-18): at 30 W the Legion Go overheats and shuts off
   even with full fans, so it stays power-limited by design, and CPU spin takes power from the GPU.
 - Memory is the tight part: in gameplay `bb-probe` held 2.0-2.8 GB resident on top of graphics
   memory taken from the same 15 GB, and with Steam and a browser open the free memory fell to
@@ -130,9 +129,9 @@ then detects the hardware and applies the best settings for it. Three target mac
 a Legion Go handheld (Ryzen Z1 Extreme, 20 W Deck profile), a ROG Flow Z13 (Ryzen AI Max, Strix
 Halo) and a Windows desktop with an RTX 3090 Ti.
 - **Port and game dump.** The launcher downloads the port, then downloads the owner's own dump from
-  the owner's private Nextcloud server (WebDAV), checks it (sizes and hashes), and installs it beside
+  the owner's private file server (WebDAV), checks it (sizes and hashes), and installs it beside
   the port. The game data never enters the repo, a release or a build artifact.
-- **Sign-in:** the one hand step besides installing the launcher. It signs in to that Nextcloud once,
+- **Sign-in:** the one hand step besides installing the launcher. It signs in to that server once,
   with an app password the owner creates, kept in the OS keychain (Windows Credential Manager, the
   Secret Service on SteamOS); never in a file or the repo. Server address, paths, user
   name and dump file names live in local config only.
@@ -163,8 +162,8 @@ Halo) and a Windows desktop with an RTX 3090 Ti.
 - **Profile the GPU thread first (2026-10-18).** On the Legion Go the GPU thread is nearly saturated
   at 1080p/60 with anti-aliasing off. `BB_FRAME_STATS=1` plus `perf` (user space, our own process)
   on U1 gameplay: where the time goes per draw, then tune the hot path in our own code.
-- **60 FPS: port-side performance, not a game unlock (Ian, 2026-10-18: "Would love to unlock
-  60fps").** Reverse engineering on Hyperion (REA, static; output private) found nothing to
+- **60 FPS: port-side performance, not a game unlock (the owner wants 60 FPS, 2026-10-18).**
+  Reverse engineering on the Windows desktop (a reverse-engineering tool, static; output private) found nothing to
   unlock. All three games run at 60 on the PS4 and step their logic by measured frame time
   (U2: the CPU clock delta, capped at 100 ms per step; U3 built the same way). Only photo mode
   (all three) and one tweak setting in U2/U3 ask the video output for 30 Hz, and the port obeys.
@@ -176,16 +175,16 @@ Halo) and a Windows desktop with an RTX 3090 Ti.
   cutscenes, gameplay) and one U2 gameplay run, the games never changed the video-out flip
   rate from "every vblank". Photo mode was not reached (scripted menu input dropped presses), so
   its 30 Hz request is still read, not measured.
-- **FSR 4 and DLSS (Ian, 2026-10-18).** Test both as anti-aliasing and upscaling options:
+- **FSR 4 and DLSS (decided 2026-10-18).** Test both as anti-aliasing and upscaling options:
   - FSR 4: fetch its model files with `tools/fetch_fsr4_assets.sh` (the official source the
     script uses). Then compare it with anti-aliasing off on Uncharted 1 at 800p/60 and at 1080p:
     noise or not (FSR 3.1 renders gameplay as noise on RADV, issue Supermedo#351), FPS, frame time.
     Without the assets it falls back to FSR 3.1 today.
-  - DLSS: test it through the hack project saved in Kaylee's queue, on Hyperion (NVIDIA tests run
-    there only, Ian 2026-10-18).
+  - DLSS: test it through the hack project kept privately, on the Windows desktop with an RTX 3090 Ti (NVIDIA
+    tests run there only, decided 2026-10-18).
   - Done when each has a measured row (picture correct or not, FPS, frame time) per machine it can
     run on.
-- **First-launch shader preparation (Ian, 2026-10-16):** like God of War or The Last of Us
+- **First-launch shader preparation (decided 2026-10-16):** like God of War or The Last of Us
   Part I on Steam, show a one-time "preparing shaders" screen the first time a game starts,
   then play without compile stutter. Today shaders are translated and compiled while playing;
   the results are cached in `user/`, and the cache is thrown away when the graphics driver or
@@ -194,10 +193,10 @@ Halo) and a Windows desktop with an RTX 3090 Ti.
   shaders a full play route uses, keyed by shader hash; (3) at first launch, find those
   shaders in the player's own dump and compile them before the game starts, with a progress
   bar; (4) redo the step automatically after a driver change. Open question: whether the
-  game's shaders can be found in the dump without running the game. Ian wants this
-  (2026-10-18: "Would love to unlock ... the shaders preload"), and the open question is now a
-  job for REA on Hyperion: find how the games store and load their shader binaries, to read
-  them from the player's own dump. Answer (REA, 2026-10-18, details private): no shaders are in
+  game's shaders can be found in the dump without running the game. The owner wants this
+  (2026-10-18: shader preload), and the open question is now a
+  job for the reverse-engineering tool on the Windows desktop: find how the games store and load their shader binaries, to read
+  them from the player's own dump. Answer (reverse-engineering tool, 2026-10-18, details private): no shaders are in
   the executables; they are in the game data, built-ins in `.psarc` archives and materials in
   `.pak` files, each binary ending in an "OrbShdr" footer whose shader hash is the port's cache
   key. A streamed census of the dump (Legion Go, read-only, counts only) found 270,245 footers,
@@ -230,11 +229,11 @@ Halo) and a Windows desktop with an RTX 3090 Ti.
 
 - Which of bbport's 8 newer commits to take.
 - Settled: the Linux launcher exists (`launcher/uncharted_linux.py`, spacepepperoni).
-- Whether to send anything of ours to spacepepperoni, and how (Ian's call, one change at a time).
+- Whether to send anything of ours to spacepepperoni, and how (the owner's call, one change at a time).
 - `run.sh` is still Bloodborne's; drop it or point it at Uncharted once Phase 0 shows which
   launch path we use. (2026-10-18: `run.py` launches all three games on Linux.)
 - FSR 3.1 noise on RADV (report above). Our side logs the driver at FSR start and warns off a
   validated list (fix/fsr-driver-log-1018). spacepepperoni's issues are turned off, so whether to
-  send it as a pull request is Ian's call.
+  send it as a pull request is the owner's call.
 - `package.sh` stopped on Arch and SteamOS (the loader listed by path): fixed on our side
   (fix/package-sh-loader-1018); same question for upstream.

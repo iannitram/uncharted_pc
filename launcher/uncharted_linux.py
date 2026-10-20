@@ -47,8 +47,8 @@ def steam_deck():
 
 
 def deck_frame_rate():
-    """Steam Deck mode's default frame rate: 60 on every handheld (Ian, 2026-10-18: "I would
-    prefer 60, always for steamdeck/legion go"). Measured on the Legion Go 8APU1: U1 57-59, U2 and
+    """Steam Deck mode's default frame rate: 60 on every handheld (owner's decision,
+    2026-10-18). Measured on the Legion Go 8APU1: U1 57-59, U2 and
     U3 60 FPS at 1280x800, anti-aliasing off, 20 W. Not measured on the Steam Deck (a weaker GPU)
     or the ROG Flow Z13. 30 stays selectable, and a saved choice is kept."""
     return '60'
