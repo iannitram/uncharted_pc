@@ -261,11 +261,13 @@ static void save_list(const unsigned char *param) {
            save_dialog.pick<0 ? "nothing to choose, cancelled" : save_dialog.pick ? "chose " : "new save data",
            save_dialog.pick>0 ? save_dialog.dir : "");
 }
+static int save_log(void) { static int v=-1; if (v<0) { const char *e=getenv("BB_SAVE_LOG"); v=e && e[0]=='1'; } return v; } /* diagnosis, as in runtime_savedata.c */
 static ABI int32_t save_init(void) { return dialog_init(2); }
 static ABI int32_t save_term(void) { return dialog_term(2); }
 static ABI int32_t save_open(const unsigned char *param) {
     if (!dialogs[2].initialized) return DIALOG_NOT_INITIALIZED;
     if (!param) return (int32_t)0x80B80006; /* ARG_NULL */
+    if (save_log() && dialogs[2].status==2) printf("Runtime: SaveLog Open while RUNNING (previous mode %u, waits %d); accepted\n",save_dialog.mode,save_dialog.waits);
     uint32_t mode, kind=0, buttons=0;
     const unsigned char *user_msg, *sys_msg;
     void *user_data;
@@ -279,6 +281,7 @@ static ABI int32_t save_open(const unsigned char *param) {
     else printf("Runtime: SaveDataDialog mode %u (message type %u)%s\n",mode,mode==SAVE_SYSTEM_MSG ? kind : buttons,
            save_dialog.waits ? ": shown until the game closes it" : ": answered OK/Yes");
     dialogs[2].status=2; /* RUNNING */
+    if (save_log()) printf("Runtime: SaveLog Open mode %u -> status RUNNING\n",mode);
     return 0;
 }
 static ABI int32_t save_status(void) {
@@ -290,7 +293,10 @@ static ABI int32_t profile_result(void *result) { if (result) memset(result,0,4)
  * pointers the game passes in (dirName, param) are left alone. */
 static ABI int32_t save_result(unsigned char *result) {
     if (!result) return (int32_t)0x80B80006; /* ARG_NULL */
-    if (dialogs[2].status!=3) return (int32_t)0x80B80005; /* NOT_FINISHED */
+    if (dialogs[2].status!=3) {
+        if (save_log()) printf("Runtime: SaveLog GetResult -> 0x80B80005 NOT_FINISHED (status %d)\n",dialogs[2].status);
+        return (int32_t)0x80B80005; /* NOT_FINISHED */
+    }
     int cancelled=save_dialog.mode==SAVE_LIST && save_dialog.pick<0;
     uint32_t outcome=cancelled ? 1 : 0, button=cancelled ? 0 : 1; /* OK / USER_CANCELED; button YES */
     memcpy(result,&save_dialog.mode,4); memcpy(result+4,&outcome,4); memcpy(result+8,&button,4);
@@ -300,13 +306,22 @@ static ABI int32_t save_result(unsigned char *result) {
         memcpy(&dir,result+16,8); memcpy(&out_param,result+24,8);
         if (dir) memcpy(dir,save_dialog.dir,32);
         if (out_param && save_dialog.pick>0) memcpy(out_param,save_dialog.param,SAVE_PARAM_SIZE);
+        if (save_log()) printf("Runtime: SaveLog GetResult list: dirName ptr %s (wrote '%.32s'), param ptr %s (%s)\n",dir ? "set" : "NULL",
+                               dir ? save_dialog.dir : "",out_param ? "set" : "NULL",
+                               out_param && save_dialog.pick>0 ? "filled" : "left alone");
     }
+    if (save_log()) printf("Runtime: SaveLog GetResult -> 0: wrote mode %u result %u button %u userData %p; pad (offset 12) left alone\n",
+                           save_dialog.mode,outcome,button,save_dialog.user_data);
     return 0;
 }
 static ABI int32_t save_ready(void) { return 1; }
-static ABI int32_t save_progress(int32_t target,uint32_t rate) { (void)target; (void)rate; return 0; }
+static ABI int32_t save_progress(int32_t target,uint32_t rate) {
+    if (save_log()) printf("Runtime: SaveLog ProgressBarSetValue target %d value %u (status %d, mode %u)\n",target,rate,dialogs[2].status,save_dialog.mode);
+    return 0;
+}
 static ABI int32_t save_close(const void *param) {
     (void)param;
+    if (save_log()) printf("Runtime: SaveLog Close (status before %d, mode %u) -> 0\n",dialogs[2].status,save_dialog.mode);
     if (dialogs[2].status==2) dialogs[2].status=3;
     return 0;
 }
