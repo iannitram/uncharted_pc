@@ -124,7 +124,28 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   (`up/*`) before starting, so we do not duplicate a fix in progress.
 - Done when each game plays 30 minutes without a crash on the Strix Halo, measured.
 
-### Phase 3: 60 FPS on the Strix Halo
+### Phase 3: launcher integration (install, update, per-machine settings)
+The Craft launcher installs and updates the port on a fresh machine (Linux/SteamOS, Windows, macOS),
+then detects the hardware and applies the best settings for it. Four target machines, by hardware:
+a Legion Go handheld (Ryzen Z1 Extreme, 20 W Deck profile), a ROG Flow Z13 (Ryzen AI Max, Strix
+Halo), a Windows desktop with an RTX 3090 Ti, and a Mac mini M1 with 8 GB.
+- **The launcher downloads only the port.** The game always comes from the player's own dump, which
+  the launcher asks for: never downloaded, never bundled.
+- **Linux/SteamOS:** fetch the port's release, ask for the dump folder, pick the settings profile
+  (Deck mode and the 20 W profile on the Legion Go; the Strix Halo profile on the Z13), keep the port
+  updated.
+- **Windows:** upstream already has Windows support (Supermedo/uncharted_pc#304; ours stacked on top
+  is #444). Our part: build and package it for the launcher, and test it on the Windows desktop.
+- **macOS: open question, research first.** The port runs the games' x86-64 code natively, so Apple
+  Silicon needs Rosetta 2 plus Vulkan through MoltenVK, and 8 GB is tight. Research is done when
+  there is a read-only feasibility note: does anyone run shadPS4-family ports on Apple Silicon, what
+  breaks, and an estimate. Measurements come later, on the Mac.
+- **Hardware detection:** the launcher reads CPU, GPU, memory and OS and maps them to a settings
+  profile per machine, with a manual override.
+- Done when a freshly wiped Z13, Windows desktop and Mac mini each go from installing the launcher
+  to playing Uncharted 1 with no hand steps except pointing at the dump.
+
+### Phase 4: 60 FPS on the Strix Halo
 - Measure per game, find the bottleneck, tune. Done when each game holds 60 FPS in a defined test
   route.
 - **Profile the GPU thread first (2026-10-18).** On the Legion Go the GPU thread is nearly saturated
@@ -176,7 +197,7 @@ keep merging their `main` (and check it builds) before starting new work, so we 
   not ship translated or compiled shaders in the repository. Also check whether Steam's own
   shader pre-caching helps when this is added as a non-Steam shortcut (not known).
 
-### Phase 4: the Legion Go
+### Phase 5: the Legion Go
 - Their Steam Deck mode is the starting point (also AMD, also SteamOS). Measure on the Legion Go,
   tune Deck mode or add a Legion Go profile.
 - Started 2026-10-18: all three games boot and hold 30 FPS in Deck mode (measurements above).
