@@ -9,7 +9,7 @@ import uncharted_linux as linux  # noqa: E402
 
 class DeckFrameRate(unittest.TestCase):
     def test_default_is_60_on_every_handheld(self):
-        # Ian, 2026-10-18: 60 always, Steam Deck and Legion Go alike; no device lookup.
+        # Owner's decision, 2026-10-18: 60 always, Steam Deck and Legion Go alike; no device lookup.
         self.assertEqual(linux.deck_frame_rate(), '60')
         self.assertEqual(linux.DECK_SETTINGS['frame_rate'], '60')
 
