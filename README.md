@@ -13,7 +13,7 @@
 
 ⚠️Uncharted 2: Some visual and physics glitches, unconfirmed if fully playable
 
-❌Uncharted 3: Crashes often. Not yet fully playable
+❌Uncharted 3: Open crashes in the Cartagena square (chapter 2) and the Citadel (chapter 8). The London bar and MP3 audio crashes are fixed. Not yet fully playable
 
 ## Distributions tested
 ✅ Confirmed Working: SteamOS 3.7, Fedora 44, Debian 13

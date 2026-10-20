@@ -118,8 +118,14 @@ keep merging their `main` (and check it builds) before starting new work, so we 
 
 ### Phase 2: all three games playable
 - Uncharted 3 first (theirs crashes often), then Uncharted 2's physics glitches, then the README's
-  known problems (Uncharted 2 streaming crash `iSubMesh < m_numSubMeshInstances`, Uncharted 3
-  London bar crash, flashing shapes on some characters). Check their open issues and branches
+  known problems (Uncharted 2 streaming crash `iSubMesh < m_numSubMeshInstances`, flashing shapes on
+  some characters).
+- Uncharted 3 crashes still open upstream: the Cartagena square, chapter 2
+  ([Supermedo/uncharted_pc#303](https://github.com/Supermedo/uncharted_pc/issues/303)) and the
+  Citadel, chapter 8 ([#230](https://github.com/Supermedo/uncharted_pc/issues/230)). The London bar
+  crash is fixed upstream in [0.3.4](https://github.com/Supermedo/uncharted_pc/releases/tag/v0.3.4)
+  and the MP3 audio crash in [0.3.5](https://github.com/Supermedo/uncharted_pc/releases/tag/v0.3.5);
+  both are in our tree. Check their open issues and branches
   (`up/*`) before starting, so we do not duplicate a fix in progress.
 - Done when each game plays 30 minutes without a crash on the Strix Halo, measured.
 
