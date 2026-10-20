@@ -13,7 +13,7 @@
 
 ⚠️Uncharted 2: Ingame, some physics glitches. Unconfirmed if fully playable
 
-❌Uncharted 3: Crashes often. Not yet fully playable
+❌Uncharted 3: Open crashes in the Cartagena square (chapter 2) and the Citadel (chapter 8). The London bar and MP3 audio crashes are fixed. Not yet fully playable
 
 ## Install
 
