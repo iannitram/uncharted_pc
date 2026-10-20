@@ -17,6 +17,8 @@ import threading
 from types import SimpleNamespace
 import time
 
+import uncharted_logs
+
 APP_ID = 'uncharted-linux'
 
 # The packaged Python and OpenSSL come from Debian and look for certificates in /usr/lib/ssl,
@@ -177,7 +179,7 @@ def desktop_entry(launcher_file, port_dir):
         icon = Path(getattr(sys, '_MEIPASS', port_dir)) / 'uncharted.png'
     text = ('[Desktop Entry]\nType=Application\nName=Uncharted\n'
             f'Comment={TITLE} for Linux\nExec={command}\nPath={port_dir}\nIcon={icon}\n'
-            'Terminal=false\nCategories=Game;\n')
+            'Terminal=false\nCategories=Game;\n' + report_action(command))
     data = Path(os.environ.get('XDG_DATA_HOME') or Path.home() / '.local' / 'share')
     written = []
     for folder in (data / 'applications', desktop_folder()):
@@ -188,6 +190,69 @@ def desktop_entry(launcher_file, port_dir):
             path.chmod(0o755)
             written.append(path)
     return written
+
+
+def report_action(command):
+    """The menu entry's right-click Create bug report (works when the window does not)."""
+    return f'Actions=report;\n\n[Desktop Action report]\nName=Create bug report\nExec={command} --report\n'
+
+
+def add_report_action():
+    """Menu and desktop entries made before Create bug report existed (install.sh, Desktop
+    shortcut) get it, when they start this AppImage."""
+    appimage = os.environ.get('APPIMAGE')
+    if not appimage:
+        return
+    data = Path(os.environ.get('XDG_DATA_HOME') or Path.home() / '.local' / 'share')
+    for folder in (data / 'applications', desktop_folder()):
+        path = folder / f'{APP_ID}.desktop' if folder else None
+        try:
+            text = path.read_text(encoding='utf-8') if path and path.is_file() else ''
+        except OSError:
+            continue
+        exec_line = next((line for line in text.splitlines() if line.startswith('Exec=')), '')
+        if appimage not in exec_line or '[Desktop Action report]' in text:
+            continue
+        try:
+            path.write_text(text.rstrip('\n') + '\n' + report_action(exec_line[len('Exec='):]), encoding='utf-8')
+        except OSError:
+            pass
+
+
+def report_without_window(settings, data_dir, port_dir, version):
+    """--report: the bug report zip in Downloads, its folder opened, without Tk."""
+    saves = Path(settings.get('user_dir') or Path(data_dir) / 'user')
+    try:
+        path = uncharted_logs.create_report(data_dir, saves, settings, port_dir, version, crash_signature)
+    except OSError as error:
+        print(f'Could not create the bug report: {error}', file=sys.stderr)
+        uncharted_logs.tell('Uncharted', f'Could not create the bug report: {error}')
+        return 1
+    print(f'Bug report: {path}')
+    uncharted_logs.tell('Uncharted', f'Bug report saved as {path.name} in {path.parent}. '
+                                     'Send this file with your bug report.')
+    try:
+        open_path(path.parent)
+    except OSError:  # no xdg-open: the path was printed and shown
+        pass
+    return 0
+
+
+def log_window(root):
+    """The window's size and scaling in the launcher's log, then a heartbeat for the watchdog."""
+    try:
+        uncharted_logs.note(f'Window built: screen {root.winfo_screenwidth()}x{root.winfo_screenheight()}, '
+                            f'Tk {root.tk.call("info", "patchlevel")}, {root.winfo_fpixels("1i"):.0f} DPI, '
+                            f'font scale {font_scale(root):.2f}, windowing system {root.tk.call("tk", "windowingsystem")}')
+
+        def shown(event):
+            if event.widget is root and not getattr(root, 'shown', False):
+                root.shown = True
+                uncharted_logs.note('Window shown')
+        root.bind('<Map>', shown, add='+')
+    except Exception as error:  # only the log line
+        uncharted_logs.note(f'Window details unavailable: {error}')
+    uncharted_logs.heartbeat(root)
 
 
 def desktop_folder():
@@ -319,10 +384,20 @@ def desktop_game_entry(launcher_file, key, name):
 CRASH_MARKERS = ('STOP:', 'Fault:', '*** ASSERTION', 'ASSERTION:', 'Device lost', 'GPU crash: the graphics')
 
 
+def read_tail(path, size=1 << 20):
+    """The last `size` bytes of a file as text. A run log can grow to gigabytes (a message every
+    frame); read whole on the window's thread, it froze the launcher black at start."""
+    with open(path, 'rb') as log:
+        log.seek(0, os.SEEK_END)
+        log.seek(max(0, log.tell() - size))
+        return log.read().decode('utf-8', errors='replace')
+
+
 def crash_signature(log_path):
-    """The first line of a run log that says how the game stopped, or None (it ended normally)."""
+    """The first line of a run log's last megabyte that says how the game stopped, or None (it
+    ended normally); with that text."""
     try:
-        text = Path(log_path).read_text(encoding='utf-8', errors='replace')
+        text = read_tail(log_path)
     except OSError:
         return None, ''
     for line in text.splitlines():
@@ -375,13 +450,14 @@ def apply_defaults(ns):
     """Linux settings the Windows launcher does not have: Steam Deck mode (on by default on
     SteamOS) and a 30 FPS frame rate."""
     ns['APP_DEFAULTS'].setdefault('steam_deck', steam_deck())
+    ns['APP_DEFAULTS'].setdefault('gpu_readbacks', '1')
     ns['version_tuple'] = version_key  # the launcher's update check compares with it
     for name in ('WINDOW_SIZES', 'ANTI_ALIASING'):
         ns[name][:] = [(value, text.replace("(the games' own)", '(Default)').replace("(the game's own)", '(Default)'))
                        for value, text in ns[name]]
     ns['FRAME_RATES'][:] = [(value, '60 FPS (Default)' if value == '60' else text) for value, text in ns['FRAME_RATES']]
     if not any(value == '30' for value, _text in ns['FRAME_RATES']):
-        ns['FRAME_RATES'].insert(0, ('30', '30 FPS (Steam Deck)'))
+        ns['FRAME_RATES'].insert(0, ('30', '30 FPS'))
     if not any(value == '1280x800' for value, _text in ns['WINDOW_SIZES']):
         ns['WINDOW_SIZES'].insert(1, ('1280x800', '1280 × 800 (Steam Deck)'))
 
@@ -398,26 +474,58 @@ def default_saves(settings, data_dir=None):
 
 # Steam Deck mode shows its values in these settings while it is on (deck_environment enforces
 # the locked ones at launch); turning it off restores what the player had.
-# The frame rate stays a choice in Steam Deck mode, 30 or 60 (deck_environment caps it at 60).
-DECK_SETTINGS = {'frame_rate': deck_frame_rate(), 'window_size': '1280x800', 'present_mode': 'Fifo',
-                 'fullscreen': True, 'anti_aliasing': 'off', 'frame_generation': 'off'}
+DECK_SETTINGS = {'frame_rate': '60', 'window_size': '1280x800', 'present_mode': 'Fifo', 'fullscreen': True,
+                 'anti_aliasing': 'off', 'frame_generation': 'off'}
 DECK_LOCKED = ('window_size', 'present_mode', 'fullscreen')
+DECK_FRAME_RATES = ('30', '60')
+# Choices the Deck's hardware cannot run (an RDNA 2 GPU, a 60 Hz screen): greyed out in Steam
+# Deck mode, and replaced by these settings' first Deck-safe value at launch.
+DECK_UNAVAILABLE = {'anti_aliasing': ('fsr4', 'fsr411', 'dlss'), 'frame_generation': ('dlss',),
+                    'frame_gen_multiplier': ('3', '4')}
+DECK_FALLBACK = {'anti_aliasing': 'off', 'frame_generation': 'off', 'frame_gen_multiplier': '2'}
+
+
+# The texts under upstream's settings rows, by row title: replaced, or None for none.
+ROW_HINTS = {'Frame rate': None,
+             'Window size': 'Game renders at 1920 x 1080 and is upscaled at higher resolutions',
+             'Upscaling': None, 'Sharpening': None, 'Anti-aliasing': None,
+             'Frame generation': None, 'Multiplier': None, 'Mouse sensitivity': None}
+
+
+# BB_READBACKS: whether GPU-written data is copied back when the game's CPU code writes the same
+# memory. Off fixes floating NPCs and characters in walls for some players (upstream #33) but can
+# turn weapons into black cubes, so it stays an experiment.
+READBACK_MODES = [('1', 'Default (relaxed)'),
+                  ('0', 'Off (experimental: fewer floating NPCs, but weapons can turn black)'),
+                  ('2', 'Precise (slower)')]
+
+
+def deck_allows(key, value):
+    """The value can be chosen for this setting in Steam Deck mode."""
+    if key == 'frame_rate':
+        return value in DECK_FRAME_RATES
+    return value not in DECK_UNAVAILABLE.get(key, ())
 
 
 def deck_environment(settings, env):
-    """Steam Deck mode: what a handheld needs for a steady 30 or 60 FPS. Applied before the
-    player's own Environment entries, which can override any of it."""
+    """Steam Deck mode: the Deck's screen and presentation, 30 or 60 FPS, and nothing its GPU
+    cannot run; also the GPU readback mode (Advanced). Applied before the player's own Environment
+    entries, which can override any of it."""
+    readbacks = str(settings.get('gpu_readbacks') or '1')
+    if readbacks in ('0', '2'):
+        env['BB_READBACKS'] = readbacks
     if not settings.get('steam_deck'):
         return
-    # The player's choice, 30 or 60 (default 60); anything higher is capped at 60.
-    rate = str(settings.get('frame_rate') or DECK_SETTINGS['frame_rate'])
-    if rate not in DECK_FRAME_RATES:
-        rate = '60' if rate.isdigit() and int(rate) > 60 else DECK_SETTINGS['frame_rate']
-    env['BB_VBLANK_HZ'] = rate
+    rate = str(settings.get('frame_rate') or '')
+    env['BB_VBLANK_HZ'] = rate if rate in DECK_FRAME_RATES else '60'  # the PS4's rate; 30 can be chosen
     env['BB_WINDOW_SIZE'] = '1280x800'   # the Deck's screen: no 1080p output pass to scale down
     env['BB_PRESENT_MODE'] = 'Fifo'      # gamescope paces FIFO best
     env['BB_FULLSCREEN'] = '1'
     env['BB_FRAME_STATS'] = '1'          # frame time breakdown in last_run.log (tuning the Deck)
+    for key, name in (('anti_aliasing', 'BB_UPSCALER'), ('frame_generation', 'BB_FRAME_GEN'),
+                      ('frame_gen_multiplier', 'BB_FRAME_GEN_MULTIPLIER')):
+        if not deck_allows(key, str(settings.get(key) or '')):
+            env[name] = DECK_FALLBACK[key]
 
 
 def rotate_logs(folder, keep=5):
@@ -722,19 +830,56 @@ def launcher_class(base, ns):
             self.steam_deck_changed(startup=True)
 
         def choice(self, parent, key, options, width=36):
-            box = super().choice(parent, key, options, width)
+            """The launcher's drop-down, with the choices the Steam Deck cannot run greyed out
+            (and not selectable) while Steam Deck mode is on."""
+            var = self.var(key)
+            values = [v for v, _t in options]
+            box = self.ttk.Combobox(parent, values=[_(t) for _v, t in options], state='readonly', width=width)
+            if var.get() not in values:
+                var.set(values[0])
             self.boxes = getattr(self, 'boxes', {})
             self.boxes[key] = box
+
+            def blocked(value):
+                return bool(self.var('steam_deck').get()) and not deck_allows(key, value)
+
+            def show(*_args):
+                box.current(values.index(var.get()) if var.get() in values else 0)
+
+            def picked(_event):
+                value = values[box.current()]
+                if blocked(value):
+                    show()  # not on the Deck: the choice stays as it was
+                else:
+                    var.set(value)
+
+            def grey():
+                # The list is refilled after postcommand runs, so its items are coloured afterwards.
+                try:
+                    listbox = f"{box.tk.call('ttk::combobox::PopdownWindow', box)}.f.l"
+                    for index, value in enumerate(values):
+                        if blocked(value):
+                            box.tk.call(listbox, 'itemconfigure', index, '-foreground', MUTED,
+                                        '-selectforeground', MUTED)
+                except Exception:  # only the colours: selection is refused in picked() anyway
+                    pass
+            box.configure(postcommand=lambda: box.after_idle(grey))
+            show()
+            box.bind('<<ComboboxSelected>>', picked)
+            var.trace_add('write', show)
             return box
 
         def steam_deck_changed(self, startup=False):
             """Steam Deck mode on: the affected settings switch to the Deck's values (the previous ones
-            are kept in deck_saved) and the enforced ones are locked. Off: the kept values come back."""
+            are kept in deck_saved), the enforced ones are locked, the frame rate is 30 or 60 and the
+            choices the Deck cannot run are greyed out. Off: the kept values come back."""
             on = bool(self.var('steam_deck').get())
             saved = self.app.get('deck_saved')
             if on and not isinstance(saved, dict):
                 self.app['deck_saved'] = {key: self.var(key).get() for key in DECK_SETTINGS}
                 for key, value in DECK_SETTINGS.items():
+                    if key == 'frame_rate' and self.var(key).get() in DECK_FRAME_RATES:
+                        continue  # 30 or 60 already: the player's choice stays
                     self.var(key).set(value)
             elif not on and isinstance(saved, dict):
                 for key, value in saved.items():
@@ -744,6 +889,12 @@ def launcher_class(base, ns):
             elif on and startup:
                 for key in DECK_LOCKED:  # what deck_environment will use anyway
                     self.var(key).set(DECK_SETTINGS[key])
+            if on:  # a value the Deck cannot run (set before, or in settings.json): its safe one
+                if not deck_allows('frame_rate', self.var('frame_rate').get()):
+                    self.var('frame_rate').set(DECK_SETTINGS['frame_rate'])
+                for key, value in DECK_FALLBACK.items():
+                    if key in ns['APP_DEFAULTS'] and not deck_allows(key, self.var(key).get()):
+                        self.var(key).set(value)
             for key in DECK_LOCKED:
                 box = getattr(self, 'boxes', {}).get(key)
                 if box is not None:
@@ -901,26 +1052,57 @@ def launcher_class(base, ns):
 
         def build_advanced(self):
             """Advanced: options for testing and the game's log."""
-            f = self.page('advanced', _('Advanced'), _('Options for testing, and the log of the last run.'))
+            f = self.page('advanced', _('Advanced'), _('Options for testing, logs and bug reports.'))
             self.check(f, 'check_updates', _('Automatic updates'),
                        _('Look for a new version when the launcher or a game starts, and offer to install it.'))
             self.check(f, 'close_on_play', _('Close the launcher when the game starts'))
+            self.row(f, _('GPU readbacks'), self.choice(f, 'gpu_readbacks', READBACK_MODES, 60),
+                     _('Off is a test for floating NPCs and characters inside walls (upstream issue #33): it '
+                       'helped some players, but weapons can turn into black cubes. Default if unsure.'))
             extra = self.ttk.Entry(f, textvariable=self.var('extra_env'), width=60)
             self.row(f, _('Environment'), extra, _('Extra variables for the game, NAME=value separated by spaces.'))
-            self.section(f, _('Log'))
-            self.note(f, _('What the game printed during the last run (also saved as last_run.log in the saves '
-                           'folder).'), top=2)
+            self.section(f, _('Logs and bug reports'))
+            self.note(f, _('Logs of the last 5 launcher and game runs. Create bug report saves them with your '
+                           'system details and settings as one zip file in Downloads, without your home folder or '
+                           'user name; nothing is uploaded. If the launcher window does not work, right-click '
+                           'Uncharted in the application menu and choose Create bug report.'), top=2)
             card = self.target(f)
+            self.health_label = self.ttk.Label(card, text='', style='Muted.TLabel', wraplength=self.px(680),
+                                               justify='left')
+            self.health_label.grid(row=self.next_row(card), column=0, columnspan=2, sticky='w', pady=(10, 0))
+            self.show_health()
             holder = self.tk.Frame(card, bg=CARD)
             holder.grid(row=self.next_row(card), column=0, columnspan=2, sticky='w', pady=(12, 0))
-            self.pill(holder, _('Show the log'), lambda: self.show('log')).pack(side='left')
-            self.pill(holder, _('Open the saves folder'), lambda: open_path(self.saves_folder())).pack(
-                side='left', padx=(8, 0))
+            self.pill(holder, _('Create bug report'), self.create_report, kind='primary').pack(side='left')
+            self.pill(holder, _('Show the game log'), lambda: self.show('log')).pack(side='left', padx=(8, 0))
+            self.pill(holder, _('Open the logs folder'),
+                      lambda: open_path(uncharted_logs.log_dir(ns['DATA_DIR']))).pack(side='left', padx=(8, 0))
+
+        def show_health(self):
+            """What the recent logs say went wrong, under Logs and bug reports."""
+            found = uncharted_logs.health(ns['DATA_DIR'], self.saves_folder(), crash_signature)
+            if found:
+                text = _('Found in the recent logs:') + '\n' + '\n'.join(f'•  {line}' for line in found)
+            else:
+                text = _('No problems found in the recent logs.')
+            self.health_label.configure(text=text, foreground=GOLD if found else MUTED)
+
+        def create_report(self):
+            self.collect()
+            try:
+                path = uncharted_logs.create_report(ns['DATA_DIR'], self.saves_folder(), self.app, PORT_DIR,
+                                                    ns['VERSION'], crash_signature)
+            except OSError as error:
+                self.messagebox.showerror(NAME, _('Could not create the bug report: {}').format(error))
+                return
+            self.show_health()
+            open_path(path.parent)
+            self.messagebox.showinfo(NAME, _('Bug report saved as {} in {}.\n\nSend this file with your bug report '
+                                             '(Discord or a GitHub issue).').format(path.name, path.parent))
 
         def build_game(self):
             """Files: the game folder, the saves folder and each game's saves, the shader cache."""
-            f = self.page('game', _('Files'), _('Your own decrypted dump of the collection, its saves and its '
-                                                'shader cache.'))
+            f = self.page('game', _('Files'), '')
             self.folder(f, 'game_dir', _('Game folder'), _('The folder with eboot.bin'),
                         _('The folder with eboot.bin, big2-ps4_Shipping.elf and big3-ps4_Shipping.elf.'),
                         on_change=self.refresh)
@@ -932,20 +1114,23 @@ def launcher_class(base, ns):
             self.saves_rows.grid(row=self.next_row(card), column=0, columnspan=2, sticky='we')
             self.fill_saves()
             self.section(f, _('Shader cache'))
-            self.note(f, _('Compiled shaders are kept so the game does not stutter again. Clear the cache only '
-                           'when the picture is broken after an update.'), top=2)
+            self.note(f, _('Recommended to only clear if you have visual issues'), top=2)
             card = self.target(f)
             holder = self.tk.Frame(card, bg=CARD)
             holder.grid(row=self.next_row(card), column=0, columnspan=2, sticky='w', pady=(12, 0))
             self.pill(holder, _('Clear shader cache'), self.clear_cache).pack(side='left')
+
+        def row(self, parent, title, widget, hint=None):
+            """Upstream's rows with this fork's shorter texts (ROW_HINTS; None: no text)."""
+            hints = {_(key): _(text) if text else None for key, text in ROW_HINTS.items()}
+            return super().row(parent, title, widget, hints[title] if title in hints else hint)
 
         def build_display(self):
             """Settings: display and graphics, and the console (language, player name)."""
             super().build_display()
             f = self.page_inner['display']
             self.section(f, _('Console'))
-            self.row(f, _('Language'), self.choice(f, 'language', ns['LANGUAGES'], 30),
-                     _('The language the PS4 would be set to; the games use it for text and speech.'))
+            self.row(f, _('Language'), self.choice(f, 'language', ns['LANGUAGES'], 30))
             name = self.ttk.Entry(f, textvariable=self.var('player_name'), width=30)
             self.row(f, _('Player name'), name, _('Shown where the game uses the PSN name.'))
 
@@ -1025,13 +1210,14 @@ def launcher_class(base, ns):
             if name == 'display':
                 title, subtitle = _('Settings'), _('Display, graphics and the console.')
             f = super().page(name, title, subtitle)
+            if not subtitle:  # the heading's empty second line (page body -> canvas -> body -> shell)
+                head = f.master.master.master.winfo_children()[0]
+                head.winfo_children()[1].pack_forget()
             self.page_inner = getattr(self, 'page_inner', {})
             self.page_inner[name] = f
             if name == 'display':
                 self.check(f, 'steam_deck', _('Steam Deck mode'),
-                           _('Sets 30 FPS, the Deck\'s 1280 × 800, FIFO and fullscreen, and turns off anti-aliasing '
-                             'and frame generation, for a steady frame rate on the Steam Deck. Turning it off '
-                             'brings back your previous settings. On by default on SteamOS.'))
+                           _('Optimizes settings for Steam Deck. 1280x800 60FPS'))
             return f
 
         def build_play(self):
@@ -1046,21 +1232,23 @@ def launcher_class(base, ns):
                 row = tk.Frame(shell, bg=CARD, highlightthickness=0)
                 row.pack(fill='x', pady=(0, self.px(10)))
                 text = tk.Frame(row, bg=CARD)
-                text.pack(side='left', padx=self.px(18), pady=self.px(14))
                 tk.Label(text, text=f'Uncharted: {title}', bg=CARD, fg=TEXT,
                          font=self.font_brand_md).pack(anchor='w')
                 note = tk.Label(text, text='', bg=CARD, fg=MUTED, font=self.font_ui_sm)
                 note.pack(anchor='w')
-                play = self.pill(row, _('Play'), lambda k=key: self.play_game(k), kind='primary',
+                buttons = tk.Frame(row, bg=CARD)
+                play = self.pill(buttons, _('Play'), lambda k=key: self.play_game(k), kind='primary',
                                  background=CARD, padding=(26, 8))
                 play.pack(side='right', padx=(self.px(8), self.px(18)))
-                shortcut = self.pill(row, _('Desktop shortcut'), lambda k=key: self.game_shortcut(k),
+                shortcut = self.pill(buttons, _('Desktop shortcut'), lambda k=key: self.game_shortcut(k),
                                      background=CARD, padding=(14, 8))
                 shortcut.pack(side='right', padx=(self.px(8), 0))
-                steam = IconButton(self.tk, row, _('Add to Steam'), lambda k=key: self.add_game_to_steam(k),
+                steam = IconButton(self.tk, buttons, _('Add to Steam'), lambda k=key: self.add_game_to_steam(k),
                                    ns['COLORS'], self.px, self.font_button, 'secondary', CARD, (16, 8),
                                    icon_name='steam')
                 steam.pack(side='right')
+                row.bind('<Configure>', lambda _e, r=row, t=text, b=buttons: self.fit_game_row(r, t, b))
+                self.fit_game_row(row, text, buttons)
                 self.game_rows[key] = (play, steam, shortcut, note, exe)
             row = tk.Frame(shell, bg=SURFACE)
             row.pack(fill='x', pady=(self.px(14), self.px(8)))
@@ -1070,6 +1258,22 @@ def launcher_class(base, ns):
             fullscreen.bind('<Button-1>', lambda _e: self.var('fullscreen').set(not self.var('fullscreen').get()))
             # The upstream refresh() writes a line here; it is not shown (the game rows say it).
             self.ready = tk.Label(shell, text='', bg=SURFACE, fg=MUTED, font=self.font_ui_sm)
+
+        def fit_game_row(self, row, text, buttons):
+            """The buttons beside the title when the row is wide enough, else under it (large
+            display scaling or a narrow window cut Add to Steam off)."""
+            wide = row.winfo_width() >= text.winfo_reqwidth() + buttons.winfo_reqwidth() + self.px(36)
+            if getattr(row, 'wide', None) == wide:
+                return
+            row.wide = wide
+            text.pack_forget()
+            buttons.pack_forget()
+            if wide:
+                text.pack(side='left', padx=self.px(18), pady=self.px(14))
+                buttons.pack(side='right')
+            else:
+                text.pack(side='top', anchor='w', padx=self.px(18), pady=(self.px(14), self.px(8)))
+                buttons.pack(side='top', anchor='w', padx=(self.px(18), 0), pady=(0, self.px(14)))
 
         def saves_folder(self):
             return Path(self.app.get('user_dir') or ns['DATA_DIR'] / 'user')
