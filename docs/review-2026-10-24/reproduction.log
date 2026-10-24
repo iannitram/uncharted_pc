@@ -1,0 +1,5 @@
+Runtime: save data 'real' mounted at /savedata0 (created)
+invalid mount alias resolves to slot 0 (expected -1)
+save search reports 2 hits (expected 1 directory)
+Runtime: save data 'real' deleted
+delete returned 0; file still exists=1 (expected error)

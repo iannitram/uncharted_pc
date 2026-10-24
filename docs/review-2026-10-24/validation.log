@@ -1,0 +1,51 @@
+Guest mod files: reads, stat, merged listing, readonly assets and writable saves PASS
+Runtime: AppContent host provider loaded; references=1
+Runtime: AppContent host provider loaded; references=2
+Runtime: AppContent initialized; offline base-game profile, no mounted add-ons
+Runtime: AppContent parameter 0 = 1
+Runtime: AppContent parameter 1 = 13
+Runtime: AppContent parameter 2 = -2147483648
+Runtime: AppContent parameter 3 = 0
+Runtime: AppContent parameter 4 = 7
+Runtime: AppContent host provider loaded; references=1
+Runtime: AppContent initialized; offline base-game profile, no mounted add-ons
+PASS: AppContent lifecycle, profile and output boundaries
+Motion history: PASS (ranges, restart, offsets, matching, capacity, gating, index cache, jitter)
+UI composition: PASS (menu without camera, HUD, FSR off, viewport scaling)
+.............Mods: A: 1 files
+...Mods: A: 1 files
+Mods: dvdroot_ps4/chr/a.dcx: A -> B
+Mods: B: 1 files
+Mods: 1 game files replaced, 0 added
+Mods: B: 1 files
+Mods: dvdroot_ps4/chr/a.dcx: B -> A
+Mods: A: 1 files
+Mods: 1 game files replaced, 0 added
+.Mods: A: 2 files
+Mods: 1 game files replaced, 1 added
+...Mods: Upper: 1 files
+Mods: 1 game files replaced, 0 added
+....Mods: Title: 1 files
+Mods: 1 game files replaced, 0 added
+Mods: Archive: 1 files
+Mods: 1 game files replaced, 0 added
+Mods: Bare: 1 files
+Mods: 1 game files replaced, 0 added
+Mods: Nested: 1 files
+Mods: 1 game files replaced, 0 added
+............Patches: broken.xml: no element found: line 1, column 7
+Patches: skipped extra.xml/Mask: invalid literal for int() with base 0: ''
+Patches: skipped extra.xml/Mask: invalid literal for int() with base 0: ''
+.............ssssssssssssss.....sssssssssss...
+----------------------------------------------------------------------
+Ran 82 tests in 11.596s
+
+OK (skipped=25)
+AppContent profile: SKU=trial (probe setting), user params=[13, 0, 0, 4294967295], mounted add-ons=0
+Linked native libc: base=0x10000, 1 fallback exports, TLS=32 bytes; eboot TLS=0 bytes, fs->gs patched=0
+Linked native libc: base=0x10000, 1 fallback exports, TLS=32 bytes; eboot TLS=0 bytes, fs->gs patched=0
+Linked native libc: base=0x10000, 1 fallback exports, TLS=32 bytes; eboot TLS=48 bytes, fs->gs patched=2
+Linked native libc: base=0x10000, 0 fallback exports, TLS=32 bytes; eboot TLS=0 bytes, fs->gs patched=0
+Linked native libc: base=0x10000, 1 fallback exports, TLS=32 bytes; eboot TLS=0 bytes, fs->gs patched=0
+Patches: external extra.xml/On (1 writes)
+Patches: external extra.xml/Off (1 writes)

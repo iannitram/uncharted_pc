@@ -1,0 +1,508 @@
+{
+  "checked": "2026-10-24",
+  "query": "repo:Supermedo/uncharted_pc is:issue is:open",
+  "limit": 100,
+  "complete": false,
+  "issues": [
+    {
+      "number": 609,
+      "title": "v0.3.8 Uncharted 1 - Chapter 3 - how do you simulate the round L button\" prompt to open Submarine hatch ?",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/609"
+    },
+    {
+      "number": 608,
+      "title": "v0.3.8 issue - Uncharted 1 clip and falling through the map chapter 3",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/608"
+    },
+    {
+      "number": 603,
+      "title": "Uncharted 2 and 3 issues with graphics",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/603"
+    },
+    {
+      "number": 601,
+      "title": "Uncharted 3 missing objects/textures, graphical glitches blocking view",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/601"
+    },
+    {
+      "number": 600,
+      "title": "Uncharted 1 - After the 0.3.8 update when I entering the game and clicking \"Continue,\" the loading music keeps playing, and then the game crashes.",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/600"
+    },
+    {
+      "number": 599,
+      "title": "UC2 Guns textures not loading (all plaint black)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/599"
+    },
+    {
+      "number": 598,
+      "title": "Feature Request: Turn Off Auto Aim",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/598"
+    },
+    {
+      "number": 597,
+      "title": "Hotfix for Uncharted PC 0.3.6 (GPU crashes)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/597"
+    },
+    {
+      "number": 596,
+      "title": "✅  [FIXED) Uncharted PC 0.3.6 (GPU crashes)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/596"
+    },
+    {
+      "number": 595,
+      "title": "[Feature Request] Add shortcut arguments to boot directly into the 3 games.",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/595"
+    },
+    {
+      "number": 594,
+      "title": "2nd gen CPU sandy bridge not supported",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/594"
+    },
+    {
+      "number": 593,
+      "title": "Uncharted 1 crash",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/593"
+    },
+    {
+      "number": 591,
+      "title": "Uncharted 1 crashes every 20 mins of gameplay",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/591"
+    },
+    {
+      "number": 590,
+      "title": "UC2 nathan is clipping through floor/ground",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/590"
+    },
+    {
+      "number": 589,
+      "title": "Can we have xbox button icon on game , ABXY?",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/589"
+    },
+    {
+      "number": 588,
+      "title": "Crash (Linux): STOP: Ajm codec 0 (0=MP3, 2=AAC) is not implemented",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/588"
+    },
+    {
+      "number": 577,
+      "title": "Confirmed : Uncharted 2 can be fully finished (with some Caveat)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/577"
+    },
+    {
+      "number": 568,
+      "title": "Characters floating or phasing through the ground in Uncharted 2 and 3",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/568"
+    },
+    {
+      "number": 567,
+      "title": "won't launch",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/567"
+    },
+    {
+      "number": 560,
+      "title": "im using the CUSA02344 version and i am experiencing random crashes in-game for uncharted 1",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/560"
+    },
+    {
+      "number": 558,
+      "title": "[Uncharted 2] Chapter 21 softlock: truck takes no damage and characters sometimes clip through the ground",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/558"
+    },
+    {
+      "number": 556,
+      "title": "Could you please add ultrawide support?",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/556"
+    },
+    {
+      "number": 555,
+      "title": "Uncharted 2: Drake's legs shaking and traspassing the floor",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/555"
+    },
+    {
+      "number": 549,
+      "title": "Uncharted collection exit unexpectedly at launch",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/549"
+    },
+    {
+      "number": 534,
+      "title": "DO NOT RUN THE POWERSHELL COMMANDS PUT UP HERE!!!!",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/534"
+    },
+    {
+      "number": 523,
+      "title": "low frame rate",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/523"
+    },
+    {
+      "number": 518,
+      "title": "Large CPU-side performance gain on 4-6 core CPUs (idle job workers spin, thread priorities ignored, small spin windows)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/518"
+    },
+    {
+      "number": 515,
+      "title": "Intel 2° and 3° Gen Suport Request",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/515"
+    },
+    {
+      "number": 510,
+      "title": "UNCHARTED 3 Cutscene Video Freezes while Audio Continues Playing (No Crash / No Error Code)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/510"
+    },
+    {
+      "number": 509,
+      "title": "charaters jumping in all three of them and after some time it crashes",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/509"
+    },
+    {
+      "number": 505,
+      "title": "Part One Of My Uncharted 1 Playthrough",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/505"
+    },
+    {
+      "number": 502,
+      "title": "games just crash instantly...i have put the log in the description",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/502"
+    },
+    {
+      "number": 499,
+      "title": "Severe in-game performance on CachyOS / RTX 2080",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/499"
+    },
+    {
+      "number": 498,
+      "title": "\"prepare failed: expected PS4 SELF\" with Itemzflow dump (decrypted plain ELF executables) - CUSA02320",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/498"
+    },
+    {
+      "number": 497,
+      "title": "Splitting a flexible mapping leaves the right half's backing offset wrong",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/497"
+    },
+    {
+      "number": 496,
+      "title": "The 12th concurrent save mount reports success without mounting",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/496"
+    },
+    {
+      "number": 493,
+      "title": "Stuttering with drops below 60 FPS",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/493"
+    },
+    {
+      "number": 492,
+      "title": "Uncharted 1 grenade launcher sometimes doesnt work or kills the player",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/492"
+    },
+    {
+      "number": 484,
+      "title": "Random Crash Uncharted Drake's Fortune 0.3.6",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/484"
+    },
+    {
+      "number": 483,
+      "title": "Uncharted 2 Light not emitted from light sources like flash lights and torches",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/483"
+    },
+    {
+      "number": 482,
+      "title": "Random crash",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/482"
+    },
+    {
+      "number": 479,
+      "title": "Crash (Linux): *** ASSERTION: iSubMesh < m_numSubMeshInstances",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/479"
+    },
+    {
+      "number": 457,
+      "title": "Suggestion for blocking malware bots",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/457"
+    },
+    {
+      "number": 448,
+      "title": "Uncharted 2 character sinks into the ground / floats at 120 FPS",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/448"
+    },
+    {
+      "number": 447,
+      "title": "10 FPS & 100% CPU Utilization in all three games (CPU : i5-8400)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/447"
+    },
+    {
+      "number": 446,
+      "title": "uncharted 1 crashing for every 30mins of gameplay",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/446"
+    },
+    {
+      "number": 443,
+      "title": "Major Issue faced during Uncharted 2 playthrough",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/443"
+    },
+    {
+      "number": 440,
+      "title": "add ultrawide 32:9",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/440"
+    },
+    {
+      "number": 439,
+      "title": "workaround for Uncharted 2 Glitches (clipping, shaking legs, blurry aims)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/439"
+    },
+    {
+      "number": 430,
+      "title": "zh-CN localisation (launcher + in-game menu) and a cheats panel",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/430"
+    },
+    {
+      "number": 429,
+      "title": "UNCHARTED 2 ANIMATION BUGS AND BLUR",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/429"
+    },
+    {
+      "number": 428,
+      "title": "can't recognize the game version correctly",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/428"
+    },
+    {
+      "number": 421,
+      "title": "Mouse control",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/421"
+    },
+    {
+      "number": 415,
+      "title": "Unchatred 2 Chapter 21 Grenade Launcher",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/415"
+    },
+    {
+      "number": 414,
+      "title": "Uncharted 1 crash",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/414"
+    },
+    {
+      "number": 413,
+      "title": "Uncharted drake fortune Audio crackling in main menu and cutscene",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/413"
+    },
+    {
+      "number": 411,
+      "title": "the game stopped",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/411"
+    },
+    {
+      "number": 410,
+      "title": "Crash (Linux): STOP: GPU library assertion failed (see GPU log above)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/410"
+    },
+    {
+      "number": 408,
+      "title": "Settings?",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/408"
+    },
+    {
+      "number": 407,
+      "title": "Uncharted 2",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/407"
+    },
+    {
+      "number": 402,
+      "title": "Ram problem",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/402"
+    },
+    {
+      "number": 401,
+      "title": "Crash (Linux): *** ASSERTION: iSubMesh < m_numSubMeshInstances",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/401"
+    },
+    {
+      "number": 400,
+      "title": "Uncharted 1 crashing on NVIDIA Pascal Graphics Card",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/400"
+    },
+    {
+      "number": 394,
+      "title": "bug e crashing capitulo 21 comboio uncharted 2",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/394"
+    },
+    {
+      "number": 388,
+      "title": "Random crashes Ryzen 5 5500 GTX 1080 16GbRAM",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/388"
+    },
+    {
+      "number": 386,
+      "title": "Uncharted 2 and 3 lead to gray screen",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/386"
+    },
+    {
+      "number": 385,
+      "title": "game constantly crash ...first game",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/385"
+    },
+    {
+      "number": 384,
+      "title": "Crash (Linux): *** ASSERTION: iSubMesh < m_numSubMeshInstances",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/384"
+    },
+    {
+      "number": 383,
+      "title": "Crash (Linux): *** ASSERTION: iSubMesh < m_numSubMeshInstances",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/383"
+    },
+    {
+      "number": 378,
+      "title": "Random Crashes",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/378"
+    },
+    {
+      "number": 377,
+      "title": "crashing in uncharted 2 after cutscene when nathan gets knocked out from the rolling train",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/377"
+    },
+    {
+      "number": 376,
+      "title": "Uncharted 3 NPC and character Glitches",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/376"
+    },
+    {
+      "number": 369,
+      "title": "Question: Game version 1.00 or 1.02?",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/369"
+    },
+    {
+      "number": 365,
+      "title": "CrIt’s like heading out into urban warfare.",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/365"
+    },
+    {
+      "number": 363,
+      "title": "Uncharted 2: weapons render fully black, and enemies clip through the environment (RX 9070 XT / RDNA 4)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/363"
+    },
+    {
+      "number": 362,
+      "title": "Steam Controller / Steam Input ignored on non-Steam shortcuts that target Play Uncharted.exe",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/362"
+    },
+    {
+      "number": 361,
+      "title": "Uncharted: Drake's Fortune Crash on Chapter 1 & 2",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/361"
+    },
+    {
+      "number": 360,
+      "title": "Uncharted 2 - Characters Clipping and Weapon zoom DOF Bug",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/360"
+    },
+    {
+      "number": 359,
+      "title": "Uncharted : Drake fortune",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/359"
+    },
+    {
+      "number": 358,
+      "title": "Confirm : Uncharted 1 : Drake Fortune can be fully finished",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/358"
+    },
+    {
+      "number": 356,
+      "title": "Vertex Explosion in Uncharted 3 during Sully Follow Mission. Is this a known issue?",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/356"
+    },
+    {
+      "number": 355,
+      "title": "Lag on I5 4590 + GTX 1050Ti",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/355"
+    },
+    {
+      "number": 354,
+      "title": "L3 + R3 shows Bloodborne title menu with settings in Russian",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/354"
+    },
+    {
+      "number": 351,
+      "title": "FSR 3.1 renders gameplay as full-screen noise on AMD Phoenix (Radeon 780M, RADV); the log shows nothing",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/351"
+    },
+    {
+      "number": 344,
+      "title": "does not work on  my pc",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/344"
+    },
+    {
+      "number": 343,
+      "title": "Lock Issue new posts.",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/343"
+    },
+    {
+      "number": 342,
+      "title": "in drake fortnite game crash every 5 min while playing with the water bike and Elena shooting",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/342"
+    },
+    {
+      "number": 339,
+      "title": "Iris Xe gpus",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/339"
+    },
+    {
+      "number": 334,
+      "title": "Game Doesnt Always Launch - the game exited (code 21)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/334"
+    },
+    {
+      "number": 332,
+      "title": "Please Add Trophy/Achievements support in both Launcher and Game pop up",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/332"
+    },
+    {
+      "number": 326,
+      "title": "[Feature Request] Separate internal render resolution from output resolution (720p for Steam Deck)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/326"
+    },
+    {
+      "number": 325,
+      "title": "Crashing after cutscene",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/325"
+    },
+    {
+      "number": 322,
+      "title": "Uncharted 2 Infinite loading sceen",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/322"
+    },
+    {
+      "number": 321,
+      "title": "[report] Uncharted 1 can be completed with minor issues",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/321"
+    },
+    {
+      "number": 306,
+      "title": "High CPU usage (100%) and low GPU usage (20-35%) on Haswell i5-4460",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/306"
+    },
+    {
+      "number": 305,
+      "title": "Uncharted 1 Alt+Tab crash",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/305"
+    },
+    {
+      "number": 303,
+      "title": "U3 Cartagena square crash (0x8df3e0), looks like the same bug as the U1 U-boat crash (0x581a90)",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/303"
+    },
+    {
+      "number": 302,
+      "title": "U3 Nat's shaky legs, massive bokeh effect when zooming to shoot, uncontrollable light bloom",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/302"
+    },
+    {
+      "number": 301,
+      "title": "anti aliasing problem",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/301"
+    },
+    {
+      "number": 299,
+      "title": "Uncharted 1 -  repeating crash in several places - read access to ffffffffffffffff at guest offset 0x74d488",
+      "url": "https://github.com/Supermedo/uncharted_pc/issues/299"
+    }
+  ]
+}
