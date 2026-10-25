@@ -3,7 +3,11 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <cstdio>
+#include <map>
+#include <mutex>
+#include <tuple>
 #include "core/memory.h"
 #include "shader_recompiler/info.h"
 #include "video_core/renderer_vulkan/vk_rasterizer.h"
@@ -246,26 +250,89 @@ static bool ExecuteCopyShaderHLE(const Shader::Info& info, const AmdGpu::Compute
 static constexpr u64 SCALAR_COPY_SHADER_HASH = 0x2d215c3b;    // one dword per workgroup
 static constexpr u64 SCALAR_COPY64_SHADER_HASH = 0x6a6422a9;  // 64 dwords per workgroup (U2)
 
-static bool ExecuteScalarCopyHLE(const Shader::Info& info, const AmdGpu::ComputeProgram& cs_program,
-                                 Rasterizer& rasterizer, u64 group_size) {
+// DIAG (BB_SC_LOG=1): per (src, dst, size) counts of the scalar copies next to GPU data and the
+// time the read back of a GPU-written source waited, printed every 10 s.
+static void sc_note(u64 group_size, u64 src, u64 dst, u64 size, bool src_written, bool synced,
+                    double ms, bool dst_cpu = false, bool dst_gpuw = false) {
+    static const bool on = std::getenv("BB_SC_LOG") != nullptr;
+    if (!on) {
+        return;
+    }
+    struct Stat { u64 n{}, written{}, synced{}, cpu{}, gpuw{}; double ms{}; };
+    static std::mutex m;
+    static std::map<std::tuple<u64, u64, u64, u64>, Stat> table;
+    static auto window = std::chrono::steady_clock::now();
+    static u64 tot_n = 0, tot_sync = 0; static double tot_ms = 0, max_ms = 0;
+    std::scoped_lock lk{m};
+    auto& st = table[{group_size, src, dst, size}];
+    ++st.n; st.cpu += dst_cpu; st.gpuw += dst_gpuw; st.written += src_written; st.synced += synced; st.ms += ms;
+    tot_n++; tot_sync += synced; tot_ms += ms; max_ms = std::max(max_ms, ms);
+    const auto now = std::chrono::steady_clock::now();
+    if (now - window >= std::chrono::seconds(10)) {
+        std::printf("SCSTALL 10s: copies %llu, synced %llu, wait %.1f ms total, max %.1f ms\n",
+                    (unsigned long long)tot_n, (unsigned long long)tot_sync, tot_ms, max_ms);
+        for (const auto& [k, v] : table) {
+            std::printf("SCCOPY g%llu 0x%llx -> 0x%llx %llu B: n %llu written %llu synced %llu dstcpu %llu dstgpuw %llu wait %.1f ms\n",
+                        (unsigned long long)std::get<0>(k), (unsigned long long)std::get<1>(k),
+                        (unsigned long long)std::get<2>(k), (unsigned long long)std::get<3>(k),
+                        (unsigned long long)v.n, (unsigned long long)v.written,
+                        (unsigned long long)v.synced, (unsigned long long)v.cpu,
+                        (unsigned long long)v.gpuw, v.ms);
+        }
+        table.clear(); tot_n = tot_sync = 0; tot_ms = max_ms = 0; window = now;
+    }
+}
+
+/// The buffers and byte count of a scalar copy; nullopt when the HLE does not take it.
+struct ScalarCopy {
+    AmdGpu::Buffer src;
+    AmdGpu::Buffer dst;
+    u64 size;
+};
+static std::optional<ScalarCopy> ScalarCopyOf(const Shader::Info& info,
+                                              const AmdGpu::ComputeProgram& cs_program,
+                                              u64 group_size) {
     if (info.buffers.size() != 2 || BbToggle::Disabled(BbToggle::MultiCopyShader)) {
-        return false;
+        return std::nullopt;
     }
     const auto ud = info.UserData();
     if (ud.size() <= 6) {
-        return false;
+        return std::nullopt;
     }
     const auto src = info.buffers[0].GetSharp(info);
     const auto dst = info.buffers[1].GetSharp(info);
     if (src.GetStride() != 4 || dst.GetStride() != 4 || !src.base_address || !dst.base_address) {
-        return false;
+        return std::nullopt;
     }
     const u64 count =
         std::min<u64>({u64(cs_program.dim_x) * group_size, ud[6], src.num_records, dst.num_records});
-    if (count == 0) {
+    return ScalarCopy{src, dst, count * 4};
+}
+
+std::optional<ScalarCopyRange> RaycasterCopyRange(const Shader::Info& info,
+                                                  const AmdGpu::ComputeProgram& cs_program) {
+    if (info.pgm_hash != SCALAR_COPY64_SHADER_HASH) {
+        return std::nullopt;
+    }
+    const auto copy = ScalarCopyOf(info, cs_program, 64);
+    if (!copy) {
+        return std::nullopt;
+    }
+    return ScalarCopyRange{copy->src.base_address, copy->dst.base_address, copy->size};
+}
+
+static bool ExecuteScalarCopyHLE(const Shader::Info& info, const AmdGpu::ComputeProgram& cs_program,
+                                 Rasterizer& rasterizer, u64 group_size) {
+    const auto copy = ScalarCopyOf(info, cs_program, group_size);
+    if (!copy) {
+        return false;
+    }
+    if (copy->size == 0) {
         return true;
     }
-    const u64 size = count * 4;
+    const auto& src = copy->src;
+    const auto& dst = copy->dst;
+    const u64 size = copy->size;
     // BB_COPY_SHADER_LOG=1: the large copies (depth surfaces among them).
     static const bool copy_log = std::getenv("BB_COPY_SHADER_LOG") != nullptr;
     if (copy_log && size >= 65536) {
@@ -273,7 +340,7 @@ static bool ExecuteScalarCopyHLE(const Shader::Info& info, const AmdGpu::Compute
                     static_cast<unsigned long long>(info.pgm_hash),
                     static_cast<unsigned long long>(src.base_address),
                     static_cast<unsigned long long>(dst.base_address),
-                    static_cast<unsigned long long>(size), cs_program.dim_x, ud[6],
+                    static_cast<unsigned long long>(size), cs_program.dim_x, info.UserData()[6],
                     src.num_records, dst.num_records);
     }
     auto& buffer_cache = rasterizer.GetBufferCache();
@@ -337,20 +404,28 @@ static bool ExecuteScalarCopyHLE(const Shader::Info& info, const AmdGpu::Compute
                 buffer_cache.ReadMemory(dst.base_address, size, false, true);
             }
         } else if (both && size < 1_MB) {
-            const bool sync =
-                sync_all || (group_size == 64 && (sync_64 == 1 ||
-                                                  (sync_64 == 2 && buffer_cache.IsRegionCpuModified(
-                                                                       dst.base_address, size))));
-            // The raycaster's copy waits for nobody here: the guest part is copied now, the
-            // GPU-written bytes land in guest memory when the GPU has made them, and the labels
-            // the game learns of it from wait for that (BufferCache::DeferGuestCopy,
-            // landing_gate.h). BB_SCALAR_COPY64_DEFER=0 waits for the GPU here instead.
+            const bool d_cpu = buffer_cache.IsRegionCpuModified(dst.base_address, size);
+            const bool d_gpuw = buffer_cache.IsRangeGpuWritten(dst.base_address, size);
+            const bool sync = sync_all || (group_size == 64 && (sync_64 == 1 || (sync_64 == 2 && d_cpu)));
             bool deferred = false;
             if (src_written && sync && group_size == 64 && !sync_all && sync_64 == 2) {
+                // The wait for the GPU moves to whoever reads the result (BufferCache::DeferGuestCopy).
                 deferred = buffer_cache.DeferGuestCopy(src.base_address, dst.base_address, size);
+                if (deferred) {
+                    sc_note(group_size, src.base_address, dst.base_address, size, src_written, false,
+                            0.0, d_cpu, d_gpuw);
+                }
             }
-            if (src_written && sync && !deferred) {
+            if (deferred) {
+                // nothing to wait for
+            } else if (src_written && sync) {
+                const auto t0 = std::chrono::steady_clock::now();
                 buffer_cache.ReadMemory(src.base_address, size, false, true);
+                sc_note(group_size, src.base_address, dst.base_address, size, src_written, true,
+                        std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count(),
+                        d_cpu, d_gpuw);
+            } else {
+                sc_note(group_size, src.base_address, dst.base_address, size, src_written, false, 0.0, d_cpu, d_gpuw);
             }
             if (!deferred && (!src_written || sync) && memory->IsValidGpuMapping(src.base_address, size) &&
                 memory->IsValidGpuMapping(dst.base_address, size)) {
