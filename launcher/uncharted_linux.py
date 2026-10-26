@@ -982,6 +982,7 @@ def launcher_class(base, ns):
 
         def nav_pages(self):
             return [('play', _('Library')), ('display', _('Settings')), ('controls', _('Controls')),
+                    ('cheats', _('Cheats')), ('fixes', _('Fixes')), ('trophies', _('Trophies')),
                     ('game', _('Files')), ('advanced', _('Advanced'))]
 
         def build_header(self):

@@ -113,6 +113,37 @@ class LoaderTests(unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn('incorrect memory image size', r.stderr)
 
+    def run_with_patch_files(self, data, *patch_files):
+        with tempfile.TemporaryDirectory() as tmp:
+            options = []
+            for n, (base, writes) in enumerate(patch_files):
+                path = Path(tmp) / f'patch{n}.bin'
+                path.write_bytes(b'BBPATCH2' + struct.pack('<QQ', base, len(writes))
+                                 + b''.join(struct.pack('<QQ', offset, len(data)) + data for offset, data in writes))
+                options += ['--patches', str(path)]
+            return self.run_image(data, *options)
+
+    def test_every_patches_file_is_applied(self):
+        # run.py passes bb-probe one --patches file per source (third-party patches, cheats, the
+        # 720p patch), each with its own base: all of them reach the image, in the order given.
+        # ud2 at 0 becomes two nops (first file); a ud2 written at 2 (second file) then stops it.
+        image = package(b'\x0f\x0b')
+        only_first = self.run_with_patch_files(image, (0x400000, [(0, b'\x90\x90')]))
+        self.assertNotEqual(only_first.returncode, 132)  # the nops run into zeroes (a fault), not the ud2
+        self.assertIn('signal 11', only_first.stderr)
+        both = self.run_with_patch_files(image, (0x400000, [(0, b'\x90\x90')]), (0, [(2, b'\x0f\x0b')]))
+        self.assertEqual(both.returncode, 132, both.stderr)
+        self.assertIn('at guest offset 0x2,', both.stderr)
+        self.assertEqual(both.stdout.count('Patches: 1 writes'), 2, both.stdout)
+        # the same two files in the other order: the same image
+        swapped = self.run_with_patch_files(image, (0, [(2, b'\x0f\x0b')]), (0x400000, [(0, b'\x90\x90')]))
+        self.assertIn('at guest offset 0x2,', swapped.stderr)
+
+    def test_too_many_patches_files_are_refused(self):
+        r = self.run_image(package(b'\xc3'), *(['--patches', 'x'] * 9))
+        self.assertEqual(r.returncode, 1)
+        self.assertIn('Too many --patches', r.stderr)
+
     def test_illegal_instruction_reports_guest_offset(self):
         r = self.run_image(package(b'\x0f\x0b'))
         self.assertEqual(r.returncode, 132)

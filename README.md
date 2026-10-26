@@ -54,6 +54,21 @@ Once your game folder has been specified: Play, Add to Steam (recommended for St
 > big3-ps4_Shipping.elf, sce_sys, u1data, u2data and u3data).
 > This project is not affiliated with Sony Interactive Entertainment or Naughty Dog.
 
+## Features
+
+- All three games from one launcher: Drake's Fortune, Among Thieves and Drake's Deception.
+- 60 FPS like on PS4, or 120 FPS (higher rates are experimental).
+- Render resolution above 1080p (up to 3200x1800) and ultrawide aspect ratios: the games draw a real larger or wider picture, set in the launcher.
+- Anti-aliasing with TAA, AMD FSR 3.1, AMD FSR 4 or NVIDIA DLSS (DLAA).
+- Frame generation: AMD FSR 3 (any GPU) or NVIDIA DLSS (RTX 40 2x, RTX 50 up to 4x).
+- Keyboard, mouse and controller together, all remappable. Mouse look in U3.
+- Stereo, 5.1 or 7.1 sound: the games are told the real speaker layout (it follows the output device, or pick it in the launcher).
+- Trophies: the games' own trophy lists in the launcher, and a notice in the game when you earn one.
+- Button prompts for keyboard and mouse, Xbox or PlayStation controllers; controller vibration settings.
+- Cheats page (infinite health and ammo per game), launcher languages, your own covers and Steam art.
+- A Fixes page for fixes that cost speed: Automatic turns each one on only where it helps.
+- Add to Steam and desktop shortcuts from the launcher, automatic updates.
+
 ## System Requirements
 
 - 64-bit x86 Linux with glibc 2.41 or newer: SteamOS 3.7+, Debian 13, Ubuntu 25.04, Fedora 42,
@@ -71,10 +86,15 @@ Bloodborne by deadinside28, and on the [shadPS4](https://github.com/shadps4-emu/
 renderer. Video decoding (Videodec2) and the DLSS bridge come from
 [IFreemz/shadPS4-Bloodborne-DLSS-FSR](https://github.com/IFreemz/shadPS4-Bloodborne-DLSS-FSR).
 Thanks to Mindro for the shadPS4 Uncharted build that showed which problems to look for.
+Several fixes come from BilalReloaded's
+[Uncharted port](https://github.com/bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port)
+(GPL v2): the Uncharted 3 cloth solver barriers (Sully's shirt), guest memory committed as the
+game allocates it (error 1450), the Uncharted 3 look-at reset and the garbage descriptor fixes.
 
 Also used: [FSR-Vulkan](https://github.com/FireBurn/FSR-Vulkan) and the AMD FidelityFX SDK (FSR),
 FSR 4 assets from [FireBurn/Q2RTX](https://github.com/FireBurn/Q2RTX), the
 [NVIDIA DLSS SDK](https://github.com/NVIDIA/DLSS) (`nvngx_dlss.dll` under NVIDIA's license),
+[Intel XeSS SDK](https://github.com/intel/xess) (`libxess.dll` under Intel's license),
 [LibAtrac9](https://github.com/Thealexbarney/LibAtrac9), [SDL3](https://github.com/libsdl-org/SDL),
 [FFmpeg](https://ffmpeg.org), [Dear ImGui](https://github.com/ocornut/imgui),
 [sirit](https://github.com/shadps4-emu/sirit), [magic_enum](https://github.com/Neargye/magic_enum),

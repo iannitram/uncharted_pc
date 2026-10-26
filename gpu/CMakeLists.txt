@@ -259,12 +259,12 @@ if (WIN32)
     add_library(atrac9 STATIC ${BB_ATRAC9})
     target_compile_options(atrac9 PRIVATE -w)
     set_target_properties(atrac9 PROPERTIES C_STANDARD 99 INTERPROCEDURAL_OPTIMIZATION OFF)
-    add_executable(bb-probe ../src/probe.c ${BB_RUNTIME} ../src/compat_win.c ../src/vulkan_smoke.c
+    add_executable(bb-probe ../src/probe.c ../src/red_zone.c ../src/cpu_patch.c ${BB_RUNTIME} ../src/compat_win.c ../src/vulkan_smoke.c
         ../packaging/windows/bb-probe.rc)
     set_target_properties(bb-probe PROPERTIES C_STANDARD 11 C_EXTENSIONS OFF)
     target_compile_options(bb-probe PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -Werror>)
     target_include_directories(bb-probe PRIVATE .. ../src)
-    target_link_libraries(bb-probe PRIVATE bbgpu atrac9 onecore bcrypt ws2_32 -pthread)
+    target_link_libraries(bb-probe PRIVATE bbgpu atrac9 Zydis::Zydis onecore bcrypt ws2_32 -pthread)
     # The PS4 range (64 GiB - 1 TiB) must stay free: no high-entropy ASLR for heaps and stacks.
     # The guest main thread runs on the process stack: 16 MiB, committed (no stack probes).
     target_link_options(bb-probe PRIVATE -Wl,--disable-high-entropy-va "SHELL:-Xlinker --stack -Xlinker 16777216,16777216")
@@ -309,12 +309,12 @@ target_compile_options(camera-motion-test PRIVATE -UNDEBUG -fPIC)
 target_link_libraries(camera-motion-test PRIVATE bbgpu)
 add_dependencies(camera-motion-test host_shaders)
 
-# bbport: FSR 4 benchmark outside the game (tools/fsr4_bench.cpp): ninja -C out/gpu fsr4-bench.
 add_executable(upscaler-support-test EXCLUDE_FROM_ALL ../tests/test_upscaler_support.cpp
     shim/bbport_settings.cpp)
 target_include_directories(upscaler-support-test PRIVATE shim)
 target_compile_options(upscaler-support-test PRIVATE -UNDEBUG)
 
+# bbport: FSR 4 benchmark outside the game (tools/fsr4_bench.cpp): ninja -C out/gpu fsr4-bench.
 add_executable(fsr4-bench EXCLUDE_FROM_ALL tools/fsr4_bench.cpp
     shadps4/video_core/renderer_vulkan/fsr411/fsr411.cpp)
 target_include_directories(fsr4-bench PRIVATE shadps4/video_core/renderer_vulkan/fsr411)
