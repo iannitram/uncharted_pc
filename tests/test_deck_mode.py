@@ -28,6 +28,15 @@ class DeckModeTests(unittest.TestCase):
     def test_rates_above_60_fall_back_to_60(self):
         self.assertEqual(environment(steam_deck=True, frame_rate='144')['BB_VBLANK_HZ'], '60')
 
+    def test_update_highlights(self):
+        notes = ('**Steam Deck**\nText.\n\n<!-- Update notes:\n- Steam Deck performance improvements\n'
+                 '- Added support for more distributions\n\n* Launcher improvements\n-->\n')
+        self.assertEqual(linux.update_highlights(notes), ['Steam Deck performance improvements',
+                                                          'Added support for more distributions',
+                                                          'Launcher improvements'])
+        self.assertEqual(linux.update_highlights('No list here.\n- not this'), [])
+        self.assertEqual(linux.update_highlights(None), [])
+
     def test_frame_rate_is_not_locked(self):
         self.assertNotIn('frame_rate', linux.DECK_LOCKED)
         self.assertEqual(set(linux.DECK_LOCKED), {'window_size', 'present_mode', 'fullscreen'})
@@ -52,11 +61,18 @@ class DeckModeTests(unittest.TestCase):
         self.assertNotIn('BB_VBLANK_HZ', env)
         self.assertEqual(env['BB_UPSCALER'], 'dlss')
 
-    def test_readbacks(self):
-        self.assertNotIn('BB_READBACKS', environment())
-        self.assertNotIn('BB_READBACKS', environment(gpu_readbacks='1'))
-        self.assertEqual(environment(gpu_readbacks='0')['BB_READBACKS'], '0')
-        self.assertEqual(environment(gpu_readbacks='2', steam_deck=True)['BB_READBACKS'], '2')
+    def test_unsaved_changes(self):
+        saved = {'frame_rate': '60', 'fullscreen': True, 'pad_bindings': {'cross': 'a'}}
+        self.assertEqual(linux.unsaved_changes(saved, dict(saved)), [])
+        self.assertEqual(linux.unsaved_changes(saved, {**saved, 'frame_rate': '30'}), ['frame_rate'])
+        self.assertEqual(linux.unsaved_changes(saved, {**saved, 'pad_bindings': {'cross': 'b'}}), ['pad_bindings'])
+        self.assertEqual(linux.unsaved_changes(saved, {**saved, 'new_setting': True}), ['new_setting'])
+
+    def test_saved_readbacks_ignored(self):
+        # The GPU readbacks choice is gone: a value saved by an older launcher has no effect.
+        for value in ('0', '1', '2'):
+            self.assertNotIn('BB_READBACKS', environment(gpu_readbacks=value))
+            self.assertNotIn('BB_READBACKS', environment(gpu_readbacks=value, steam_deck=True))
 
 
 if __name__ == '__main__':

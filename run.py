@@ -225,6 +225,12 @@ def main():
         out_root.mkdir(parents=True, exist_ok=True)
         guest_argv.write_text('/app0/eboot.bin\neboot.bin\nispartofuccollection\n', encoding='utf-8')
         print('Starting eboot.bin as part of the collection (BB_U1_DIRECT=1)')
+    # Linux fork: Uncharted 1 opens its own menu, not the collection's (probe.c
+    # patch_collection_skip, from Mevlock's uncharted_pc-dev). Only for this first start: a game
+    # that returns to the collection later (LoadExec into eboot.bin) shows it.
+    # BB_SKIP_COLLECTION_MENU=0 keeps the collection menu.
+    if exe == EXECUTABLES['u1'] and 'BB_SKIP_COLLECTION_MENU' not in env and not guest_argv:
+        env['BB_SKIP_COLLECTION_MENU'] = '1'
     # Uncharted 2 reads the results of GPU work (grenade explosions, vehicle damage, the convoy
     # of chapter 21) from memory it also writes: merging leaves them on the GPU, so it runs with
     # accurate GPU memory (BB_GPU_MERGE=0) unless the player chose otherwise.
@@ -256,6 +262,19 @@ def main():
             command += ['--patches', str(out / 'patches.bin')]
         if guest_argv:
             command += ['--guest-argv', str(guest_argv)]
+        # Linux fork: BB_RENDER_720P=1 (Steam Deck mode) renders the game at 1280x720 through its
+        # own 720p video settings (scripts/render_720p.py). An executable whose settings are not
+        # found starts at its usual 1080p.
+        if env.get('BB_RENDER_720P') == '1':
+            patches = out / 'render-720p.bin'
+            script = ['--script'] if getattr(sys, 'frozen', False) else []
+            made = subprocess.run([sys.executable, *script, str(PORT / 'scripts' / 'render_720p.py'),
+                                   str(out / 'eboot.elf'), str(patches)],
+                                  stdin=subprocess.DEVNULL, creationflags=no_console()).returncode == 0
+            if made:
+                command += ['--patches', str(patches)]
+            else:
+                print('Render 720p: not available for this executable; rendering at 1080p')
         loadexec.unlink(missing_ok=True)
         # No stdin: an inherited pipe (shells such as Git Bash) cost the game its console output.
         code = subprocess.run([*command, *args], stdin=subprocess.DEVNULL, creationflags=no_console()).returncode
@@ -267,6 +286,8 @@ def main():
             fail('The game asked for another executable without a name.')
         print(f'Switching to {target}')
         exe = target
+        if env.get('BB_SKIP_COLLECTION_MENU') == '1':
+            env['BB_SKIP_COLLECTION_MENU'] = '0'
         guest_argv = out_root / 'guest-argv.txt'
         guest_argv.write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
