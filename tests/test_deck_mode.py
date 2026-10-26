@@ -28,6 +28,15 @@ class DeckModeTests(unittest.TestCase):
     def test_rates_above_60_fall_back_to_60(self):
         self.assertEqual(environment(steam_deck=True, frame_rate='144')['BB_VBLANK_HZ'], '60')
 
+    def test_saved_rate_survives(self):
+        # 60 by default (owner's decision, 2026-10-18): a saved 30 or 60 is kept as chosen, and the
+        # sync's one-time migration of a saved 60 to 30 (deck_frame_rate_30) stays out.
+        for rate in ('30', '60'):
+            self.assertTrue(linux.deck_allows('frame_rate', rate))
+            self.assertEqual(environment(steam_deck=True, frame_rate=rate)['BB_VBLANK_HZ'], rate)
+        self.assertFalse(linux.deck_allows('frame_rate', '144'))
+        self.assertFalse(hasattr(linux, 'deck_frame_rate_30'))
+
     def test_update_highlights(self):
         notes = ('**Steam Deck**\nText.\n\n<!-- Update notes:\n- Steam Deck performance improvements\n'
                  '- Added support for more distributions\n\n* Launcher improvements\n-->\n')

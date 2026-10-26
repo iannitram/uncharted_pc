@@ -71,10 +71,23 @@ class Render720pTests(unittest.TestCase):
         self.assertEqual(blob[:8], b'BBPATCH2')
         self.assertEqual(struct.unpack_from('<QQ', blob, 8), (0x400000, count))
 
+    def test_one_setup_block_is_patched(self):
+        # Upstream d6c9f43: 1 to 3 blocks are accepted (a CUSA02344 dump has one); the file ends
+        # right after the decoder, so the field scan must also stay inside the file.
+        data, (site, dec) = elf(setup(0x47), decoder())
+        found = dict(render_720p.writes(data))
+        values = sorted(struct.unpack('<I', v)[0] for o, v in found.items() if site <= o < site + 0x50)
+        self.assertEqual(values, sorted([1280, 720] * 4 + [160, 180]))
+        self.assertEqual(found[dec + 4], struct.pack('<I', 1280))
+        self.assertEqual(found[dec + 12], struct.pack('<I', 720))
+        self.assertEqual(len(found), 10 + 2)
+
     def test_other_executables_are_left_alone(self):
-        data, _ = elf(setup(0x47), decoder())
-        with self.assertRaises(ValueError):
-            render_720p.writes(data)
+        # No video setting site (a decoder alone), more than three, or no movie decoder: not a target.
+        for pieces in ((decoder(),), (setup(0x47),) * 4 + (decoder(),), (setup(0x47), setup(0x40))):
+            data, _ = elf(*pieces)
+            with self.assertRaises(ValueError):
+                render_720p.writes(data)
 
 
 if __name__ == '__main__':
