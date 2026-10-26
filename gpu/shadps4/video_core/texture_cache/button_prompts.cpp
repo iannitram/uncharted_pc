@@ -1069,7 +1069,9 @@ std::vector<Patch> Build(const Sheet& sheet, u32 levels, Style style) {
 } // namespace
 
 namespace {
-std::atomic<int> device_used{0}; ///< 0 keyboard and mouse, 1 PlayStation pad, 2 Xbox or other pad
+/// 0 keyboard and mouse, 1 PlayStation pad, 2 Xbox or other pad. Linux fork: Steam Deck mode starts
+/// with the controller (runtime_pad.c then picks the active pad's style), not the keys.
+std::atomic<int> device_used{DeckPictures() ? 2 : 0};
 std::atomic<u32> switches{0};
 
 enum class Force : u8 { Auto, Off, Keyboard, Xbox };
