@@ -172,7 +172,9 @@ static ABI int32_t save_terminate(void) {
     if (!initialized) return ERR_NOT_INITIALIZED;
     initialized=0; return 0;
 }
-static int32_t mount(int32_t user, const char *title, const DirName *dir, uint32_t mode, MountResult *result) {
+/* BB_SAVE_LOG=1 prints every mount/umount with its arguments and result code (diagnosis). */
+static int save_log(void) { static int v=-1; if (v<0) { const char *e=getenv("BB_SAVE_LOG"); v=e && e[0]=='1'; } return v; }
+static int32_t mount_do(int32_t user, const char *title, const DirName *dir, uint32_t mode, MountResult *result) {
     if (!initialized) return ERR_NOT_INITIALIZED;
     if (user<0) return ERR_INVALID_USER;
     if (!dir || !result || !valid_name(dir->data,sizeof(dir->data))) return ERR_PARAMETER;
@@ -211,6 +213,12 @@ static int32_t mount(int32_t user, const char *title, const DirName *dir, uint32
            exists ? "existing" : "created",(mode & MODE_RDONLY) ? ", read-only" : "");
     return 0;
 }
+static int32_t mount(int32_t user, const char *title, const DirName *dir, uint32_t mode, MountResult *result) {
+    int32_t r=mount_do(user,title,dir,mode,result);
+    if (save_log()) printf("Runtime: SaveLog mount dir '%.32s' mode 0x%x user %d -> 0x%08x%s%s\n",dir ? dir->data : "(null)",mode,user,
+                           (uint32_t)r,r ? " FAILED" : " point ",r || !result ? "" : result->point.data);
+    return r;
+}
 static ABI int32_t save_mount(const Mount1 *m, MountResult *result) {
     if (!m) return ERR_PARAMETER;
     return mount(m->user,m->title ? m->title->data : NULL,m->dir,m->mode,result);
@@ -230,6 +238,8 @@ static ABI int32_t save_umount(const MountPoint *point) {
     int slot=slot_of(point);
     if (slot>=0) { runtime_file_unmount(point->data); slots[slot].used=0; }
     pthread_mutex_unlock(&lock);
+    if (save_log()) printf("Runtime: SaveLog umount '%.16s' slot %d -> 0x%08x\n",point ? point->data : "(null)",slot,
+                           (uint32_t)(slot>=0 ? 0 : ERR_NOT_FOUND));
     return slot>=0 ? 0 : ERR_NOT_FOUND;
 }
 static ABI int32_t save_set_param(const MountPoint *point, uint32_t type, const void *buffer, uint64_t size) {
