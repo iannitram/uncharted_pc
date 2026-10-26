@@ -207,7 +207,13 @@ void Menu() {
             ImGui::EndDisabled();
             if (!supported) {
                 ImGui::SameLine();
-                ImGui::TextDisabled("%s", unsupported);
+                // Linux fork: FSR 4 on a capable GPU without its assets (fsr4_shaders).
+                const char* fsr4_problem = s.fsr4_problem.load();
+                const bool no_assets = i == BbSettings::UpscalerFsr4 && fsr4_problem &&
+                                       std::strncmp(fsr4_problem, "assets", 6) == 0;
+                ImGui::TextDisabled("%s", no_assets ? T("— files not installed",
+                                                        "— файлы не установлены")
+                                                    : unsupported);
             }
         }
         ImGui::EndCombo();
