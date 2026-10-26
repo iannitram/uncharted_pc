@@ -3,6 +3,8 @@
 Status as of 2026-10-17. This replaces the Bloodborne roadmap, which is kept in
 `history/ROADMAP_bloodborne_2026-09_ru.md` (Russian, unchanged).
 
+A proposed roadmap from the 2026-10-24 review (aimed at main 68c8cf9, so linux needs reconciling): [review-2026-10-24/ROADMAP-proposed.md](review-2026-10-24/ROADMAP-proposed.md).
+
 ## Goal
 
 Run Uncharted 1, 2 and 3 from the PS4 collection natively on Linux, on two machines

@@ -1,0 +1,1183 @@
+ninja: Entering directory `out/gpu'
+[0/2] Re-checking globbed directories...
+[1/2] Re-running CMake...
+CMake Warning (dev) at CMakeLists.txt:45 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Deprecation Warning at third_party/miniz/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Configuring done (0.3s)
+-- Generating done (0.1s)
+-- Build files have been written to: /workspace/uncharted_pc/out/gpu
+[0/4] Re-checking globbed directories...
+[1/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_host_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/shared/ffx_assert.cpp.o
+[2/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_host_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/shared/ffx_message.cpp.o
+[3/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_host_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/shared/ffx_object_management.cpp.o
+[4/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_host_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/components/fsr3upscaler/ffx_fsr3upscaler.cpp.o
+[5/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_host_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/components/opticalflow/ffx_opticalflow.cpp.o
+[6/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_host_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/components/frameinterpolation/ffx_frameinterpolation.cpp.o
+[7/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_host_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/components/fsr3/ffx_fsr3.cpp.o
+[8/304] Linking CXX static library third_party/fsr-vulkan/libffx_vulkan_fsr3_host_1_1_4.a
+[9/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_backend_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/backends/shared/ffx_shader_blobs.cpp.o
+[10/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_backend_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/backends/vk/ffx_vk.cpp.o
+[11/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_backend_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/backends/shared/blob_accessors/ffx_frameinterpolation_shaderblobs.cpp.o
+[12/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_backend_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/backends/shared/blob_accessors/ffx_opticalflow_shaderblobs.cpp.o
+[13/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_backend_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/backends/shared/blob_accessors/ffx_fsr3upscaler_shaderblobs.cpp.o
+[14/304] Generating shadnet_proto_gen/shadnet.pb.cc, shadnet_proto_gen/shadnet.pb.h
+[15/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_backend_1_1_4.dir/upstream/ffx-1.1.4/sdk/src/shared/ffx_breadcrumbs_list.cpp.o
+[16/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr4_v07_assets.dir/src/ffx_vk_fsr4_v07_schedule.c.o
+[17/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr4_v07_assets.dir/src/ffx_vk_fsr4_v07_assets.c.o
+[18/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_portable.dir/src/ffx_vk_fsr3_3_1_5_reflection.c.o
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_5_reflection.c: In function ‘ffxVkFsr3_3_1_5ReflectSpirv’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_5_reflection.c:169:34: warning: ISO C forbids empty initializer braces before C23 [-Wpedantic]
+  169 |     uint8_t seenBindings[1024] = {};
+      |                                  ^
+[19/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_portable.dir/src/ffx_vk_portable.c.o
+[20/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_portable.dir/src/ffx_vk_fsr3_3_1_5_catalog.c.o
+[21/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_portable.dir/src/ffx_vk_fsr3_3_1_5_pipeline.c.o
+[22/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_portable.dir/src/ffx_vk_fsr3_3_1_5_descriptor.c.o
+[23/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_portable.dir/src/ffx_vk_fsr3_3_1_5_bundle.c.o
+[24/304] Linking CXX static library third_party/fsr-vulkan/libffx_vulkan_fsr3_vk_backend_1_1_4.a
+[25/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_portable.dir/src/ffx_vk_fsr3_portable.cpp.o
+[26/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/http2.cpp.o
+[27/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/net.cpp.o
+[28/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/net_ctl_obj.cpp.o
+[29/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/net_epoll.cpp.o
+[30/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/net_obj.cpp.o
+[31/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/net_resolver.cpp.o
+[32/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/net_upnp.cpp.o
+[33/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/net_util.cpp.o
+[34/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/netctl.cpp.o
+[35/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/p2p_sockets.cpp.o
+[36/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/posix_sockets.cpp.o
+[37/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/ssl.cpp.o
+[38/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/ssl2.cpp.o
+[39/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/sys_net.cpp.o
+In file included from /workspace/setup/prefix/usr/include/fmt/std.h:11,
+                 from /workspace/uncharted_pc/gpu/shim/common/logging/log.h:14,
+                 from /workspace/uncharted_pc/gpu/shadps4/common/assert.h:8,
+                 from /workspace/uncharted_pc/gpu/shadps4/core/libraries/network/sys_net.cpp:4:
+In member function ‘void std::atomic<_Tp>::store(_Tp, std::memory_order) [with _Tp = Core::FileSys::FileType]’,
+    inlined from ‘_Tp std::atomic<_Tp>::operator=(_Tp) [with _Tp = Core::FileSys::FileType]’ at /usr/include/c++/14/atomic:254:14,
+    inlined from ‘int Libraries::Net::sys_accept(OrbisNetId, OrbisNetSockaddr*, u32*)’ at /workspace/uncharted_pc/gpu/shadps4/core/libraries/network/sys_net.cpp:77:20:
+/usr/include/c++/14/atomic:284:23: warning: ‘void __atomic_store_4(volatile void*, unsigned int, int)’ writing 4 bytes into a region of size 0 overflows the destination [-Wstringop-overflow=]
+  284 |         __atomic_store(std::__addressof(_M_i),
+      |         ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+  285 |                        __atomic_impl::__clear_padding(__i),
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  286 |                        int(__m));
+      |                        ~~~~~~~~~
+In function ‘int Libraries::Net::sys_accept(OrbisNetId, OrbisNetSockaddr*, u32*)’:
+cc1plus: note: destination object is likely at address zero
+In member function ‘void std::atomic<_Tp>::store(_Tp, std::memory_order) [with _Tp = Core::FileSys::FileType]’,
+    inlined from ‘_Tp std::atomic<_Tp>::operator=(_Tp) [with _Tp = Core::FileSys::FileType]’ at /usr/include/c++/14/atomic:254:14,
+    inlined from ‘int Libraries::Net::sys_socketex(const char*, int, int, int)’ at /workspace/uncharted_pc/gpu/shadps4/core/libraries/network/sys_net.cpp:228:16:
+/usr/include/c++/14/atomic:284:23: warning: ‘void __atomic_store_4(volatile void*, unsigned int, int)’ writing 4 bytes into a region of size 0 overflows the destination [-Wstringop-overflow=]
+  284 |         __atomic_store(std::__addressof(_M_i),
+      |         ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+  285 |                        __atomic_impl::__clear_padding(__i),
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  286 |                        int(__m));
+      |                        ~~~~~~~~~
+In function ‘int Libraries::Net::sys_socketex(const char*, int, int, int)’:
+cc1plus: note: destination object is likely at address zero
+In member function ‘void std::atomic<_Tp>::store(_Tp, std::memory_order) [with _Tp = Core::FileSys::FileType]’,
+    inlined from ‘_Tp std::atomic<_Tp>::operator=(_Tp) [with _Tp = Core::FileSys::FileType]’ at /usr/include/c++/14/atomic:254:14,
+    inlined from ‘int Libraries::Net::sys_socketpair(int, int, int, int*)’ at /workspace/uncharted_pc/gpu/shadps4/core/libraries/network/sys_net.cpp:318:16:
+/usr/include/c++/14/atomic:284:23: warning: ‘void __atomic_store_4(volatile void*, unsigned int, int)’ writing 4 bytes into a region of size 0 overflows the destination [-Wstringop-overflow=]
+  284 |         __atomic_store(std::__addressof(_M_i),
+      |         ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+  285 |                        __atomic_impl::__clear_padding(__i),
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  286 |                        int(__m));
+      |                        ~~~~~~~~~
+In function ‘int Libraries::Net::sys_socketpair(int, int, int, int*)’:
+cc1plus: note: destination object is likely at address zero
+In member function ‘void std::atomic<_Tp>::store(_Tp, std::memory_order) [with _Tp = Core::FileSys::FileType]’,
+    inlined from ‘_Tp std::atomic<_Tp>::operator=(_Tp) [with _Tp = Core::FileSys::FileType]’ at /usr/include/c++/14/atomic:254:14,
+    inlined from ‘int Libraries::Net::sys_socketpair(int, int, int, int*)’ at /workspace/uncharted_pc/gpu/shadps4/core/libraries/network/sys_net.cpp:323:16:
+/usr/include/c++/14/atomic:284:23: warning: ‘void __atomic_store_4(volatile void*, unsigned int, int)’ writing 4 bytes into a region of size 0 overflows the destination [-Wstringop-overflow=]
+  284 |         __atomic_store(std::__addressof(_M_i),
+      |         ~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+  285 |                        __atomic_impl::__clear_padding(__i),
+      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  286 |                        int(__m));
+      |                        ~~~~~~~~~
+In function ‘int Libraries::Net::sys_socketpair(int, int, int, int*)’:
+cc1plus: note: destination object is likely at address zero
+[40/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/http.cpp.o
+[41/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_auth.cpp.o
+[42/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/network/unix_sockets.cpp.o
+[43/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_common.cpp.o
+/workspace/uncharted_pc/gpu/shadps4/core/libraries/np/np_common.cpp: In function ‘s32 Libraries::Np::NpCommon::sceNpIntIsValidOnlineId(const Libraries::Np::OrbisNpOnlineId*)’:
+/workspace/uncharted_pc/gpu/shadps4/core/libraries/np/np_common.cpp:372:31: warning: ‘size_t strnlen(const char*, size_t)’ specified bound 17 exceeds source size 16 [-Wstringop-overread]
+  372 |     const size_t len = strnlen(id->data, ORBIS_NP_ONLINEID_MAX_LENGTH + 1);
+      |                        ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /workspace/uncharted_pc/gpu/shadps4/core/libraries/np/np_common.h:8,
+                 from /workspace/uncharted_pc/gpu/shadps4/core/libraries/np/np_common.cpp:15:
+/workspace/uncharted_pc/gpu/shadps4/core/libraries/np/np_types.h:30:10: note: source object allocated here
+   30 |     char data[ORBIS_NP_ONLINEID_MAX_LENGTH];
+      |          ^~~~
+[44/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_manager.cpp.o
+[45/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_matching2/np_matching2.cpp.o
+[46/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_matching2/np_matching2_internal.cpp.o
+[47/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_matching2/np_matching2_mm.cpp.o
+[48/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_matching2/np_matching2_signaling.cpp.o
+[49/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_partner.cpp.o
+[50/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_handler.cpp.o
+[51/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_party.cpp.o
+[52/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_signaling/np_signaling.cpp.o
+[53/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_score/np_score.cpp.o
+[54/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_signaling/np_signaling_helpers.cpp.o
+[55/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_signaling/np_signaling_stubs.cpp.o
+[56/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_signaling/np_signaling_state.cpp.o
+[57/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_tus.cpp.o
+[58/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_web_api/np_web_api.cpp.o
+[59/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_web_api2/np_web_api2.cpp.o
+[60/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_web_api/np_web_api_internal.cpp.o
+[61/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_web_api2/np_web_api2_context.cpp.o
+[62/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_web_api2/np_web_api2_internal.cpp.o
+[63/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/core/libraries/np/np_web_api2/np_web_api2_push_event.cpp.o
+[64/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/shadnet/server_probe.cpp.o
+[65/304] Building CXX object CMakeFiles/bbnet.dir/shadps4/shadnet/client.cpp.o
+[66/304] Building CXX object CMakeFiles/bbnet.dir/bbnet/bbnet_glue.cpp.o
+[67/304] Generating include/video_core/host_shaders/buffer_multi_copy_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/buffer_multi_copy.comp
+[68/304] Generating include/video_core/host_shaders/camera_motion_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/camera_motion.comp
+[69/304] Generating include/video_core/host_shaders/camera_motion_debug_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/camera_motion.comp
+[70/304] Generating include/video_core/host_shaders/color_to_ms_depth_frag.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/color_to_ms_depth.frag
+[71/304] Generating include/video_core/host_shaders/depth_resample_frag.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/depth_resample.frag
+[72/304] Generating include/video_core/host_shaders/depth_stencil_bits_frag.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/depth_resample.frag
+[73/304] Generating include/video_core/host_shaders/depth_stencil_resample_frag.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/depth_resample.frag
+[74/304] Generating include/video_core/host_shaders/fault_buffer_process_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/fault_buffer_process.comp
+[75/304] Generating include/video_core/host_shaders/frame_gen_inputs_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/frame_gen_inputs.comp
+[76/304] Generating include/video_core/host_shaders/frame_gen_ui_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/frame_gen_ui.comp
+[77/304] Generating include/video_core/host_shaders/fs_tri_vert.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/fs_tri.vert
+[78/304] Generating include/video_core/host_shaders/fsr_easu_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/fsr.comp
+[79/304] Generating include/video_core/host_shaders/fsr_rcas_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/fsr.comp
+[80/304] Generating include/video_core/host_shaders/ms_image_blit_frag.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/ms_image_blit.frag
+[81/304] Generating include/video_core/host_shaders/ms_image_blit_msaa_frag.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/ms_image_blit.frag
+[82/304] Generating include/video_core/host_shaders/post_process_frag.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/post_process.frag
+[83/304] Generating include/video_core/host_shaders/taa_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/taa.comp
+[84/304] Generating include/video_core/host_shaders/taa_sharpen_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/taa_sharpen.comp
+[85/304] Generating include/video_core/host_shaders/taa_sharpen_ldr_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/taa_sharpen.comp
+[86/304] Generating include/video_core/host_shaders/tiling_macro_128_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[87/304] Generating include/video_core/host_shaders/tiling_macro_16_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[88/304] Generating include/video_core/host_shaders/tiling_macro_32_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[89/304] Generating include/video_core/host_shaders/tiling_macro_64_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[90/304] Generating include/video_core/host_shaders/tiling_macro_8_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[91/304] Generating include/video_core/host_shaders/tiling_macro_96_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[92/304] Generating include/video_core/host_shaders/tiling_micro_128_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[93/304] Generating include/video_core/host_shaders/tiling_micro_16_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[94/304] Generating include/video_core/host_shaders/tiling_micro_32_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[95/304] Generating include/video_core/host_shaders/tiling_micro_64_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[96/304] Generating include/video_core/host_shaders/tiling_micro_8_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[97/304] Generating include/video_core/host_shaders/tiling_micro_96_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/tiling.comp
+[98/304] Generating include/video_core/host_shaders/upscale_merge_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/upscale_merge.comp
+[99/304] Generating include/video_core/host_shaders/upscale_reactive_comp.h
+/workspace/uncharted_pc/gpu/shadps4/video_core/host_shaders/upscale_reactive.comp
+[100/304] Building C object third_party/miniz/CMakeFiles/miniz.dir/miniz.c.o
+[101/304] Building C object third_party/miniz/CMakeFiles/miniz.dir/miniz_zip.c.o
+[102/304] Building C object third_party/miniz/CMakeFiles/miniz.dir/miniz_tinfl.c.o
+[103/304] Building C object third_party/miniz/CMakeFiles/miniz.dir/miniz_tdef.c.o
+[104/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/sirit.cpp.o
+[105/304] Building CXX object CMakeFiles/bbnet.dir/shadnet_proto_gen/shadnet.pb.cc.o
+[106/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/type.cpp.o
+[107/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/constant.cpp.o
+[108/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/function.cpp.o
+[109/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/debug.cpp.o
+[110/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/flow.cpp.o
+[111/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/derivatives.cpp.o
+[112/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/memory.cpp.o
+[113/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/annotation.cpp.o
+[114/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/misc.cpp.o
+[115/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/conversion.cpp.o
+[116/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/logical.cpp.o
+[117/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/bit.cpp.o
+[118/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/arithmetic.cpp.o
+[119/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/extension.cpp.o
+[120/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/image.cpp.o
+[121/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/group.cpp.o
+[122/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/barrier.cpp.o
+[123/304] Linking C static library third_party/fsr-vulkan/libffx_vulkan_fsr4_v07_assets.a
+[124/304] Building CXX object third_party/sirit/src/CMakeFiles/sirit.dir/instructions/atomic.cpp.o
+[125/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr4_v07_vulkan.dir/src/ffx_vk_fsr4_v07.c.o
+[126/304] Linking CXX static library third_party/fsr-vulkan/libffx_vulkan_portable.a
+[127/304] Building C object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr4_v07_vulkan.dir/src/ffx_vk_fsr4_v07_provider.c.o
+[128/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_sdk_core_3_1_5_scaffold.dir/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_assert.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_assert.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_assert.cpp:23:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[129/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_sdk_core_3_1_5_scaffold.dir/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_message.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_message.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_message.cpp:23:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[130/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_sdk_core_3_1_5_scaffold.dir/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_object_management.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_assert.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_interface.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_object_management.cpp:23:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[131/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_framegen_3_1_6_scaffold.dir/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_assert.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_interface.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/ffx_frameinterpolation.h:28,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:27:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/ffx_backends.h:24,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:43:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/../include/ffx_api.hpp:30: warning: ignoring ‘#pragma FFX_PRAGMA_WARNING_PUSH ’ [-Wunknown-pragmas]
+   30 | #pragma FFX_PRAGMA_WARNING_PUSH
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/../include/ffx_api.hpp:31: warning: ignoring ‘#pragma FFX_PRAGMA_WARNING_DISABLE_DEPRECATIONS ’ [-Wunknown-pragmas]
+   31 | #pragma FFX_PRAGMA_WARNING_DISABLE_DEPRECATIONS
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/../include/ffx_api.hpp:190: warning: ignoring ‘#pragma FFX_PRAGMA_WARNING_POP ’ [-Wunknown-pragmas]
+  190 | #pragma FFX_PRAGMA_WARNING_POP
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1356: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+ 1356 | #pragma warning(pop)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode patchResourceBindings(FfxPipelineState*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:164:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  164 |         for (mapIndex = 0; mapIndex < _countof(srvResourceBindingTable); ++mapIndex)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:170:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  170 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:179:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  179 |         for (mapIndex = 0; mapIndex < _countof(uavResourceBindingTable); ++mapIndex)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:185:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  185 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:193:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  193 |         for (mapIndex = 0; mapIndex < _countof(cbResourceBindingTable); ++mapIndex)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:199:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  199 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:207:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  207 |         for (mapIndex = 0; mapIndex < _countof(uavResourceBindingTable); ++mapIndex)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:213:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  213 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:221:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  221 |         for (mapIndex = 0; mapIndex < _countof(srvResourceBindingTable); ++mapIndex)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:227:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  227 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode createPipelineStates(FfxFrameInterpolationContext_Private*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:312:10: warning: variable ‘CreateRasterPipeline’ set but not used [-Wunused-but-set-variable]
+  312 |     auto CreateRasterPipeline = [&](FfxPass pass, const wchar_t* name, FfxPipelineState* pipeline) -> FfxErrorCode {
+      |          ^~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘void getInternalResourceDescriptions(const FfxApiDimensions2D*, const FfxApiDimensions2D*, FfxApiSurfaceFormat, FfxFrameInterpolationInternalResourceDescriptions*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:422:514: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  422 |     internalResourceDescriptions->reconstructedDepthInterpolatedFrame = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R32_UINT, maxRenderSize->width, maxRenderSize->height, 1, 1, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_ReconstructedDepthInterpolatedFrame", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_RECONSTRUCTED_DEPTH_INTERPOLATED_FRAME, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:422:514: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:423:476: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  423 |     internalResourceDescriptions->gameMotionVectorFieldX = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R32_UINT, maxRenderSize->width, maxRenderSize->height, 1, 1, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_GameMotionVectorFieldX", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_GAME_MOTION_VECTOR_FIELD_X, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:423:476: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:424:476: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  424 |     internalResourceDescriptions->gameMotionVectorFieldY = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R32_UINT, maxRenderSize->width, maxRenderSize->height, 1, 1, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_GameMotionVectorFieldY", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_GAME_MOTION_VECTOR_FIELD_Y, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:424:476: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:425:472: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  425 |     internalResourceDescriptions->inpaintingPyramid = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R16G16B16A16_FLOAT, displaySize->width / 2, displaySize->height / 2, 1, 0, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_InpaintingPyramid", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_INPAINTING_PYRAMID, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:425:472: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:426:382: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  426 |     internalResourceDescriptions->counters = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_BUFFER, FFX_API_SURFACE_FORMAT_UNKNOWN, 8, 4, 1, 1, FFX_API_RESOURCE_FLAGS_NONE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_Counters", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_COUNTERS, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                              ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:426:382: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:427:498: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  427 |     internalResourceDescriptions->opticalFlowMotionVectorFieldX = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R32_UINT, maxRenderSize->width, maxRenderSize->height, 1, 1, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_OpticalFlowMotionVectorFieldX", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_OPTICAL_FLOW_MOTION_VECTOR_FIELD_X, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:427:498: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:428:498: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  428 |     internalResourceDescriptions->opticalFlowMotionVectorFieldY = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R32_UINT, maxRenderSize->width, maxRenderSize->height, 1, 1, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_OpticalFlowMotionVectorFieldY", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_OPTICAL_FLOW_MOTION_VECTOR_FIELD_Y, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:428:498: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:429:491: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  429 |     internalResourceDescriptions->previousInterpolationSource = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, (uint32_t)previousInterpolationSourceFormat, displaySize->width, displaySize->height, 1, 1, FFX_API_RESOURCE_FLAGS_NONE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_PreviousInterpolationSouce", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_PREVIOUS_INTERPOLATION_SOURCE, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:429:491: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:430:445: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  430 |     internalResourceDescriptions->inpaintingMask = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R8_UNORM, displaySize->width, displaySize->height, 1, 1, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_InpaintingMask", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_INPAINTING_MASK, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:430:445: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:431:457: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  431 |     internalResourceDescriptions->disocclusionMask = { FfxResourceHeapPlacementInfo::InitDefault(), { FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_API_SURFACE_FORMAT_R8G8_UNORM, maxRenderSize->width, maxRenderSize->height, 1, 1, FFX_API_RESOURCE_FLAGS_ALIASABLE, FFX_API_RESOURCE_USAGE_UAV }, FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FI_DisocclusionMask", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_DISOCCLUSION_MASK, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:431:457: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘void getSharedResourceDescriptions(const FfxApiDimensions2D*, const FfxApiDimensions2D*, FfxFrameInterpolationSharedResourceDescriptions*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:442:178: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  442 |         FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FISHARED_DilatedDepth", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_DILATED_DEPTH, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                  ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:442:178: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:444:194: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  444 |             FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FISHARED_DilatedVelocity", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_DILATED_MOTION_VECTORS, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                  ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:444:194: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:446:220: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  446 |             FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"FISHARED_ReconstructedPrevNearestDepth", FFX_FRAMEINTERPOLATION_RESOURCE_IDENTIFIER_RECONSTRUCTED_DEPTH_PREVIOUS_FRAME, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                                                                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:446:220: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘void scheduleDispatch(FfxFrameInterpolationContext_Private*, const FfxPipelineState*, uint32_t, uint32_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:661:62: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+  661 |     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
+      |                                                              ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:661:62: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_interface.h:27:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316FrameInterpolationGetSharedResourceDescriptions(FfxFrameInterpolationContext*, FfxFrameInterpolationSharedResourceDescriptions*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:673:9: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  673 |         FFX_ERROR_INVALID_POINTER);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:676:9: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  676 |         FFX_ERROR_INVALID_POINTER);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316FrameInterpolationContextCreate(FfxFrameInterpolationContext*, FfxFrameInterpolationContextDescription*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:693:9: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  693 |         FFX_ERROR_INVALID_POINTER);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:696:9: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  696 |         FFX_ERROR_INVALID_POINTER);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:699:79: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  699 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpGetSDKVersion, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:700:87: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  700 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpGetDeviceCapabilities, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:701:86: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  701 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpCreateBackendContext, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:702:87: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  702 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpDestroyBackendContext, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:707:85: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  707 |         FFX_RETURN_ON_ERROR(contextDescription->backendInterface.scratchBufferSize, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316FrameInterpolationContextGetGpuMemoryUsage(FfxFrameInterpolationContext*, FfxApiEffectMemoryUsage*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:722:34: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  722 |     FFX_RETURN_ON_ERROR(context, FFX_ERROR_INVALID_POINTER);
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:723:36: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  723 |     FFX_RETURN_ON_ERROR(vramUsage, FFX_ERROR_INVALID_POINTER);
+      |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:726:49: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_NULL_DEVICE’ to ‘-2147483636’ [-Woverflow]
+  726 |     FFX_RETURN_ON_ERROR(contextPrivate->device, FFX_ERROR_NULL_DEVICE);
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316SharedContextGetGpuMemoryUsage(FfxInterface*, FfxApiEffectMemoryUsage*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:737:49: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  737 |     FFX_RETURN_ON_ERROR(backendInterfaceShared, FFX_ERROR_INVALID_POINTER);
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:738:36: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  738 |     FFX_RETURN_ON_ERROR(vramUsage, FFX_ERROR_INVALID_POINTER);
+      |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316FrameInterpolationContextDestroy(FfxFrameInterpolationContext*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:807:9: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  807 |         FFX_ERROR_INVALID_POINTER);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316FrameInterpolationContextEnqueueRefreshPipelineRequest(FfxFrameInterpolationContext*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:820:9: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  820 |         FFX_ERROR_INVALID_POINTER);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316FrameInterpolationPrepare(FfxFrameInterpolationContext*, const FfxFrameInterpolationPrepareDescription*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:974:65: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+  974 |         FfxGpuJobDescription clearJob = {FFX_GPU_JOB_CLEAR_FLOAT};
+      |                                                                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:974:65: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: In function ‘FfxErrorCode ffxVk316FrameInterpolationDispatch(FfxFrameInterpolationContext*, const FfxFrameInterpolationDispatchDescription*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1183:27: warning: comparison of integer expressions of different signedness: ‘int’ and ‘long unsigned int’ [-Wsign-compare]
+ 1183 |         for (int i = 0; i < _countof(aliasableResources); ++i)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1185:74: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+ 1185 |             FfxGpuJobDescription barrierJob        = {FFX_GPU_JOB_BARRIER};
+      |                                                                          ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1185:74: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1191:27: warning: comparison of integer expressions of different signedness: ‘int’ and ‘long unsigned int’ [-Wsign-compare]
+ 1191 |         for (int i = 0; i < _countof(aliasableResources); ++i)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1193:74: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+ 1193 |             FfxGpuJobDescription discardJob        = {FFX_GPU_JOB_DISCARD};
+      |                                                                          ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1193:74: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1230:73: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+ 1230 |                 FfxGpuJobDescription clearJob = {FFX_GPU_JOB_CLEAR_FLOAT};
+      |                                                                         ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1230:73: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1289:68: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+ 1289 |             FfxGpuJobDescription copyJobs[] = { {FFX_GPU_JOB_COPY} };
+      |                                                                    ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1289:68: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1293:31: warning: comparison of integer expressions of different signedness: ‘int’ and ‘long unsigned int’ [-Wsign-compare]
+ 1293 |             for (int i = 0; i < _countof(copyJobs); ++i)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1327:64: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+ 1327 |             FfxGpuJobDescription barrier = {FFX_GPU_JOB_BARRIER};
+      |                                                                ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:1327:64: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:145:14: warning: ‘float halton(int32_t, int32_t)’ defined but not used [-Wunused-function]
+  145 | static float halton(int32_t index, int32_t base)
+      |              ^~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:139:14: warning: ‘float lanczos2(float)’ defined but not used [-Wunused-function]
+  139 | static float lanczos2(float value)
+      |              ^~~~~~~~
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core.h:59,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation.cpp:42:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:335:22: warning: ‘FfxUInt32 ffxPackHalf2x16(float*)’ defined but not used [-Wunused-function]
+  335 | FFX_STATIC FfxUInt32 ffxPackHalf2x16(FfxFloat32x2 x)
+      |                      ^~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:231:17: warning: ‘void ffxOpARcpF3(float*, float*)’ defined but not used [-Wunused-function]
+  231 | FFX_STATIC void ffxOpARcpF3(FfxFloat32x3 d, FfxFloat32x3 a)
+      |                 ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:223:17: warning: ‘void ffxOpAMulOneF3(float*, float*, FfxFloat32)’ defined but not used [-Wunused-function]
+  223 | FFX_STATIC void ffxOpAMulOneF3(FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32 b)
+      |                 ^~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:215:17: warning: ‘void ffxOpAMulF3(float*, float*, float*)’ defined but not used [-Wunused-function]
+  215 | FFX_STATIC void ffxOpAMulF3(FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32x3 b)
+      |                 ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:207:17: warning: ‘void ffxOpACpyF3(float*, float*)’ defined but not used [-Wunused-function]
+  207 | FFX_STATIC void ffxOpACpyF3(FfxFloat32x3 d, FfxFloat32x3 a)
+      |                 ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:199:17: warning: ‘void ffxOpAAddOneF3(float*, float*, FfxFloat32)’ defined but not used [-Wunused-function]
+  199 | FFX_STATIC void ffxOpAAddOneF3(FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32 b)
+      |                 ^~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:191:23: warning: ‘FfxFloat32 ffxSaturate(FfxFloat32)’ defined but not used [-Wunused-function]
+  191 | FFX_STATIC FfxFloat32 ffxSaturate(FfxFloat32 x)
+      |                       ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:168:22: warning: ‘FfxUInt32 ffxMin(FfxUInt32, FfxUInt32)’ defined but not used [-Wunused-function]
+  168 | FFX_STATIC FfxUInt32 ffxMin(FfxUInt32 x, FfxUInt32 y)
+      |                      ^~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:158:23: warning: ‘FfxFloat32 ffxRsqrt(FfxFloat32)’ defined but not used [-Wunused-function]
+  158 | FFX_STATIC FfxFloat32 ffxRsqrt(FfxFloat32 x)
+      |                       ^~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:145:23: warning: ‘FfxFloat32 ffxFract(FfxFloat32)’ defined but not used [-Wunused-function]
+  145 | FFX_STATIC FfxFloat32 ffxFract(FfxFloat32 x)
+      |                       ^~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:130:22: warning: ‘FfxUInt32 ffxAShrSU1(FfxUInt32, FfxUInt32)’ defined but not used [-Wunused-function]
+  130 | FFX_STATIC FfxUInt32 ffxAShrSU1(FfxUInt32 a, FfxUInt32 b)
+      |                      ^~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:99:23: warning: ‘FfxFloat32 ffxLerp(FfxFloat32, FfxFloat32, FfxFloat32)’ defined but not used [-Wunused-function]
+   99 | FFX_STATIC FfxFloat32 ffxLerp(FfxFloat32 x, FfxFloat32 y, FfxFloat32 t)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:79:23: warning: ‘FfxFloat32 ffxDot4(float*, float*)’ defined but not used [-Wunused-function]
+   79 | FFX_STATIC FfxFloat32 ffxDot4(FfxFloat32x4 a, FfxFloat32x4 b)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:74:23: warning: ‘FfxFloat32 ffxDot3(float*, float*)’ defined but not used [-Wunused-function]
+   74 | FFX_STATIC FfxFloat32 ffxDot3(FfxFloat32x3 a, FfxFloat32x3 b)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:69:23: warning: ‘FfxFloat32 ffxDot2(float*, float*)’ defined but not used [-Wunused-function]
+   69 | FFX_STATIC FfxFloat32 ffxDot2(FfxFloat32x2 a, FfxFloat32x2 b)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:57:22: warning: ‘FfxUInt32 ffxAsUInt32(FfxFloat32)’ defined but not used [-Wunused-function]
+   57 | FFX_STATIC FfxUInt32 ffxAsUInt32(FfxFloat32 x)
+      |                      ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[132/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_framegen_3_1_6_scaffold.dir/src/ffx_vk_fsr3_3_1_6_framegen_shaderblobs.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_assert.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_interface.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/ffx_frameinterpolation.h:28,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_frameinterpolation_shaderblobs.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen_shaderblobs.cpp:11:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[133/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_framegen_3_1_6_scaffold.dir/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_assert.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_interface.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/ffx_opticalflow.h:28,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:27:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/ffx_backends.h:24,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:51:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/../include/ffx_api.hpp:30: warning: ignoring ‘#pragma FFX_PRAGMA_WARNING_PUSH ’ [-Wunknown-pragmas]
+   30 | #pragma FFX_PRAGMA_WARNING_PUSH
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/../include/ffx_api.hpp:31: warning: ignoring ‘#pragma FFX_PRAGMA_WARNING_DISABLE_DEPRECATIONS ’ [-Wunknown-pragmas]
+   31 | #pragma FFX_PRAGMA_WARNING_DISABLE_DEPRECATIONS
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/../include/ffx_api.hpp:190: warning: ignoring ‘#pragma FFX_PRAGMA_WARNING_POP ’ [-Wunknown-pragmas]
+  190 | #pragma FFX_PRAGMA_WARNING_POP
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1151: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+ 1151 | #pragma warning(pop)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘FfxErrorCode patchResourceBindings(FfxPipelineState*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:119:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  119 |         for (mapIndex = 0; mapIndex < _countof(srvBindingNames); ++mapIndex)
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_assert.h:26:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:124:29: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  124 |         FFX_ASSERT(mapIndex < _countof(srvBindingNames));
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_util.h:60:45: note: in definition of macro ‘FFX_UNUSED’
+   60 | #define FFX_UNUSED(x)               ((void)(x))
+      |                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:124:9: note: in expansion of macro ‘FFX_ASSERT’
+  124 |         FFX_ASSERT(mapIndex < _countof(srvBindingNames));
+      |         ^~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:126:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  126 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:134:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  134 |         for (mapIndex = 0; mapIndex < _countof(uavBindingNames); ++mapIndex)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:139:29: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  139 |         FFX_ASSERT(mapIndex < _countof(uavBindingNames));
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_util.h:60:45: note: in definition of macro ‘FFX_UNUSED’
+   60 | #define FFX_UNUSED(x)               ((void)(x))
+      |                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:139:9: note: in expansion of macro ‘FFX_ASSERT’
+  139 |         FFX_ASSERT(mapIndex < _countof(uavBindingNames));
+      |         ^~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:141:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  141 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:149:37: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  149 |         for (mapIndex = 0; mapIndex < _countof(cbBindingNames); ++mapIndex)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:154:29: warning: comparison of integer expressions of different signedness: ‘int32_t’ {aka ‘int’} and ‘long unsigned int’ [-Wsign-compare]
+  154 |         FFX_ASSERT(mapIndex < _countof(cbBindingNames));
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_util.h:60:45: note: in definition of macro ‘FFX_UNUSED’
+   60 | #define FFX_UNUSED(x)               ((void)(x))
+      |                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:154:9: note: in expansion of macro ‘FFX_ASSERT’
+  154 |         FFX_ASSERT(mapIndex < _countof(cbBindingNames));
+      |         ^~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:156:20: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+  156 |             return FFX_ERROR_INVALID_ARGUMENT;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘void getInternalResourceDescriptions(const FfxApiDimensions2D*, FfxOpticalflowInternalResourceDescriptions*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:298:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  298 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:298:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:303:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  303 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:303:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:308:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  308 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:308:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:313:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  313 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:313:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:318:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  318 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:318:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:323:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  323 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:323:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:328:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  328 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:328:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:333:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  333 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:333:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:338:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  338 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:338:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:343:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  343 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:343:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:348:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  348 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:348:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:353:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  353 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:353:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:358:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  358 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:358:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:363:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  363 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:363:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:368:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  368 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:368:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:373:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  373 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:373:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:378:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  378 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:378:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:383:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  383 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:383:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:388:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  388 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:388:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:393:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  393 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:393:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:398:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  398 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:398:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:403:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  403 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:403:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:408:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  408 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:408:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:413:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  413 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:413:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:418:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  418 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:418:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:423:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  423 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:423:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:428:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  428 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:428:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:433:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  433 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:433:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:439:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  439 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:439:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:445:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  445 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:445:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:451:5: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  451 |     };
+      |     ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:451:5: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:291:30: warning: unused variable ‘opticalFlowLevel7TextureSize’ [-Wunused-variable]
+  291 |     const FfxApiDimensions2D opticalFlowLevel7TextureSize = { FFX_ALIGN_UP(opticalFlowLevel6TextureSize.width, 2) / 2, FFX_ALIGN_UP(opticalFlowLevel6TextureSize.height, 2) / 2 };
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘void getSharedResourceDescriptions(const FfxApiDimensions2D*, FfxOpticalflowSharedResourceDescriptions*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:463:120: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  463 |         FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"OPTICALFLOW_Result", 0, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                        ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:463:120: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:468:123: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  468 |         FFX_API_RESOURCE_STATE_UNORDERED_ACCESS, L"OPTICALFLOW_SCDOutput", 0, {FFX_RESOURCE_INIT_DATA_TYPE_UNINITIALIZED} };
+      |                                                                                                                           ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:468:123: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘void scheduleDispatch(FfxOpticalflowContext_Private*, const FfxPipelineState*, const wchar_t*, uint32_t, uint32_t, uint32_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:618:62: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+  618 |     FfxGpuJobDescription dispatchJob = { FFX_GPU_JOB_COMPUTE };
+      |                                                              ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:618:62: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘FfxErrorCode dispatch(FfxOpticalflowContext_Private*, const FfxOpticalflowDispatchDescription*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:678:67: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+  678 |         FfxGpuJobDescription clearJob = { FFX_GPU_JOB_CLEAR_FLOAT };
+      |                                                                   ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:678:67: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:823:45: warning: comparison of integer expressions of different signedness: ‘const int’ and ‘const uint32_t’ {aka ‘const unsigned int’} [-Wsign-compare]
+  823 |             FFX_ASSERT(pyramidMaxIterations <= OpticalFlowMaxPyramidLevels);
+      |                        ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_util.h:60:45: note: in definition of macro ‘FFX_UNUSED’
+   60 | #define FFX_UNUSED(x)               ((void)(x))
+      |                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:823:13: note: in expansion of macro ‘FFX_ASSERT’
+  823 |             FFX_ASSERT(pyramidMaxIterations <= OpticalFlowMaxPyramidLevels);
+      |             ^~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:920:79: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+  920 |                         FfxGpuJobDescription barrierJob = {FFX_GPU_JOB_BARRIER};
+      |                                                                               ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:920:79: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:927:75: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+  927 |                     FfxGpuJobDescription barrierJob = {FFX_GPU_JOB_BARRIER};
+      |                                                                           ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:927:75: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:936:63: warning: missing initializer for member ‘FfxGpuJobDescription::jobLabel’ [-Wmissing-field-initializers]
+  936 |         FfxGpuJobDescription barrierJob = {FFX_GPU_JOB_BARRIER};
+      |                                                               ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:936:63: warning: missing initializer for member ‘FfxGpuJobDescription::<anonymous>’ [-Wmissing-field-initializers]
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_interface.h:27:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘FfxErrorCode ffxVk316OpticalflowContextCreate(FfxOpticalflowContext*, FfxOpticalflowContextDescription*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:993:34: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  993 |     FFX_RETURN_ON_ERROR(context, FFX_ERROR_INVALID_POINTER);
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:994:45: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+  994 |     FFX_RETURN_ON_ERROR(contextDescription, FFX_ERROR_INVALID_POINTER);
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:996:79: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  996 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpGetSDKVersion, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:997:87: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  997 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpGetDeviceCapabilities, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:998:86: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  998 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpCreateBackendContext, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:999:87: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+  999 |     FFX_RETURN_ON_ERROR(contextDescription->backendInterface.fpDestroyBackendContext, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1003:85: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INCOMPLETE_INTERFACE’ to ‘-2147483640’ [-Woverflow]
+ 1003 |         FFX_RETURN_ON_ERROR(contextDescription->backendInterface.scratchBufferSize, FFX_ERROR_INCOMPLETE_INTERFACE);
+      |                                                                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘FfxErrorCode ffxVk316OpticalflowContextGetGpuMemoryUsage(FfxOpticalflowContext*, FfxApiEffectMemoryUsage*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1016:34: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1016 |     FFX_RETURN_ON_ERROR(context, FFX_ERROR_INVALID_POINTER);
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1017:36: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1017 |     FFX_RETURN_ON_ERROR(vramUsage, FFX_ERROR_INVALID_POINTER);
+      |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1020:49: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_NULL_DEVICE’ to ‘-2147483636’ [-Woverflow]
+ 1020 |     FFX_RETURN_ON_ERROR(contextPrivate->device, FFX_ERROR_NULL_DEVICE);
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘FfxErrorCode ffxVk316OpticalflowContextDestroy(FfxOpticalflowContext*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1107:34: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1107 |     FFX_RETURN_ON_ERROR(context, FFX_ERROR_INVALID_POINTER);
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘FfxErrorCode ffxVk316OpticalflowGetSharedResourceDescriptions(FfxOpticalflowContext*, FfxOpticalflowSharedResourceDescriptions*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1122:34: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1122 |     FFX_RETURN_ON_ERROR(context, FFX_ERROR_INVALID_POINTER);
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1123:42: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1123 |     FFX_RETURN_ON_ERROR(sharedResources, FFX_ERROR_INVALID_POINTER);
+      |                                          ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: In function ‘FfxErrorCode ffxVk316OpticalflowContextDispatch(FfxOpticalflowContext*, const FfxOpticalflowDispatchDescription*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1133:34: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1133 |     FFX_RETURN_ON_ERROR(context, FFX_ERROR_INVALID_POINTER);
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1134:41: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1134 |     FFX_RETURN_ON_ERROR(dispatchParams, FFX_ERROR_INVALID_POINTER);
+      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1135:54: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1135 |     FFX_RETURN_ON_ERROR(dispatchParams->commandList, FFX_ERROR_INVALID_POINTER);
+      |                                                      ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1136:79: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1136 |     FFX_RETURN_ON_ERROR(!ffxOpticalflowResourceIsNull(dispatchParams->color), FFX_ERROR_INVALID_POINTER);
+      |                                                                               ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1137:100: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+ 1137 |     FFX_RETURN_ON_ERROR(dispatchParams->color.description.type == FFX_API_RESOURCE_TYPE_TEXTURE2D, FFX_ERROR_INVALID_ARGUMENT);
+      |                                                                                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1138:91: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1138 |     FFX_RETURN_ON_ERROR(!ffxOpticalflowResourceIsNull(dispatchParams->opticalFlowVector), FFX_ERROR_INVALID_POINTER);
+      |                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1139:88: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_POINTER’ to ‘-2147483648’ [-Woverflow]
+ 1139 |     FFX_RETURN_ON_ERROR(!ffxOpticalflowResourceIsNull(dispatchParams->opticalFlowSCD), FFX_ERROR_INVALID_POINTER);
+      |                                                                                        ^~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1143:49: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_NULL_DEVICE’ to ‘-2147483636’ [-Woverflow]
+ 1143 |     FFX_RETURN_ON_ERROR(contextPrivate->device, FFX_ERROR_NULL_DEVICE);
+      |                                                 ^~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1144:121: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+ 1144 |     FFX_RETURN_ON_ERROR(dispatchParams->color.description.width <= contextPrivate->contextDescription.resolution.width, FFX_ERROR_INVALID_ARGUMENT);
+      |                                                                                                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:1145:123: warning: overflow in conversion from ‘FfxErrorCodes’ to ‘FfxErrorCode’ {aka ‘int’} changes value from ‘FFX_ERROR_INVALID_ARGUMENT’ to ‘-2147483638’ [-Woverflow]
+ 1145 |     FFX_RETURN_ON_ERROR(dispatchParams->color.description.height <= contextPrivate->contextDescription.resolution.height, FFX_ERROR_INVALID_ARGUMENT);
+      |                                                                                                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_error.h:69:17: note: in definition of macro ‘FFX_RETURN_ON_ERROR’
+   69 |         return (y);                                 \
+      |                 ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:262:27: warning: ‘FfxApiDimensions2D GetGlobalMotionSearchDispatchSize(int)’ defined but not used [-Wunused-function]
+  262 | static FfxApiDimensions2D GetGlobalMotionSearchDispatchSize(int level)
+      |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:42:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/gpu/spd/ffx_spd.h:80:17: warning: ‘void ffxSpdSetup(uint32_t*, uint32_t*, uint32_t*, uint32_t*)’ defined but not used [-Wunused-function]
+   80 | FFX_STATIC void ffxSpdSetup(FfxUInt32x2 dispatchThreadGroupCountXY,
+      |                 ^~~~~~~~~~~
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core.h:59,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/ffx_opticalflow.cpp:41:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:335:22: warning: ‘FfxUInt32 ffxPackHalf2x16(float*)’ defined but not used [-Wunused-function]
+  335 | FFX_STATIC FfxUInt32 ffxPackHalf2x16(FfxFloat32x2 x)
+      |                      ^~~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:231:17: warning: ‘void ffxOpARcpF3(float*, float*)’ defined but not used [-Wunused-function]
+  231 | FFX_STATIC void ffxOpARcpF3(FfxFloat32x3 d, FfxFloat32x3 a)
+      |                 ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:223:17: warning: ‘void ffxOpAMulOneF3(float*, float*, FfxFloat32)’ defined but not used [-Wunused-function]
+  223 | FFX_STATIC void ffxOpAMulOneF3(FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32 b)
+      |                 ^~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:215:17: warning: ‘void ffxOpAMulF3(float*, float*, float*)’ defined but not used [-Wunused-function]
+  215 | FFX_STATIC void ffxOpAMulF3(FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32x3 b)
+      |                 ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:207:17: warning: ‘void ffxOpACpyF3(float*, float*)’ defined but not used [-Wunused-function]
+  207 | FFX_STATIC void ffxOpACpyF3(FfxFloat32x3 d, FfxFloat32x3 a)
+      |                 ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:199:17: warning: ‘void ffxOpAAddOneF3(float*, float*, FfxFloat32)’ defined but not used [-Wunused-function]
+  199 | FFX_STATIC void ffxOpAAddOneF3(FfxFloat32x3 d, FfxFloat32x3 a, FfxFloat32 b)
+      |                 ^~~~~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:191:23: warning: ‘FfxFloat32 ffxSaturate(FfxFloat32)’ defined but not used [-Wunused-function]
+  191 | FFX_STATIC FfxFloat32 ffxSaturate(FfxFloat32 x)
+      |                       ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:168:22: warning: ‘FfxUInt32 ffxMin(FfxUInt32, FfxUInt32)’ defined but not used [-Wunused-function]
+  168 | FFX_STATIC FfxUInt32 ffxMin(FfxUInt32 x, FfxUInt32 y)
+      |                      ^~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:158:23: warning: ‘FfxFloat32 ffxRsqrt(FfxFloat32)’ defined but not used [-Wunused-function]
+  158 | FFX_STATIC FfxFloat32 ffxRsqrt(FfxFloat32 x)
+      |                       ^~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:145:23: warning: ‘FfxFloat32 ffxFract(FfxFloat32)’ defined but not used [-Wunused-function]
+  145 | FFX_STATIC FfxFloat32 ffxFract(FfxFloat32 x)
+      |                       ^~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:130:22: warning: ‘FfxUInt32 ffxAShrSU1(FfxUInt32, FfxUInt32)’ defined but not used [-Wunused-function]
+  130 | FFX_STATIC FfxUInt32 ffxAShrSU1(FfxUInt32 a, FfxUInt32 b)
+      |                      ^~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:99:23: warning: ‘FfxFloat32 ffxLerp(FfxFloat32, FfxFloat32, FfxFloat32)’ defined but not used [-Wunused-function]
+   99 | FFX_STATIC FfxFloat32 ffxLerp(FfxFloat32 x, FfxFloat32 y, FfxFloat32 t)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:79:23: warning: ‘FfxFloat32 ffxDot4(float*, float*)’ defined but not used [-Wunused-function]
+   79 | FFX_STATIC FfxFloat32 ffxDot4(FfxFloat32x4 a, FfxFloat32x4 b)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:74:23: warning: ‘FfxFloat32 ffxDot3(float*, float*)’ defined but not used [-Wunused-function]
+   74 | FFX_STATIC FfxFloat32 ffxDot3(FfxFloat32x3 a, FfxFloat32x3 b)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:69:23: warning: ‘FfxFloat32 ffxDot2(float*, float*)’ defined but not used [-Wunused-function]
+   69 | FFX_STATIC FfxFloat32 ffxDot2(FfxFloat32x2 a, FfxFloat32x2 b)
+      |                       ^~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../../../api/internal/gpu/ffx_core_cpu.h:57:22: warning: ‘FfxUInt32 ffxAsUInt32(FfxFloat32)’ defined but not used [-Wunused-function]
+   57 | FFX_STATIC FfxUInt32 ffxAsUInt32(FfxFloat32 x)
+      |                      ^~~~~~~~~~~
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/framegeneration/fsr3/internal/../include/../../../api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[134/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_framegeneration_3_1_6.dir/src/ffx_vk_fsr3_3_1_6_framegen.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_assert.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_interface.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:8:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp: In function ‘bool {anonymous}::make_shared_image(VkPhysicalDevice, VkDevice, FfxVkFsr3_3_1_5Bridge*, const FfxApiResourceDescription&, OwnedSharedImage*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::pNext’ [-Wmissing-field-initializers]
+  125 |     VkImageCreateInfo imageInfo{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
+      |                                                                    ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::flags’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::imageType’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::format’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::extent’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::mipLevels’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::arrayLayers’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::samples’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::tiling’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::usage’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::sharingMode’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::queueFamilyIndexCount’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::pQueueFamilyIndices’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:125:68: warning: missing initializer for member ‘VkImageCreateInfo::initialLayout’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:141:79: warning: missing initializer for member ‘VkMemoryAllocateInfo::pNext’ [-Wmissing-field-initializers]
+  141 |     VkMemoryAllocateInfo allocationInfo{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
+      |                                                                               ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:141:79: warning: missing initializer for member ‘VkMemoryAllocateInfo::allocationSize’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_6_framegen.cpp:141:79: warning: missing initializer for member ‘VkMemoryAllocateInfo::memoryTypeIndex’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[135/304] Linking CXX static library libbbnet.a
+[136/304] Building CXX object third_party/fsr-vulkan/CMakeFiles/ffx_vulkan_fsr3_vk_framegeneration_3_1_6.dir/src/ffx_vk_fsr3_3_1_5_bridge.cpp.o
+In file included from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_assert.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_interface.h:25,
+                 from /workspace/uncharted_pc/gpu/third_party/fsr-vulkan/src/ffx_vk_fsr3_3_1_5_bridge.cpp:16:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:163: warning: ignoring ‘#pragma warning ’ [-Wunknown-pragmas]
+  163 | #pragma warning(disable : 4365 4710 4820 5039)
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitValue(size_t, uint8_t)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  658 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_VALUE };
+      |                                                                            ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:658:76: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: In static member function ‘static FfxResourceInitData FfxResourceInitData::FfxResourceInitBuffer(size_t, const void*)’:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::size’ [-Wmissing-field-initializers]
+  666 |         FfxResourceInitData initData = { FFX_RESOURCE_INIT_DATA_TYPE_BUFFER };
+      |                                                                             ^
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:666:77: warning: missing initializer for member ‘FfxResourceInitData::<anonymous>’ [-Wmissing-field-initializers]
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h: At global scope:
+/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/upstream/ffx-2.3.0/Kits/FidelityFX/api/internal/ffx_internal_types.h:712:27: warning: ‘s_FfxViewDescInit’ defined but not used [-Wunused-variable]
+  712 | static FfxViewDescription s_FfxViewDescInit = { false, FFX_RESOURCE_VIEW_DIMENSION_TEXTURE_2D, -1, -1, -1, L"" };
+      |                           ^~~~~~~~~~~~~~~~~
+[137/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/amdgpu/pixel_format.cpp.o
+[138/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/amdgpu/regs.cpp.o
+[139/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/amdgpu/tiling.cpp.o
+[140/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/amdgpu/liverpool.cpp.o
+[141/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/buffer_cache/buffer.cpp.o
+[142/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/buffer_cache/fault_manager.cpp.o
+[143/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/buffer_cache/buffer_cache.cpp.o
+[144/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/cache_storage.cpp.o
+[145/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/fsr411/fsr411.cpp.o
+[146/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/page_manager.cpp.o
+[147/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/host_passes/fsr_pass.cpp.o
+[148/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/host_passes/pp_pass.cpp.o
+[149/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_barrier_tracker.cpp.o
+[150/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/liverpool_to_vk.cpp.o
+[151/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_common.cpp.o
+[152/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_camera_motion.cpp.o
+[153/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_dlss.cpp.o
+[154/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_compute_pipeline.cpp.o
+[155/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_frame_capture.cpp.o
+[156/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_draw_prep.cpp.o
+[157/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp.o
+FAILED: CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp.o 
+/usr/bin/c++ -DBB_FONT_PATH=\"/workspace/uncharted_pc/gpu/third_party/fonts/DejaVuSans.ttf\" -DBOOST_ASIO_STANDALONE -DFMT_SHARED -DIMGUI_IMPL_VULKAN_NO_PROTOTYPES -DMINIZ_STATIC_DEFINE -DNDEBUG -Dbbgpu_EXPORTS -I/workspace/uncharted_pc/gpu/third_party/imgui -I/workspace/uncharted_pc/gpu/third_party/imgui/backends -I/workspace/uncharted_pc/gpu/shim -I/workspace/uncharted_pc/gpu/shadps4 -I/workspace/uncharted_pc/out/gpu/include -I/workspace/uncharted_pc/gpu/third_party/gcn/include -I/workspace/uncharted_pc/gpu/third_party/half/include -I/workspace/uncharted_pc/gpu/third_party/magic_enum/include -I/workspace/uncharted_pc/gpu/third_party/magic_enum/include/magic_enum -I/workspace/uncharted_pc/gpu/third_party/fsr-vulkan/include -I/workspace/uncharted_pc/gpu/third_party/miniz -I/workspace/uncharted_pc/out/gpu/third_party/miniz -I/workspace/uncharted_pc/gpu/third_party/sirit/src/../include -I/workspace/uncharted_pc/gpu/third_party/sirit/externals/SPIRV-Headers/include -isystem /workspace/setup/prefix/usr/include -isystem /workspace/setup/prefix/usr/include/pipewire-0.3 -isystem /workspace/setup/prefix/usr/include/spa-0.2 -isystem /workspace/setup/prefix/usr/include/libdrm -isystem /workspace/setup/prefix/usr/include/libdecor-0 -isystem /workspace/setup/prefix/usr/include/x86_64-linux-gnu -I/workspace/setup/prefix/usr/include/miniupnpc -O2 -g -DNDEBUG -std=gnu++23 -fPIC -fno-omit-frame-pointer -Wno-deprecated-declarations -Wno-missing-field-initializers -D_REENTRANT -MD -MT CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp.o -MF CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp.o.d -o CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp.o -c /workspace/uncharted_pc/gpu/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp
+/workspace/uncharted_pc/gpu/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp: In member function ‘vk::ImageView Vulkan::FrameGenerator::Hudless(vk::Format, vk::Extent2D&)’:
+/workspace/uncharted_pc/gpu/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp:349:42: error: ambiguous overload for ‘operator=’ (operand types are ‘vk::Extent2D’ and ‘<brace-enclosed initializer list>’)
+  349 |     size = {hudless_width, hudless_height};
+      |                                          ^
+In file included from /workspace/setup/prefix/usr/include/vulkan/vulkan.hpp:14249,
+                 from /workspace/uncharted_pc/gpu/shadps4/video_core/renderer_vulkan/vk_common.h:19,
+                 from /workspace/uncharted_pc/gpu/shadps4/video_core/renderer_vulkan/vk_frame_generation.h:20,
+                 from /workspace/uncharted_pc/gpu/shadps4/video_core/renderer_vulkan/vk_frame_generation.cpp:2:
+/workspace/setup/prefix/usr/include/vulkan/vulkan_structs.hpp:44:16: note: candidate: ‘vk::Extent2D& vk::Extent2D::operator=(const VkExtent2D&)’
+   44 |     Extent2D & operator=( VkExtent2D const & rhs ) VULKAN_HPP_NOEXCEPT
+      |                ^~~~~~~~
+/workspace/setup/prefix/usr/include/vulkan/vulkan_structs.hpp:26:10: note: candidate: ‘constexpr vk::Extent2D& vk::Extent2D::operator=(const vk::Extent2D&)’
+   26 |   struct Extent2D
+      |          ^~~~~~~~
+/workspace/setup/prefix/usr/include/vulkan/vulkan_structs.hpp:26:10: note: candidate: ‘constexpr vk::Extent2D& vk::Extent2D::operator=(vk::Extent2D&&)’
+[158/304] Building CXX object CMakeFiles/bbgpu.dir/shadps4/video_core/renderer_vulkan/vk_fsr4.cpp.o
+ninja: build stopped: subcommand failed.
