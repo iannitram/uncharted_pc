@@ -1,6 +1,6 @@
 # Uncharted PC roadmap — 2026-10-24
 
-This plan supersedes the inherited Bloodborne roadmap, preserved in [history](../history/ROADMAP_BLOODBORNE_PRE_2026-10-24.md). It targets fork `iannitram/uncharted_pc`. Current review baseline: main snapshot `68c8cf9a6563d653ed17ce72d758aaa5f33a7a76`; the fork's separate linux branch has reported working builds and must be reconciled before implementation. Dates below are proposed work windows from project kickoff, not delivery commitments. Owners are roles to assign.
+This plan supersedes the inherited Bloodborne roadmap, preserved in [history](../history/ROADMAP_bloodborne_2026-09_ru.md). It targets fork `iannitram/uncharted_pc`. Current review baseline: main snapshot `68c8cf9a6563d653ed17ce72d758aaa5f33a7a76`; the fork's separate linux branch has reported working builds and must be reconciled before implementation. Dates below are proposed work windows from project kickoff, not delivery commitments. Owners are roles to assign.
 
 ## Window 1: correctness and reproducible builds (weeks 1–2)
 
