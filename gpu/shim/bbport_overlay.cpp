@@ -839,8 +839,36 @@ void SetTextEntry(bool active, const std::string& prompt, const std::string& tex
     text_entry_text = text;
 }
 
+// BB_STEREO_PARITY=<offset> (z13 diagnostic): at each present, read the guest byte at image base
+// (BB_GUEST_IMAGE_BASE, set by the probe) + offset, e.g. Uncharted 3's alternate-frame eye flag.
+// Every 5 s: presents, how often the byte alternated, and how often it repeated (a break in
+// left/right parity: a frame dropped, replaced or presented twice).
+static void NoteStereoParity() {
+    static const unsigned char* flag = [] () -> const unsigned char* {
+        const char* off = std::getenv("BB_STEREO_PARITY");
+        const char* base = std::getenv("BB_GUEST_IMAGE_BASE");
+        if (!off || !base) return nullptr;
+        return reinterpret_cast<const unsigned char*>(std::strtoull(base, nullptr, 0) + std::strtoull(off, nullptr, 0));
+    }();
+    if (!flag) return;
+    static int last = -1, presents = 0, flips = 0, repeats = 0, run = 0, longest = 0;
+    static auto window_start = std::chrono::steady_clock::now();
+    const int v = *reinterpret_cast<const volatile unsigned char*>(flag) & 1;
+    ++presents;
+    if (last >= 0) {
+        if (v != last) { ++flips; run = 0; } else { ++repeats; longest = std::max(longest, ++run); }
+    }
+    last = v;
+    const auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration<float>(now - window_start).count() >= 5.0f) {
+        std::printf("Stereo parity: %d presents, %d alternated, %d repeated (longest run %d)\n", presents, flips, repeats, longest);
+        window_start = now; presents = flips = repeats = longest = run = 0;
+    }
+}
+
 // Called for every presented frame: the interval for the FPS readout and BB_FPS_LOG.
 void NotePresent() {
+    NoteStereoParity();
     const auto now = std::chrono::steady_clock::now();
     const float ms = std::chrono::duration<float, std::milli>(now - last_present).count();
     last_present = now;
