@@ -161,7 +161,7 @@ int DriverDefaultUpscaler(int current, bool chosen, bool driver_validated) {
 
 void ConfigureDriverDefault(unsigned driver_id, const char* driver_name) {
     auto& v = Get();
-    const bool validated = FsrDriverValidated(driver_id);
+    const bool validated = FsrDriverValidated(driver_id) || FsrDeviceValidated(driver_name);
     const int before = v.upscaler;
     const int now = DriverDefaultUpscaler(before, v.upscaler_chosen, validated);
     if (now != before) {
@@ -169,6 +169,9 @@ void ConfigureDriverDefault(unsigned driver_id, const char* driver_name) {
         v.startup_upscaler = now;
         std::printf("Upscaler: decision: anti-aliasing Off by default: FSR 3.1 has not been checked "
                     "on %s (driver id %u); turn it on in the menu (Insert / L3+R3) to try it\n",
+                    driver_name, driver_id);
+    } else if (before == UpscalerFsr3 && validated) {
+        std::printf("Upscaler: decision: FSR 3.1 on by default: measured clean on %s (driver id %u)\n",
                     driver_name, driver_id);
     } else if (before == UpscalerFsr3 && !validated) {
         std::printf("Upscaler: decision: FSR 3.1 kept (the player chose it) on %s (driver id %u), "
@@ -262,6 +265,20 @@ const char* UpscalerName(int upscaler) {
 const char* FrameGenName(int frame_gen) {
     static constexpr const char* names[FrameGenCount] = {"off", "fsr3", "dlss"};
     return names[std::clamp(frame_gen, 0, FrameGenCount - 1)];
+}
+
+bool FsrDeviceValidated(const char* device) {
+    // Device names as the driver reports them (VkPhysicalDeviceProperties::deviceName). Driver
+    // ids can't tell these apart: RADV is one id for every AMD GPU. Each entry was measured clean
+    // with FSR 3.1 on (U3, the London pub): PHOENIX (Ryzen Z1 Extreme, Legion Go) once FSR-Vulkan
+    // patch 0003 keeps FSR out of protected memory; STRIX_HALO (Radeon 8060S, Z13). 2026-10-19.
+    static constexpr const char* validated[] = {"(RADV PHOENIX)", "(RADV STRIX_HALO)"};
+    if (!device) return false;
+    const std::string_view name{device};
+    for (const char* v : validated) {
+        if (name.find(v) != std::string_view::npos) return true;
+    }
+    return false;
 }
 
 bool FsrDriverValidated(unsigned driver_id) {

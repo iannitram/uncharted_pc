@@ -39,5 +39,16 @@ int main() {
     Load();
     ConfigureDriverDefault(3, "test GPU, driver test");
     Check(Get().upscaler_chosen && Get().upscaler == UpscalerFsr3, "BB_UPSCALER=fsr3 is kept");
+    // Measured devices, by name (driver ids can't tell AMD GPUs apart)
+    Check(FsrDeviceValidated("AMD Ryzen Z1 Extreme (RADV PHOENIX), driver 26.1.99"), "PHOENIX is on the list");
+    Check(FsrDeviceValidated("AMD Radeon 8060S Graphics (RADV STRIX_HALO), driver 26.1.99"), "STRIX_HALO is on the list");
+    Check(!FsrDeviceValidated("AMD Radeon 610M (RADV RAPHAEL_MENDOCINO), driver 26.2.4"), "an unmeasured AMD GPU is not");
+    Check(!FsrDeviceValidated(nullptr), "no name: not on the list");
+    Get().upscaler = UpscalerFsr3;
+    Get().upscaler_chosen = false;
+    ConfigureDriverDefault(3, "AMD Ryzen Z1 Extreme (RADV PHOENIX), driver 26.1.99");
+    Check(Get().upscaler == UpscalerFsr3, "PHOENIX keeps the FSR 3.1 default");
+    ConfigureDriverDefault(3, "AMD Radeon 610M (RADV RAPHAEL_MENDOCINO), driver 26.2.4");
+    Check(Get().upscaler == UpscalerOff, "an unmeasured AMD GPU still defaults to Off");
     return failures ? 1 : 0;
 }
