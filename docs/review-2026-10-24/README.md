@@ -11,7 +11,7 @@ Windows is the advertised product. Linux runtime/build paths exist but this main
 ## Deliverables
 
 - [Bug report](BUG_REPORT.md): 19 individual newly filed issues, evidence, fixes and acceptance; follow-ups on nine existing correctness issues and two performance issues.
-- [Updated platform roadmap](../ROADMAP.md): phased windows, Windows/Linux artifacts and release gates, Intel/Apple Silicon macOS feasibility deliverables. Previous inherited Bloodborne roadmap preserved in history.
+- [Updated platform roadmap](ROADMAP-proposed.md): phased windows, Windows/Linux artifacts and release gates, Intel/Apple Silicon macOS feasibility deliverables. Previous inherited Bloodborne roadmap preserved in history.
 - [Code map](CODE_MAP.md): execution flow and subsystem responsibilities.
 - [Mac compatibility bundle feasibility](MAC_COMPATIBILITY.md): Wine/MoltenVK translation path and acceptance gates.
 - [Optimization proposals](OPTIMIZATIONS.md): existing performance work plus bounded wildcard/preparation-cache proposals and benchmark method.
