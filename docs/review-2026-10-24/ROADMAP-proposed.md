@@ -1,6 +1,6 @@
 # Uncharted PC roadmap — 2026-10-24
 
-This plan supersedes the inherited Bloodborne roadmap, preserved in [history](history/ROADMAP_BLOODBORNE_PRE_2026-10-24.md). It targets fork `iannitram/uncharted_pc`. Current review baseline: main snapshot `68c8cf9a6563d653ed17ce72d758aaa5f33a7a76`; the fork's separate linux branch has reported working builds and must be reconciled before implementation. Dates below are proposed work windows from project kickoff, not delivery commitments. Owners are roles to assign.
+This plan supersedes the inherited Bloodborne roadmap, preserved in [history](../history/ROADMAP_BLOODBORNE_PRE_2026-10-24.md). It targets fork `iannitram/uncharted_pc`. Current review baseline: main snapshot `68c8cf9a6563d653ed17ce72d758aaa5f33a7a76`; the fork's separate linux branch has reported working builds and must be reconciled before implementation. Dates below are proposed work windows from project kickoff, not delivery commitments. Owners are roles to assign.
 
 ## Window 1: correctness and reproducible builds (weeks 1–2)
 
@@ -32,8 +32,8 @@ macOS owner: if window 2 proves a viable runtime, scope an Intel experimental bu
 
 ## Release evidence required
 
-Each candidate records commit, compiler/dependencies, OS/CPU/GPU/driver, game revision identifier (no game files), settings, cold/warm cache state, expected skips, logs and known limitations. Publish artifact checksums and third-party notices, preserve user saves/config, and test upgrade failure recovery. QA evidence includes p50/p95/p99 frame times, RSS/VRAM trend, device-lost/assertion counts and power for handhelds. Source code fixes are proposed in [the review register](review-2026-10-24/BUG_REPORT.md).
+Each candidate records commit, compiler/dependencies, OS/CPU/GPU/driver, game revision identifier (no game files), settings, cold/warm cache state, expected skips, logs and known limitations. Publish artifact checksums and third-party notices, preserve user saves/config, and test upgrade failure recovery. QA evidence includes p50/p95/p99 frame times, RSS/VRAM trend, device-lost/assertion counts and power for handhelds. Source code fixes are proposed in [the review register](../review-2026-10-24/BUG_REPORT.md).
 
 ## Mac compatibility bundle experiment
 
-In window 2, also test the Windows release through a macOS-compatible Wine runtime and MoltenVK on physical Macs. Proton itself targets Linux. Apple Silicon needs a validated x86-64 translation path. Deliver a configuration, Vulkan feature inventory and go/no-go report; if successful, scope an experimental compatibility app in window 4 after redistribution and packaging checks. See [the feasibility assessment](review-2026-10-24/MAC_COMPATIBILITY.md).
+In window 2, also test the Windows release through a macOS-compatible Wine runtime and MoltenVK on physical Macs. Proton itself targets Linux. Apple Silicon needs a validated x86-64 translation path. Deliver a configuration, Vulkan feature inventory and go/no-go report; if successful, scope an experimental compatibility app in window 4 after redistribution and packaging checks. See [the feasibility assessment](../review-2026-10-24/MAC_COMPATIBILITY.md).
