@@ -238,6 +238,7 @@ Halo) and a Windows desktop with an RTX 3090 Ti.
 - Which of bbport's 8 newer commits to take.
 - Settled: the Linux launcher exists (`launcher/uncharted_linux.py`, spacepepperoni).
 - Whether to send anything of ours to spacepepperoni, and how (the owner's call, one change at a time).
+- In-game frame-rate choice (60/30) once the in-game menus land.
 - `run.sh` is still Bloodborne's; drop it or point it at Uncharted once Phase 0 shows which
   launch path we use. (2026-10-18: `run.py` launches all three games on Linux.)
 - FSR 3.1 noise on RADV (report above). Our side logs the driver at FSR start and warns off a
