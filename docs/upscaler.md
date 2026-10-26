@@ -361,3 +361,17 @@ same files; `VERIFY=1` compares against the DLL at the end.
 **Correction to the A/B above ("the frame is CPU-bound").** Those measurements ran while 12 hung
 shadPS4 processes each occupied a core. On an idle system: "host copies" 1.6%, waiting on the GPU
 ~41% — the frame is GPU-bound, so async compute for FSR makes sense again.
+
+## FSR debug switches: BB_FSR_FP16 and BB_FSR_SUBGROUP_CONTROL (2026-10-19)
+
+Two troubleshooting environment switches were added for the FSR noise seen on RADV PHOENIX.
+They are read in `MakeDeviceInfo` (`gpu/shadps4/video_core/renderer_vulkan/vk_temporal_upscaler.cpp`).
+
+- `BB_FSR_FP16=0`: FSR is told `shaderFloat16` is off, so it uses its 32-bit shader variants.
+- `BB_FSR_SUBGROUP_CONTROL=0`: FSR is told subgroup size control is off, so it uses its default wave size.
+- Unset (or any value other than `0`): normal behaviour, FSR gets the device's real feature flags.
+
+When one of them is `0`, the run logs a line starting `Upscaler: debug switch:`. They change only what FSR
+is told about the device, not the game's rendering. The RADV PHOENIX noise they were added for is
+now fixed by patch 0003 (`gpu/patches/fsr-vulkan/0003-ffx_vk-never-pick-a-protected-memory-type.patch`),
+so they are not needed for normal runs and are kept only for troubleshooting.
