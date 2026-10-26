@@ -1,6 +1,7 @@
 /* Exercise actual guest file operations on a linked overlay and writable saves. */
 #include "../src/runtime_file.c"
 #include <assert.h>
+#include "portable.h"
 static int32_t guest_errno;
 int32_t *runtime_errno(void) { return &guest_errno; }
 int32_t runtime_guest_errno(int e) { return e; }
@@ -9,16 +10,17 @@ uintptr_t runtime_lookup(const RuntimeExport *table,size_t n,const char *name) {
     return 0;
 }
 int main(void) {
-    char root[]="/tmp/bbport-mod-files-XXXXXX";
-    assert(mkdtemp(root));
-    char game[512],user[512],source[512],link[512];
+    /* bb_mkdtemp picks a scratch directory on both platforms (tests/portable.h). */
+    char root[BB_TEST_PATH_MAX]="/tmp/bbport-mod-files-XXXXXX"; /* the template mkdtemp needs; Windows overwrites it */
+    assert(bb_mkdtemp(root));
+    char game[BB_TEST_PATH_MAX+64],user[BB_TEST_PATH_MAX+64],source[BB_TEST_PATH_MAX+64],link[BB_TEST_PATH_MAX+64];
     snprintf(game,sizeof(game),"%s/game",root);
     snprintf(user,sizeof(user),"%s/user",root);
     snprintf(source,sizeof(source),"%s/mod.dcx",root);
     snprintf(link,sizeof(link),"%s/game/asset.dcx",root);
     assert(!mkdir(game,0755));
     FILE *f=fopen(source,"w"); assert(f); assert(fputs("modded",f)>=0); assert(!fclose(f));
-    assert(!symlink(source,link));
+    assert(!bb_test_link(source,link));
     runtime_file_configure(game,user);
     for (int i=0;i<3;++i) {
         const char *path=i==0 ? "/app0/asset.dcx" : i==1 ? "/hostapp/asset.dcx" : "asset.dcx";
@@ -44,6 +46,11 @@ int main(void) {
     assert(found && !do_close(dir));
     int save=(int)do_open("/data/test-save",0x202,0644); assert(save>=3);
     assert(do_write(save,"save",4)==4 && !do_close(save));
+    /* ".." hidden behind Windows separators must not escape a mount ... */
+    assert(do_open("/data/..\\..\\escape",0,0)==-EACCES);
+    assert(do_open("..\\..\\escape",0,0)==-EACCES);
+    /* ... while ".." inside a single name is a normal, allowed component. */
+    assert(do_open("/data/a..b",0,0)==-ENOENT);
     assert(!path_op("/data/test-save",2,0));
     assert(!unlink(link) && !unlink(source) && !rmdir(game));
     const char *dirs[]={"temp0","download0","data"};

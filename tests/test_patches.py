@@ -311,5 +311,30 @@ class PatchGameTests(unittest.TestCase):
             self.assertTrue(called.call_args.kwargs.get('fail_closed'))
 
 
+class PatchTargetTests(unittest.TestCase):
+    """A patch database must never be written into a game it does not belong to."""
+
+    def test_title_ids_are_read_from_the_database(self):
+        ids = patches.patch_title_ids(XML)
+        self.assertIn('CUSA03173', ids)          # Bloodborne
+        self.assertNotIn('CUSA02344', ids)       # Uncharted
+
+    def test_a_game_the_database_does_not_list_is_refused(self):
+        # Same APP_VER is not the same game: Bloodborne 01.09 and a hypothetical
+        # Uncharted 01.09 have different code at these addresses.
+        with patch.object(patches, 'game_title_id', return_value='CUSA02344'):
+            self.assertIsNotNone(patches.check_patch_target(XML, '/game'))
+
+    def test_the_game_the_database_is_for_is_allowed(self):
+        with patch.object(patches, 'game_title_id', return_value='CUSA03173'):
+            self.assertIsNone(patches.check_patch_target(XML, '/game'))
+
+    def test_an_unreadable_title_id_does_not_block(self):
+        # Nothing to compare against: the version check has to stand alone rather
+        # than refusing every game whose param.sfo cannot be read.
+        with patch.object(patches, 'game_title_id', return_value=None):
+            self.assertIsNone(patches.check_patch_target(XML, '/game'))
+
+
 if __name__ == '__main__':
     unittest.main()

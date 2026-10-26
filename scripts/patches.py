@@ -84,6 +84,32 @@ def game_title_id(game):
         return None
 
 
+def patch_title_ids(xml):
+    """The Title IDs the patch database declares entries for (the database's path)."""
+    root = ET.parse(xml).getroot()
+    return {node.text.strip() for group in root.iter('TitleID')
+            for node in group.iter('ID') if node.text}
+
+
+def check_patch_target(xml, game):
+    """Why these patches must not be written to this game, or None when they may be.
+
+    The app version alone is not enough: patches are byte writes at the addresses of one
+    game build, and two games can share an APP_VER ("01.09") with entirely different code
+    there. The database names the games it belongs to, so a game it does not list is
+    refused even when the version matches.
+    """
+    title = game_title_id(game)
+    known = patch_title_ids(xml)
+    if not title or not known:
+        return None  # cannot tell which game this is: the version check stands alone
+    if title not in known:
+        others = ', '.join(sorted(known)[:4])
+        return (f'this game is {title}; the patches are for {others}... and none of '
+                f'them belongs to it')
+    return None
+
+
 def validate_patch_requirements(names, game):
     if 'Restore Debug Camera' in names and 'Enemy Control' in names:
         raise ValueError('Restore Debug Camera conflicts with Enemy Control; enable only one')
@@ -349,9 +375,14 @@ def main():
     # would corrupt code. Such a game runs unpatched (run.sh/run.py then choose 30 FPS).
     version=game_app_version(a.game_dir)
     if version and version!=a.app_version and not os.environ.get('BB_FORCE_PATCHES'):
+        declined=f'game version {version}, patches are for {a.app_version}'
+    else:
+        # Right version is not the same game: the database says which games it is for.
+        declined=check_patch_target(a.xml,a.game_dir)
+    if declined:
         blob=struct.pack('<8sQQ',b'BBPATCH2',EBOOT_BASE,0)
         (a.out/'patches.bin').write_bytes(blob)
-        print(f'Patches: game version {version}, patches are for {a.app_version}: none applied '
+        print(f'Patches: {declined}: none applied '
               '(30 FPS, no effect or resolution patches)')
         return
     names=FPS_PRESETS[a.fps]+[n.strip() for n in a.extra.split(';') if n.strip()]
