@@ -117,6 +117,9 @@ public:
     /// once the GPU work that wrote them has completed; the labels the guest learns of the GPU's
     /// progress from wait for it (landing_gate.h). False when not deferred (no side queue,
     /// BB_SCALAR_COPY64_DEFER=0): the caller reads back as before.
+    /// bbport: whether DeferGuestCopy can take a raycaster copy of this range (its checks that don't
+    /// depend on the arena), so callers that rely on the deferral can fall back in time.
+    [[nodiscard]] bool CanDeferGuestCopy(VAddr src, VAddr dst, u64 size) const;
     bool DeferGuestCopy(VAddr src, VAddr dst, u64 size);
     u64 PendingLanding() const;
     bool LandingGateActive() const;

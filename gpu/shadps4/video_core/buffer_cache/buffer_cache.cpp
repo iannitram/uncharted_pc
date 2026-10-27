@@ -566,6 +566,16 @@ struct BufferCache::Landing {
     boost::container::small_vector<VAddr, 4> targets;         ///< guest address of each copy
 };
 
+bool BufferCache::CanDeferGuestCopy(VAddr src, VAddr dst, u64 size) const {
+    static const bool enabled = [] {
+        const char* env = std::getenv("BB_SCALAR_COPY64_DEFER");
+        return env && env[0] == '1';
+    }();
+    return enabled && side_queue && !land_stopping.load(std::memory_order_acquire) && size != 0 &&
+           size <= SideQueue::StagingSize / 2 && memory->IsValidGpuMapping(src, size) &&
+           memory->IsValidGpuMapping(dst, size);
+}
+
 bool BufferCache::DeferGuestCopy(VAddr src, VAddr dst, u64 size) {
     static const bool enabled = [] {
         const char* env = std::getenv("BB_SCALAR_COPY64_DEFER");
