@@ -2,6 +2,31 @@
 
 This plan supersedes the inherited Bloodborne roadmap, preserved in [history](../history/ROADMAP_bloodborne_2026-09_ru.md). It targets fork `iannitram/uncharted_pc`. Current review baseline: main snapshot `68c8cf9a6563d653ed17ce72d758aaa5f33a7a76`; the fork's separate linux branch has reported working builds and must be reconciled before implementation. Dates below are proposed work windows from project kickoff, not delivery commitments. Owners are roles to assign.
 
+## Status on `linux` (2026-10-26, evening)
+
+Where it stands: Window 1 is partly built; work windows 2, 3 and 4 have not started. Five review findings are fixed on `linux` and closed; the rest are open issues. 1.0 is defined in [SPEC.md](../../SPEC.md): each of the three games plays start to finish on the Legion Go.
+
+| Item | Status | Issues / PRs |
+|---|---|---|
+| Linux branch reconciled with main and the spacepepperoni fork | built | main merged in 9050e79, fork sync merged via PR #47 (457e49e) |
+| Compute ring offset reset on queue map | built | #33 closed; PR #43 |
+| `WAIT_ON_CE_COUNTER` missing-task guard | built | #32 closed; PR #45. Its `WAIT_ON_DE_COUNTER_DIFF` half is backwards: #67 open |
+| Flexible-mapping split offset | built | #34 closed; fa64614 |
+| Save mount table full reported as success | built | #36 closed; 7b68786 |
+| Linux `-Werror` build (`host_priority`) | built on `linux` | #68 closed; 4dd6034 |
+| ExpandImage stale copy, BUFFER_WBINVL1 decode, equeue loop hang | not started | #31, #37, #35 open |
+| AJM MP3/AAC process termination | not started | #56 open |
+| GPU build with Vulkan-Headers 1.4.365 | not started | #60 open |
+| Save integrity findings S01-S06 | not started, after 1.0 | #48-#53 (also #38) |
+| Platform CI and release verification | not started, after 1.0 | #59 |
+| Windows release-candidate items | not started, after 1.0 | #39, #54, #65 |
+| Linux package starts each game | partly: package misses `scripts/patches.py` | #73 (in progress), #72 |
+| Controller in Desktop Mode, upstream PR pulls | not started | #20, #41 (after 1.0), #42 |
+| Campaign stability (U1/U2/U3) | not started, needs the owner's Legion Go | #61-#64, playthroughs #76-#78, crashes #79-#82 |
+| Plain ELF input | not started, after 1.0 | #66 |
+| Window 4 quality items (shader preload, bounded save match, preparation cache, graphics menu, Xbox prompts, trophies, aspect ratio, AI testers, FSR 4, stereo) | not started, after 1.0 | #16, #57, #58, #10, #11, #12, #14, #15, #18, #19 |
+| macOS research | not started, after 1.0 | #55 |
+
 ## Window 1: correctness and reproducible builds (weeks 1–2)
 
 Runtime maintainer: resolve save integrity findings [#48–53](https://github.com/iannitram/uncharted_pc/issues/48), existing #34–39, and AJM process termination #56. Renderer maintainer: triage #31–33/#37 and reproduce the current-header build failure #60. Release maintainer: establish dependency-pinned Windows/Linux CI #59. No release passes with unreported skipped runtime tests.

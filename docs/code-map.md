@@ -2,7 +2,7 @@
 
 - Repo: iannitram/uncharted_pc, a fork of Supermedo/uncharted_pc (C, C++20, Python; GPL-2.0-or-later parts from shadPS4).
 - Kind: a native port (not an emulator) that runs the decrypted PS4 build of Uncharted: The Nathan Drake Collection as an x86-64 image, with the PS4 system libraries reimplemented in C and GNM graphics translated to Vulkan through a vendored shadPS4 renderer. Ships a Python launcher.
-- Integration branch: `linux` (not `main`). Described commit: `0170fb113` (2026-10-26). `main` is the release branch of the sync workflow described under CI.
+- Integration branch: `linux` (not `main`). Described commit: `585632eb9` (2026-10-26). `main` is the release branch of the sync workflow described under CI.
 - Upstream: `Supermedo/uncharted_pc` (`upstream/main`). A second source, `spacepepperoni/uncharted_Linux`, is merged separately. Nothing is posted to either.
 - No game files, keys or RE output are in the repo; the user supplies a decrypted dump.
 - Naming oddity: many file and variable names use `bbport` / `BB_*` / `bb-probe` because the code started as a Bloodborne port. `patches/Bloodborne.xml` is still Bloodborne's patch database and does not apply to Uncharted.
@@ -15,6 +15,8 @@
 | `gpu/` | The renderer. `CMakeLists.txt` builds the GPU library and `bb-probe`. `shadps4/` is shadPS4 pinned to one commit (`VENDOR.txt`), with local edits marked `bbport:`; `shim/` is the port's own C++ layer (ImGui settings menu, window, async copy threads, overlay); `bbgpu.h` is the C ABI; `bbnet/` network glue for private co-op; `dlss_bridge/` optional NVIDIA DLSS bridge; `patches/fsr-vulkan/` patches applied to the FSR submodule; `tools/`; `third_party/` submodules. |
 | `launcher/` | Python/Tk launcher (`uncharted_launcher.py`, `bbport_*.py` helpers for Steam, Vulkan, i18n, assets), desktop entry, icons, covers, fonts. |
 | `scripts/` | Python prep tools run by the launcher or `run.py`: `prepare.py`, `link_modules.py`, `link_libc.py`, `content_profile.py`, `patches.py`, `pkg.py`, `mods.py`, `cheats.py`, `trophies.py`, `render_720p.py`. |
+| `PIPELINE.md`, `SPEC.md`, `AGENTS.fork.md`, `CHANGELOG.md` | Our pipeline files (stage, 1.0 spec, short agent rules, decisions log); upstream owns `README.md` and `docs/ROADMAP.md`. |
+| `install.sh` | One-line Linux installer from the spacepepperoni fork (fetches that fork's latest AppImage; not our release channel). |
 | `run.py`, `run.sh` | Builds the boot image and sets `BB_*` environment, then starts `bb-probe`. `BB_PREBUILT=1` is the packaged mode. |
 | `build.sh` | Native build (Linux gcc/cc, or MSYS2 CLANG64 on Windows); `build.sh --test` compiles and runs the C and C++ tests. |
 | `msys2-env.sh`, `shell.nix`, `packaging/default.nix` | Windows toolchain env; Nix shell. |
@@ -23,7 +25,7 @@
 | `third_party/` | LibAtrac9, Vulkan-Headers submodules. |
 | `tools/` | Dev helpers: frame A/B (`ab.sh`), `soak.sh`, stack and freeze tools, FSR4 capture and optimize scripts (`fsr4cap/`), name importers, `gpu_capabilities.c`. |
 | `tests/` | C/C++ unit tests (`test_runtime.c`, `test_pad.c`, `test_sema.c`, `test_cpu_patch.c`, `test_eop_matcher.c`, shader and motion tests) and about 28 Python `unittest` files (launcher, patches, pkg, mods, trophies, i18n, display). |
-| `docs/` | `ARCHITECTURE.md`, `LINUX_BUILD.md`, `BUILDING_LINUX.md`, `ROADMAP.md`, `upscaler.md`, `PKG.md`, `MODS.md`, `resolution.md`, `parallel_gpu.md`, `DEVELOPMENT_LOG.md`, `maps/overview.md`, `review-2026-10-24/` (code review and delivery roadmap), Russian translations in `ru/`, `history/`. |
+| `docs/` | `ARCHITECTURE.md`, `LINUX_BUILD.md`, `BUILDING_LINUX.md`, `ROADMAP.md`, `upscaler.md`, `PKG.md`, `MODS.md`, `resolution.md`, `parallel_gpu.md`, `DEVELOPMENT_LOG.md`, `keyboard-prompts.md`, `motion_vectors.md`, `DEPTH_ADAPTIVE_TAA.md`, `CHANGES_2026-10-0*.md`, `maps/overview.md`, `code-map.md` (this file), `review-2026-10-24/` (code review and our delivery roadmap `ROADMAP-proposed.md`), Russian translations in `ru/`, `history/`. |
 | `Research/` | Background research notes (architecture, upscaling, licensing, similar projects). |
 | `.github/workflows/` | `build.yml`, `sync-upstream.yml`. |
 
@@ -46,16 +48,22 @@ flowchart TD
 
 ## Where our work is
 
-`git log upstream/main..HEAD` shows 241 commits and `git diff upstream/main...HEAD` is 166 files (+17,308 / -2,203); upstream is not ahead of `linux` at this snapshot. Most of the 241 commits come from other contributors and from the spacepepperoni fork's history (about 56 by its maintainer, 22 by one Deck contributor, 10 by Supermedo, the rest scattered); about 62 are ours. Our commits concentrate on:
+`git log upstream/main..HEAD` shows 244 commits and `git diff upstream/main...HEAD` is 171 files (+17,471 / -2,203); upstream is not ahead of `linux` at this snapshot. Most of the 244 commits come from other contributors and from the spacepepperoni fork's history (about 56 by its maintainer, 22 by one Deck contributor, 10 by Supermedo, the rest scattered); about 65 are ours. Our commits concentrate on:
 
 | Area | Files |
 |---|---|
 | Docs: `docs/review-2026-10-24/` code review and cross-platform roadmap, `ROADMAP.md`, `LINUX_BUILD.md`, `docs/history/`, `docs/ru/`, `Research/` | most of our changed lines |
 | Patch handling: `scripts/patches.py`, `tests/test_patches.py` (per-executable third-party patches, `APP_VER` decides the external version, own-executable-only patches) | few files |
-| Renderer fixes under `gpu/shadps4/` (nested indirect-buffer frame leak, `WAIT_ON_CE_COUNTER` guard, compute ring offset reset) and FSR 3.1 defaults/protected-memory handling | about 300 changed lines |
-| `src/runtime_trophy.c`, `src/runtime_thread.c` (GCC 15 `-Werror` fixes), MXCSR test, `tests/test_eop_matcher.c`, `render_720p` tests | few files |
+| Renderer fixes under `gpu/shadps4/` (nested indirect-buffer frame leak; `WAIT_ON_CE_COUNTER` guard and compute ring offset reset from PRs #45 and #43, which reached `linux` through the main merge; the `WAIT_ON_DE_COUNTER_DIFF` operands of that merge are still backwards, #67) and FSR 3.1 defaults/protected-memory handling | about 300 changed lines |
+| `src/runtime_trophy.c`, `src/runtime_thread.c` (`host_priority` compiled only on Windows, 4dd6034, so Linux `-Werror` builds pass), MXCSR test, `tests/test_eop_matcher.c`, `render_720p` tests | few files |
 
 Two stray commits ("index on ..." and "untracked files on ...") are stash artifacts from an experiment branch; leave them.
+
+## Known gaps (from the tree)
+
+- AJM audio (`src/runtime_ajm.c`): creating an AAC instance (codec 2) prints `STOP` and exits the process (#56).
+- Renderer: `ExpandImage` can copy a stale image over fresh data (#31) and `BUFFER_WBINVL1` is not lowered (#37); `liverpool.cpp` `WAIT_ON_DE_COUNTER_DIFF` compares backwards (#67).
+- No Windows or macOS CI job; CI runs `bash build.sh` only, so no test suite runs there.
 
 ## Build and test
 

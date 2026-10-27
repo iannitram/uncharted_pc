@@ -8,7 +8,7 @@ Uncharted 1, 2 and 3 from the PS4 collection each play from the first chapter to
 
 ## The spec is upstream's plan plus our delta
 
-- **Upstream plan:** Supermedo's port, [README](https://github.com/Supermedo/uncharted_pc/blob/main/README.md) and [docs/ROADMAP.md](https://github.com/Supermedo/uncharted_pc/blob/main/docs/ROADMAP.md) (inherited from the Bloodborne port; ours keeps it as history). Our `linux` branch also carries spacepepperoni's Linux fork (merged at c06843d).
+- **Upstream plan:** Supermedo's port, [README](https://github.com/Supermedo/uncharted_pc/blob/main/README.md) and [docs/ROADMAP.md](https://github.com/Supermedo/uncharted_pc/blob/main/docs/ROADMAP.md) (inherited from the Bloodborne port; ours keeps it as history). Our `linux` branch also carries spacepepperoni's Linux fork (latest sync merged in 457e49e, PR #47).
 - **Our delta:** the goals and rules in the pinned issue #23, and the delivery plan in [docs/review-2026-10-24/ROADMAP-proposed.md](docs/review-2026-10-24/ROADMAP-proposed.md) as far as it serves 1.0 (Window 1 correctness and builds, the Linux row of Window 2, Window 3 campaign stability). Our 173 commits ahead of upstream (`linux`) are the Linux build, SteamOS packaging, FSR 3.1/4 and DLSS on Linux, the Steam Deck 720p mode, third-party patches per executable, compute-fence and copy fixes, and the trophy and runtime fixes.
 
 | Delta | Upstream? |
@@ -24,14 +24,14 @@ Each Must is checked on the owner's Legion Go (AMD Z1 Extreme, a Phoenix APU, Ra
 
 | # | Must | Done looks like | Check | Issues |
 |---|---|---|---|---|
-| M1 | Uncharted 1 plays start to finish | Every chapter completes, the credits roll, at 30 or 60 Hz with no crash or hang | A playthrough log per chapter (build commit, preset, FPS from `BB_FRAME_STATS=1`, any assertion) | new U1 playthrough issue |
-| M2 | Uncharted 2 plays start to finish | Same; chapter 21 progresses and the streaming assertion does not stop play | Same log | #61, #62, U2 playthrough issue |
-| M3 | Uncharted 3 plays start to finish | Same; no view-blocking corruption, videos play in step with audio | Same log | #63, #64, U3 playthrough issue |
-| M4 | Saves work | A save made in each game loads after a restart and after switching games | Save, quit, restart, load, per game | #36 |
+| M1 | Uncharted 1 plays start to finish | Every chapter completes, the credits roll, at 30 or 60 Hz with no crash or hang | A playthrough log per chapter (build commit, preset, FPS from `BB_FRAME_STATS=1`, any assertion) | #76, #79 (mesh raycaster copies), #82 |
+| M2 | Uncharted 2 plays start to finish | Same; chapter 21 progresses and the streaming assertion does not stop play | Same log | #61, #62, #77, #81, #82 |
+| M3 | Uncharted 3 plays start to finish | Same; no view-blocking corruption, videos play in step with audio | Same log | #63, #64, #78, #80 |
+| M4 | Saves work | A save made in each game loads after a restart and after switching games | Save, quit, restart, load, per game | #36 (closed: done on `linux`, 7b68786) |
 | M5 | Power and frame rate | 20 W holds; 30 Hz is steady 30 FPS and 60 Hz holds 57-60 FPS, as measured 2026-10-18 | `BB_FRAME_STATS=1` over a 30-minute soak per game | #22 (default rate, open question) |
-| M6 | Every build is verified | `bash build.sh` and the C, Python and GPU tests pass on Linux in CI for each merge to `linux` | `.github/workflows/build.yml` green | #60, #68 |
+| M6 | Every build is verified | `bash build.sh` and the C, Python and GPU tests pass on Linux in CI for each merge to `linux` | `.github/workflows/build.yml` green | #60 open; #68 closed (done on `linux`, 4dd6034) |
 | M7 | Our package starts each game | The Linux package (AppImage / tarball) starts U1, U2 and U3, including with third-party patches enabled | Package, start each game from the launcher | #72, #73 |
-| M8 | The review's play-breaking correctness bugs are fixed | ExpandImage, flexible-mapping split, equeue wait, BUFFER_WBINVL1 decode, AJM MP3/AAC, the CE/DE counter wait | Each issue's own check | #31, #34, #35, #37, #56, #67 |
+| M8 | The review's play-breaking correctness bugs are fixed | ExpandImage, flexible-mapping split, equeue wait, BUFFER_WBINVL1 decode, AJM MP3/AAC, the CE/DE counter wait | Each issue's own check | #31, #35, #37, #56, #67 open; #32, #33, #34 closed (done on `linux`: PR #45, PR #43, fa64614) |
 | M9 | No game files, ever | Nothing from a dump, firmware, keys or game-binary analysis is in the repo, a package or an issue | Review of every PR; the package file list | #23 rules |
 
 ## Won'ts (after 1.0)
