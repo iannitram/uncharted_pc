@@ -51,6 +51,9 @@ ENTRY_NAMES_ID = 0x200
 # sce_sys entries (param.sfo 0x1000, icon0.png 0x1200, ...) live there too.
 STRUCTURAL_ID_MAX = 0x1000
 
+# Entry bodies are copied in pieces of this size, so one entry never sits in memory whole.
+CHUNK_SIZE = 1 << 20
+
 # Entry flags (big-endian)
 FLAG_ENCRYPTED = 0x80000000
 KEY_INDEX_MASK = 0xF000
@@ -275,6 +278,12 @@ def _extract(source, out, report):
                        'which cannot be unpacked on its own. Extract the base package, or '
                        'use a cumulative patch, or dump the game from the console.')
 
+    # Two entries sharing bytes would let a small package write far more than its own size.
+    spans = sorted((e.offset, e.offset + e.size, e.name) for e in info['files'] if e.size)
+    for (_start, end, name), (start, _end, other) in zip(spans, spans[1:]):
+        if start < end:
+            raise PkgError(f'entries overlap: {name} and {other}')
+
     out = Path(out)
     written = 0
     for entry in info['files']:
@@ -282,7 +291,12 @@ def _extract(source, out, report):
             continue
         target = out / safe_relative(entry.name)
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_bytes(source.read(entry.offset, entry.size))
+        with open(target, 'wb') as handle:
+            done = 0
+            while done < entry.size:
+                piece = min(CHUNK_SIZE, entry.size - done)
+                handle.write(source.read(entry.offset + done, piece))
+                done += piece
         written += 1
         report(f'  {entry.name} ({entry.size} bytes)')
 
