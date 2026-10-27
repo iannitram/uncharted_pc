@@ -22,7 +22,7 @@
 | `patches/Bloodborne.xml` | Community patch database (Bloodborne only). |
 | `third_party/` | LibAtrac9, Vulkan-Headers submodules. |
 | `tools/` | Dev helpers: frame A/B (`ab.sh`), `soak.sh`, stack and freeze tools, FSR4 capture and optimize scripts (`fsr4cap/`), name importers, `gpu_capabilities.c`. |
-| `tests/` | C/C++ unit tests (`test_runtime.c`, `test_pad.c`, `test_sema.c`, `test_cpu_patch.c`, `test_eop_matcher.c`, shader and motion tests) and about 29 Python `unittest` files (launcher, patches, pkg, mods, trophies, i18n, display). |
+| `tests/` | C/C++ unit tests (`test_runtime.c`, `test_pad.c`, `test_sema.c`, `test_cpu_patch.c`, `test_eop_matcher.c`, shader and motion tests) and about 28 Python `unittest` files (launcher, patches, pkg, mods, trophies, i18n, display). |
 | `docs/` | `ARCHITECTURE.md`, `LINUX_BUILD.md`, `BUILDING_LINUX.md`, `ROADMAP.md`, `upscaler.md`, `PKG.md`, `MODS.md`, `resolution.md`, `parallel_gpu.md`, `DEVELOPMENT_LOG.md`, `maps/overview.md`, `review-2026-10-24/` (code review and delivery roadmap), Russian translations in `ru/`, `history/`. |
 | `Research/` | Background research notes (architecture, upscaling, licensing, similar projects). |
 | `.github/workflows/` | `build.yml`, `sync-upstream.yml`. |
