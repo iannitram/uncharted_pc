@@ -16,6 +16,7 @@ extern "C" [[noreturn]] void bb_longjmp(sigjmp_buf buffer, int value);
 #endif
 
 extern "C" std::uint64_t runtime_disabled_optimizations;
+extern "C" std::uint64_t runtime_disabled_optimizations2;
 /// Recovery point for speculative guest memory reads on this thread (runtime_memory.c).
 extern "C" __thread sigjmp_buf* runtime_fault_recover;
 
@@ -77,6 +78,20 @@ enum : std::uint64_t {
 inline bool Disabled(std::uint64_t bit) {
     return (__atomic_load_n(&runtime_disabled_optimizations, __ATOMIC_RELAXED) & bit) != 0;
 }
+
+/// Toggles in the second number of BB_TOGGLE_FILE ("mask mask2"; the first 64 bits are used).
+enum : std::uint64_t {
+    TextureSetExact = 1, ///< memoized texture sets of exact images survive (un)registrations
+    PipelinedRaycasterCopies = 2, ///< 64-dword copies of GPU data run on the recording thread
+    ChainedEosLabels = 4, ///< end-of-shader labels written behind the deferred fences
+    VoLabelNoDrain = 8, ///< a met display buffer label wait does not drain the draw pipe
+    FaultReadbackHere = 16, ///< guest write faults on submitted GPU data read back on their thread
+    RecycledImages = 32, ///< images remade by format reuse the Vulkan images freed that way
+    TrackedStreamReads = 64, ///< (bit set) stream buffer reads go to the barrier tracker again
+};
+inline bool Disabled2(std::uint64_t bit) {
+    return (__atomic_load_n(&runtime_disabled_optimizations2, __ATOMIC_RELAXED) & bit) != 0;
+}
 } // namespace BbToggle
 
 namespace BbStats {
@@ -89,6 +104,8 @@ inline std::atomic<std::uint64_t> dead_gpu_drops{0}, gpu_read_backs{0};
 inline std::atomic<std::uint64_t> gpu_merges{0};
 /// ... or read back on the second queue (GPU work done; BufferCache::DownloadOnSideQueue).
 inline std::atomic<std::uint64_t> gpu_side_downloads{0}, gpu_side_download_ns{0};
+/// ... of which on the faulting thread (BufferCache::ReadBackOnFaultThread).
+inline std::atomic<std::uint64_t> fault_thread_read_backs{0};
 inline std::atomic<std::int64_t> hot_pages{0};
 /// Stall diagnostics (BB_FRAME_STATS): per-frame deltas printed for frames over 40 ms.
 inline std::atomic<std::uint64_t> images_registered{0};

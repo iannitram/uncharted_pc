@@ -71,6 +71,7 @@ Bloodborne by deadinside28, and on the [shadPS4](https://github.com/shadps4-emu/
 renderer. Video decoding (Videodec2) and the DLSS bridge come from
 [IFreemz/shadPS4-Bloodborne-DLSS-FSR](https://github.com/IFreemz/shadPS4-Bloodborne-DLSS-FSR).
 Thanks to Mindro for the shadPS4 Uncharted build that showed which problems to look for.
+Performance work on Uncharted 2's draw recording and read-backs is [che2281337](https://github.com/che2281337)'s, and several freeze fixes are from [drakolordx7's community build](https://github.com/drakolordx7/uncharted_pc).
 The render resolution patch (scripts/render_res.py, cutscene movie scaling in gpu/shim/bbport_movie.cpp, the Uncharted 2 aim focus fix) is ported from [BilalReloaded's Uncharted PC port](https://github.com/bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port) (GPL-2.0-or-later).
 
 Also used: [FSR-Vulkan](https://github.com/FireBurn/FSR-Vulkan) and the AMD FidelityFX SDK (FSR),

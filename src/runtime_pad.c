@@ -870,6 +870,21 @@ static void sample_host(PadData *d) {
     int keys_used=mouse || wheel || (captured && SDL_fabsf(mdx)+SDL_fabsf(mdy)>3.0f);
     for (int a=0;a<ACTIONS && !keys_used;++a) keys_used=action_down(a,k,mouse,now);
     static int prompts_device=-1;
+    /* Linux fork: Steam Deck mode (BB_DECK_PROMPTS=1) starts with the active controller's pictures
+     * (the Deck's own, or a PlayStation or other pad connected over USB or Bluetooth) instead of
+     * the keys, until the player uses a controller or the keyboard and mouse. */
+    static int deck_prompts=-1, prompts_touched;
+    if (deck_prompts<0) { const char *e=getenv("BB_DECK_PROMPTS"); deck_prompts=e && e[0]=='1'; }
+    if (deck_prompts && !prompts_touched) {
+        if (pad_used || keys_used) prompts_touched=1;
+        else {
+            const int device=g ? prompts_pad_device(g) : 2;
+            if (device!=prompts_device) {
+                prompts_device=device;
+                bbgpu_prompts_controller(device);
+            }
+        }
+    }
     if (pad_used!=keys_used) {
         const int device=pad_used ? prompts_pad_device(g) : 0;
         if (device!=prompts_device) {
