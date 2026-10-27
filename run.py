@@ -24,6 +24,38 @@ sys.path.insert(0, str(PORT / 'scripts'))
 import cheats
 EXECUTABLES = {'u1': 'eboot.bin', 'u2': 'big2-ps4_Shipping.elf', 'u3': 'big3-ps4_Shipping.elf'}
 LOADEXEC_EXIT = 101  # runtime_services.c: the game asked for another executable
+
+
+def fix_defaults(player_env, exe):
+    result = {}
+    if exe == EXECUTABLES['u2']:
+        if 'BB_GPU_MERGE' not in player_env:
+            result['BB_GPU_MERGE'] = '0'
+        if 'BB_TINY_READBACK' not in player_env:
+            result['BB_TINY_READBACK'] = '1'
+        if 'BB_SCALAR_COPY64_SYNC' not in player_env:
+            result['BB_SCALAR_COPY64_SYNC'] = '2'
+            result['BB_SCALAR_COPY64_DEFER'] = '1'
+    elif exe == EXECUTABLES['u1']:
+        if 'BB_TINY_READBACK' not in player_env:
+            result['BB_TINY_READBACK'] = '0'
+        if 'BB_SCALAR_COPY64_SYNC' not in player_env:
+            result['BB_SCALAR_COPY64_SYNC'] = '2'
+            result['BB_SCALAR_COPY64_DEFER'] = '1'
+    elif exe == EXECUTABLES['u3']:
+        if 'BB_TINY_READBACK' not in player_env:
+            result['BB_TINY_READBACK'] = '0'
+        if 'BB_SCALAR_COPY64_SYNC' not in player_env:
+            result['BB_SCALAR_COPY64_SYNC'] = '0'
+            result['BB_SCALAR_COPY64_DEFER'] = '0'
+    else:
+        return {}
+    if 'BB_SCALAR_COPY64_SYNC' in player_env:
+        result.pop('BB_SCALAR_COPY64_SYNC', None)
+        result.pop('BB_SCALAR_COPY64_DEFER', None)
+    return result
+
+
 WINDOWS = sys.platform == 'win32'
 PROBE = 'bb-probe.exe' if WINDOWS else 'bb-probe'
 
@@ -324,22 +356,16 @@ def main():
     # of chapter 21) from memory it also writes: merging leaves them on the GPU, so it runs with
     # accurate GPU memory (BB_GPU_MERGE=0) unless the player chose otherwise.
     # Its aim and turret blur reads tiny render results back (BB_TINY_READBACK, ~13% elsewhere).
-    player_merge = env.get('BB_GPU_MERGE')
-    player_tiny = env.get('BB_TINY_READBACK')
-    player_copy = env.get('BB_SCALAR_COPY64_SYNC')
     all_cheats = env.setdefault('BB_CHEATS_ALL', env.get('BB_CHEATS', ''))
+    # Take a copy of the environment once before the loop
+    player_env = dict(env)
     while True:
-        if player_merge is None:
-            if exe == EXECUTABLES['u2']:
-                env['BB_GPU_MERGE'] = '0'
-            else:
-                env.pop('BB_GPU_MERGE', None)
-        if player_tiny is None:
-            env['BB_TINY_READBACK'] = '1' if exe == EXECUTABLES['u2'] else '0'
-        # Its mesh raycaster copies land in guest memory too (iSubMesh after checkpoints).
-        if player_copy is None:
-            env['BB_SCALAR_COPY64_SYNC'] = '2' if exe == EXECUTABLES['u2'] else '0'
-            env['BB_SCALAR_COPY64_DEFER'] = '1' if exe == EXECUTABLES['u2'] else '0'
+        # Remove existing keys that we'll be setting from fix_defaults, but only if they weren't set by the player
+        for key in ('BB_GPU_MERGE', 'BB_TINY_READBACK', 'BB_SCALAR_COPY64_SYNC', 'BB_SCALAR_COPY64_DEFER'):
+            if key not in player_env:
+                env.pop(key, None)
+        # Apply the per-game defaults
+        env.update(fix_defaults(player_env, exe))
         game, file = locate(env, exe)
         if not game:
             fail('Set BB_GAME_DIR to the game folder (the one with eboot.bin).')
