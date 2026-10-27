@@ -62,7 +62,7 @@ ldd out/bb-probe out/gpu/libbbgpu.so out/bb-gpu-capabilities | awk '/=> \// {pri
         [[ $name == libbbgpu.so ]] && continue
         [[ $name =~ $system ]] || cp -L "$path" "$dest/bin/lib/$name"
     done
-cp scripts/prepare.py scripts/link_modules.py scripts/link_libc.py scripts/content_profile.py scripts/render_720p.py scripts/cheats.py scripts/trophies.py "$dest/scripts/"
+cp scripts/prepare.py scripts/link_modules.py scripts/link_libc.py scripts/content_profile.py scripts/render_720p.py scripts/cheats.py scripts/trophies.py scripts/patches.py "$dest/scripts/"
 cp run.py LICENSE "$dest/"
 cp launcher/uncharted.png "$dest/launcher/"
 cp README.md "$dest/README.md"
