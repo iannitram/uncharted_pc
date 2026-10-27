@@ -4,6 +4,7 @@ import struct
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 spec = importlib.util.spec_from_file_location('pkg', ROOT / 'scripts/pkg.py')
@@ -244,6 +245,37 @@ class SourceTests(unittest.TestCase):
         self.assertEqual(written, 0)
         self.assertEqual(info['header']['drm_type'], pkg.DRM_TYPE_PS4)
         self.assertTrue(any('encrypted' in line for line in lines))
+
+
+class SizeTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.out = Path(self.temp.name) / 'out'
+
+    def test_overlapping_entries_are_refused(self):
+        image = bytearray(build_pkg({'a.bin': b'AAAA', 'b.bin': b'BBBB'}))
+        table = struct.unpack_from('>I', image, 0x18)[0]
+        a_offset = struct.unpack_from('>I', image, table + ENTRY_SIZE + 0x10)[0]
+        struct.pack_into('>I', image, table + 2 * ENTRY_SIZE + 0x10, a_offset)
+        with self.assertRaises(pkg.PkgError):
+            pkg.extract(bytes(image), self.out)
+        self.assertFalse((self.out / 'a.bin').exists())
+
+    def test_large_entry_is_copied_in_chunks(self):
+        image = build_pkg({'big.bin': b'0123456789'})
+        sizes = []
+
+        class Spy(pkg.BytesSource):
+            def read(self, offset, size):
+                sizes.append(size)
+                return super().read(offset, size)
+
+        with patch.object(pkg, 'CHUNK_SIZE', 4):
+            _, written = pkg.extract(Spy(image), self.out)
+        self.assertEqual(written, 1)
+        self.assertEqual((self.out / 'big.bin').read_bytes(), b'0123456789')
+        self.assertEqual(sizes[-3:], [4, 4, 2])
 
 
 if __name__ == '__main__':
