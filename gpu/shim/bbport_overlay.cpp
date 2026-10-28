@@ -159,6 +159,17 @@ void Hint(const char* text) {
     }
 }
 
+// Linux fork: the menu follows the game language picked in the launcher (BB_LANGUAGE, the PS4
+// numbering): Russian for 8, English for every other language.
+const char* T(const char* en, const char* ru) {
+    static const bool russian = [] {
+        const char* language = std::getenv("BB_LANGUAGE");
+        return language && std::strcmp(language, "8") == 0;
+    }();
+    return russian ? ru : en;
+}
+
+// Uncharted settings, including the fork's output and live-resolution controls.
 void Menu() {
     auto& s = BbSettings::Get();
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -167,19 +178,22 @@ void Menu() {
                             ImGuiCond_Appearing);
     ImGui::SetNextWindowSize(ImVec2(620.0f * base_scale, 0.0f), ImGuiCond_Appearing);
     bool keep_open = true;
-    if (!ImGui::Begin("Uncharted — settings  (Insert / L3+R3)", &keep_open,
-                      ImGuiWindowFlags_NoCollapse)) {
+    if (!ImGui::Begin(T("Uncharted — settings  (Insert / L3+R3)###menu",
+                        "Uncharted — настройки  (Insert / L3+R3)###menu"),
+                      &keep_open, ImGuiWindowFlags_NoCollapse)) {
         ImGui::End();
         return;
     }
-    ImGui::Text("%.0f FPS  (%.1f ms)", frame_ms_avg > 0.0f ? 1000.0f / frame_ms_avg : 0.0f,
-                frame_ms_avg);
+    ImGui::Text(T("%.0f FPS  (%.1f ms)", "%.0f FPS  (%.1f мс)"),
+                frame_ms_avg > 0.0f ? 1000.0f / frame_ms_avg : 0.0f, frame_ms_avg);
 
-    ImGui::SeparatorText("Temporal upscaler");
-    static const char* upscalers[] = {"Off", "FSR 3.1", "FSR 4 (INT8)", "FSR 4.1.1 (INT8)",
-                                     "TAA (native anti-aliasing)", "DLSS (NVIDIA RTX)", "XeSS (Intel)"};
+    ImGui::SeparatorText(T("Anti-aliasing", "Сглаживание"));
+    const char* upscalers[] = {T("Off (the game's own)", "Выкл (сглаживание игры)"), "FSR 3.1",
+                               "FSR 4 (INT8)", "FSR 4.1.1 (INT8)", "TAA", "DLSS (NVIDIA RTX)",
+                               "XeSS (Intel)"};
+    const char* unsupported = T("— not supported by this GPU", "— не поддерживается видеокартой");
     int upscaler = s.upscaler;
-    if (ImGui::BeginCombo("Upscaler", upscalers[upscaler])) {
+    if (ImGui::BeginCombo(T("Method", "Метод"), upscalers[upscaler])) {
         for (int i = 0; i < BbSettings::UpscalerCount; ++i) {
             const bool supported = i == BbSettings::UpscalerFsr4 ? s.fsr4_supported.load()
                 : i == BbSettings::UpscalerFsr411 ? s.fsr411_supported.load()
@@ -192,11 +206,22 @@ void Menu() {
             ImGui::EndDisabled();
             if (!supported) {
                 ImGui::SameLine();
-                ImGui::TextDisabled("— not supported by this GPU");
+                // Linux fork: FSR 4 on a capable GPU without its assets (fsr4_shaders).
+                const char* fsr4_problem = s.fsr4_problem.load();
+                const bool no_assets = i == BbSettings::UpscalerFsr4 && fsr4_problem &&
+                                       std::strncmp(fsr4_problem, "assets", 6) == 0;
+                ImGui::TextDisabled("%s", no_assets ? T("— files not installed",
+                                                        "— файлы не установлены")
+                                                    : unsupported);
             }
         }
         ImGui::EndCombo();
     }
+    Hint(T("Runs at the game's render resolution (launcher: Display) on the scene before "
+           "post-processing, with the game's own motion vectors, and replaces its edge smoothing. "
+           "Changes apply on the next frame.",
+           "Работает в разрешении рендеринга игры на сцене до постобработки, с векторами движения "
+           "самой игры, и заменяет её сглаживание. Применяется со следующего кадра."));
     if (const char* problem = s.dlss_problem.load(); problem && upscaler == BbSettings::UpscalerDlss) {
         ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.3f, 1.0f), "DLSS: %s", problem);
     }
@@ -205,9 +230,11 @@ void Menu() {
     }
     if (const char* problem = s.fsr4_problem.load()) {
         ImGui::PushTextWrapPos();
-        ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.3f, 1.0f), "FSR 4 unavailable: %s", problem);
+        ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.3f, 1.0f),
+                           T("FSR 4 unavailable: %s", "FSR 4 недоступен: %s"), problem);
         if (!BbSettings::IsFsr4(s.upscaler))
-            ImGui::TextUnformatted("The mode selected above is active. FSR 4 can be selected again.");
+            ImGui::TextUnformatted(T("The method chosen above is active. FSR 4 can be picked again.",
+                                     "Активен метод, выбранный выше. FSR 4 можно выбрать снова."));
         ImGui::PopTextWrapPos();
     }
     if (BbSettings::IsFsr4(s.upscaler)) {
@@ -274,48 +301,56 @@ void Menu() {
     }
     Checkbox("Sharpening (RCAS)", s.sharpen);
     ImGui::BeginDisabled(!s.sharpen);
-    Slider("Sharpening strength", s.sharpness, 0.0f, 2.0f);
-    Hint("Up to 1: the upscaler's own sharpening (RCAS). Above 1 an extra RCAS pass is added. "
-         "Ctrl+click the slider to type an exact value.");
+    Slider(T("Strength", "Сила резкости"), s.sharpness, 0.0f, 2.0f);
+    Hint(T("Up to 1: the anti-aliasing's own sharpening (RCAS). Above 1 adds another RCAS pass. "
+           "Ctrl+click the slider to type an exact value.",
+           "До 1 — резкость самого сглаживания (RCAS). Выше 1 добавляется ещё один проход RCAS. "
+           "Ctrl+клик по ползунку — ввести точное значение."));
     ImGui::EndDisabled();
-    Checkbox("Sub-pixel jitter", s.jitter);
-    Hint("Each frame the scene shifts by a fraction of a pixel, and the upscaler gathers more "
-         "detail from several frames. Without it you only get history-based smoothing.");
+    Checkbox(T("Sub-pixel jitter", "Субпиксельный сдвиг (jitter)"), s.jitter);
+    Hint(T("Shifts the scene by a fraction of a pixel each frame so detail builds up over several "
+           "frames. Without it, only history smoothing remains.",
+           "Каждый кадр сцена сдвигается на долю пикселя, и из нескольких кадров собирается "
+           "больше деталей. Без него остаётся только сглаживание по истории."));
 
-    ImGui::SeparatorText("Reactive mask");
+    ImGui::SeparatorText(T("Reactive mask", "Маска реактивности"));
     ImGui::BeginDisabled(taa);
-    Checkbox("Enable mask", s.reactive);
-    Hint("Marks transparent effects (particles, haze) so the upscaler relies less on previous "
-         "frames. Fewer trails behind effects, but shimmer returns underneath them.");
+    Checkbox(T("Enable the mask", "Включить маску"), s.reactive);
+    Hint(T("Marks transparent effects (particles, haze) so less of their past frames is kept: "
+           "fewer trails behind effects, but more shimmer under them.",
+           "Помечает прозрачные эффекты (частицы, дымку), чтобы меньше опираться на прошлые "
+           "кадры. Меньше шлейфов за эффектами, но под ними возвращается дрожание."));
     ImGui::BeginDisabled(!s.reactive);
-    Slider("Scale", s.reactive_scale, 0.0f, 4.0f);
-    Slider("Threshold", s.reactive_threshold, 0.0f, 1.0f);
-    Slider("Maximum", s.reactive_max, 0.0f, 1.0f);
+    Slider(T("Scale", "Масштаб"), s.reactive_scale, 0.0f, 4.0f);
+    Slider(T("Threshold", "Порог"), s.reactive_threshold, 0.0f, 1.0f);
+    Slider(T("Maximum", "Максимум"), s.reactive_max, 0.0f, 1.0f);
     bool show_mask = s.debug_view == BbSettings::DebugReactive;
-    if (ImGui::Checkbox("Show mask (debug)", &show_mask)) {
+    if (ImGui::Checkbox(T("Show the mask (debug)", "Показать маску (отладка)"), &show_mask)) {
         s.debug_view = show_mask ? BbSettings::DebugReactive : BbSettings::DebugNone;
     }
     ImGui::EndDisabled();
     ImGui::EndDisabled();
-    Checkbox("Character motion vectors", s.object_motion);
-    Hint("Exact vectors for animated objects: clothing and weapons break up less in motion. "
-         "A static scene gets no extra pass. "
-         "The change applies after restarting the game.");
+    Checkbox(T("Character motion vectors", "Векторы движения персонажей"), s.object_motion);
+    Hint(T("Exact motion for animated objects, so clothing and weapons break up less in motion. "
+           "Applies the next time the game starts.",
+           "Точные векторы для анимированных объектов: одежда и оружие меньше рассыпаются "
+           "при движении. Применяется при следующем запуске игры."));
     bool show_motion = s.debug_view == BbSettings::DebugMotion;
-    if (ImGui::Checkbox("Show motion vectors (debug)", &show_motion)) {
+    if (ImGui::Checkbox(T("Show motion vectors (debug)", "Показать векторы движения (отладка)"),
+                        &show_motion)) {
         s.debug_view = show_motion ? BbSettings::DebugMotion : BbSettings::DebugNone;
     }
-    Hint("Red/green: horizontal/vertical motion (8 pixels = full brightness). "
-         "Blue: the pixel got an exact object vector, not just camera motion. "
-         "A moving object with neither blue nor red/green is treated by the upscaler "
-         "as still, which causes trails.");
-    ImGui::EndDisabled(); // upscaler off
+    Hint(T("Red/green: horizontal/vertical motion (8 pixels = full brightness). Blue: the pixel "
+           "has an exact object vector, not only camera motion.",
+           "Красный/зелёный: движение по горизонтали/вертикали (8 пикселей = полная яркость). "
+           "Синий: пиксель получил точный вектор объекта, а не только движение камеры."));
+    ImGui::EndDisabled(); // anti-aliasing off
 
-    ImGui::SeparatorText("Frame generation");
-    static const char* frame_gens[] = {"Off", "FSR 3 (any GPU)",
-                                       "DLSS (NVIDIA RTX 40/50)"};
+    ImGui::SeparatorText(T("Frame generation", "Генерация кадров"));
+    const char* frame_gens[] = {T("Off", "Выкл"), T("FSR 3 (any GPU)", "FSR 3 (любая видеокарта)"),
+                                "DLSS (NVIDIA RTX 40/50)"};
     const int frame_gen = s.frame_gen;
-    if (ImGui::BeginCombo("Frame generation", frame_gens[frame_gen])) {
+    if (ImGui::BeginCombo(T("Generation", "Генерация"), frame_gens[frame_gen])) {
         for (int i = 0; i < BbSettings::FrameGenCount; ++i) {
             const bool supported = i != BbSettings::FrameGenDlss || s.dlssg_max_multiplier > 1;
             ImGui::BeginDisabled(!supported);
@@ -325,18 +360,21 @@ void Menu() {
             ImGui::EndDisabled();
             if (!supported) {
                 ImGui::SameLine();
-                ImGui::TextDisabled("— not supported by this GPU");
+                ImGui::TextDisabled("%s", unsupported);
             }
         }
         ImGui::EndCombo();
     }
-    Hint("Frames between two game frames: 60 FPS on screen becomes 120. Needs Mailbox or "
-         "Immediate presentation and a monitor with that refresh rate. Adds a little input "
-         "latency. Menus and videos are not generated.");
+    Hint(T("Frames between two of the game's: 60 FPS on screen becomes 120. Needs the Mailbox or "
+           "Immediate present mode and a display that fast. Adds a little input latency. Menus and "
+           "cutscene videos are not generated.",
+           "Кадры между двумя кадрами игры: 60 FPS на экране становятся 120. Нужны представление "
+           "Mailbox или Immediate и монитор с такой частотой. Немного добавляет задержку ввода. "
+           "Меню и видеоролики не генерируются."));
     const int max_multiplier = s.frame_gen == BbSettings::FrameGenDlss ? s.dlssg_max_multiplier.load() : 2;
     ImGui::BeginDisabled(s.frame_gen == BbSettings::FrameGenOff || max_multiplier <= 2);
     int multiplier = std::min(s.frame_gen_multiplier.load(), max_multiplier);
-    if (ImGui::SliderInt("Multiplier", &multiplier, 2, std::max(max_multiplier, 2), "%dx")) {
+    if (ImGui::SliderInt(T("Multiplier", "Множитель"), &multiplier, 2, std::max(max_multiplier, 2), "%dx")) {
         Store(s.frame_gen_multiplier, multiplier, true);
     }
     ImGui::EndDisabled();
@@ -395,11 +433,14 @@ void Menu() {
     Checkbox("FPS counter in the corner", s.show_fps);
 
     ImGui::Spacing();
-    if (ImGui::Button("Close")) {
+    if (ImGui::Button(T("Close", "Закрыть"))) {
         keep_open = false;
     }
     ImGui::SameLine();
-    ImGui::TextDisabled("Settings are saved to bbport.ini");
+    ImGui::TextDisabled("%s", T("Anti-aliasing, sharpness and frame generation reset to the "
+                                "launcher's choice at each start",
+                                "Сглаживание, резкость и генерация кадров при каждом запуске "
+                                "берутся из лаунчера"));
     ImGui::End();
     if (!keep_open) {
         SetOpen(false);
@@ -442,7 +483,7 @@ void FpsCounter() {
                      ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoNav |
                      ImGuiWindowFlags_NoFocusOnAppearing);
     const auto& s = BbSettings::Get();
-    ImGui::Text("%.0f FPS  %.1f ms  %s", frame_ms_avg > 0.0f ? 1000.0f / frame_ms_avg : 0.0f,
+    ImGui::Text(T("%.0f FPS  %.1f ms  %s", "%.0f FPS  %.1f мс  %s"), frame_ms_avg > 0.0f ? 1000.0f / frame_ms_avg : 0.0f,
                 frame_ms_avg,
                 s.upscaler == BbSettings::UpscalerFsr3   ? "FSR 3.1"
                 : s.upscaler == BbSettings::UpscalerFsr4 ? "FSR 4"

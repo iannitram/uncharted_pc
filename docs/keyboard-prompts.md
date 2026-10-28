@@ -132,3 +132,9 @@ The two tools are for development and off by default.
 | `src/runtime_pad.c` | last device, layout-aware bindings |
 | `texture_cache/button_prompts_xbox.inc`, `tools/make_xbox_prompts.py` | the Xbox pictures and the script that packs them |
 | `tools/dds_view.py` | collected pictures to PNG |
+
+## Steam Deck buttons (Linux fork)
+
+In Steam Deck mode (BB_DECK_PROMPTS=1), or with the launcher's "Steam Deck / Steam Controller buttons" choice
+(BB_BUTTON_PROMPTS=steamdeck), the Xbox pictures are used with A, B, X and Y as black buttons with white letters
+(button_prompts.cpp, MakeDeckFaceButtons). The other Xbox pictures stay as they are.

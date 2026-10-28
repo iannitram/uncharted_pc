@@ -707,9 +707,13 @@ const GraphicsPipeline* PipelineCache::GetGraphicsPipeline(const DrawIndirectPar
     auto pipeline = std::make_unique<GraphicsPipeline>(
         instance, scheduler, desc_heap, profile, sel.graphics_key, *pipeline_cache, sel.infos,
         sel.runtime_infos, sel.fetch_shader, sel.modules, sdata, false);
-    // Linux fork: the driver could not create it. Nothing is stored or saved, so the next start
-    // does not load it (the draw is skipped; the key is compiled again on its next use).
+    // bbport: the driver could not create it. An empty entry keeps the key from being
+    // compiled again on every draw; it is not saved, so the next start does not load it.
     if (!pipeline->IsValid()) {
+        {
+            std::unique_lock lock{pipelines_mutex};
+            graphics_pipelines.try_emplace(sel.graphics_key, nullptr);
+        }
         ReleaseClaim(claim_id);
         sel.fetch_shader.reset();
         return nullptr;
@@ -771,8 +775,12 @@ const ComputePipeline* PipelineCache::GetComputePipeline() {
     auto pipeline = std::make_unique<ComputePipeline>(instance, scheduler, desc_heap, profile,
                                                       *pipeline_cache, compute_key, *sel.infos[0],
                                                       sel.modules[0], sdata, false);
-    // Linux fork: as for graphics pipelines, not stored and not saved.
+    // bbport: as for graphics pipelines, kept empty and not saved.
     if (!pipeline->IsValid()) {
+        {
+            std::unique_lock lock{pipelines_mutex};
+            compute_pipelines.try_emplace(compute_key, nullptr);
+        }
         ReleaseClaim(claim_id);
         return nullptr;
     }

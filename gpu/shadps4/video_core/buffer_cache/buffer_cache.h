@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <thread>
 #include <unordered_map>
 #include <vector>
@@ -117,6 +118,9 @@ public:
     /// once the GPU work that wrote them has completed; the labels the guest learns of the GPU's
     /// progress from wait for it (landing_gate.h). False when not deferred (no side queue,
     /// BB_SCALAR_COPY64_DEFER=0): the caller reads back as before.
+    /// bbport: whether DeferGuestCopy can take a raycaster copy of this range (its checks that don't
+    /// depend on the arena), so callers that rely on the deferral can fall back in time.
+    [[nodiscard]] bool CanDeferGuestCopy(VAddr src, VAddr dst, u64 size) const;
     bool DeferGuestCopy(VAddr src, VAddr dst, u64 size);
     u64 PendingLanding() const;
     bool LandingGateActive() const;
@@ -217,7 +221,40 @@ private:
 
     StreamBuffer stream_buffer;
     Buffer gds_buffer;
-    RangeSet gpu_modified_ranges;
+    /// bbport: the GPU-written ranges, read by the GPU command thread (resource table walks,
+    /// SyncSrtReads) while the draw recording thread changes them (bindings that write, and
+    /// since fault resolves run there, read-backs and landings). Unlocked, a walk iterating
+    /// the tree while it was rebalanced looped forever (U3, chapter 1's pub: the game froze).
+    class LockedRangeSet {
+    public:
+        void Add(VAddr address, size_t size) {
+            std::unique_lock lock{mutex};
+            set.Add(address, size);
+        }
+        void Subtract(VAddr address, size_t size) {
+            std::unique_lock lock{mutex};
+            set.Subtract(address, size);
+        }
+        bool Intersects(VAddr address, size_t size) const {
+            std::shared_lock lock{mutex};
+            return set.Intersects(address, size);
+        }
+        bool Contains(VAddr address, size_t size) const {
+            std::shared_lock lock{mutex};
+            return set.Contains(address, size);
+        }
+        /// `func` must not change this set (the lock is held).
+        template <typename Func>
+        void ForEachInRange(VAddr address, size_t size, Func&& func) const {
+            std::shared_lock lock{mutex};
+            set.ForEachInRange(address, size, std::forward<Func>(func));
+        }
+
+    private:
+        mutable std::shared_mutex mutex;
+        RangeSet set;
+    };
+    LockedRangeSet gpu_modified_ranges;
     /// bbport: pages the guest writes while they hold recent GPU data (InvalidateMemory): the
     /// guest bytes of their GPU-written ranges as the write began. An upload sends only the bytes
     /// the guest changed since (the rest keeps the GPU's data); a read-back keeps those bytes.
@@ -236,6 +273,10 @@ private:
     struct SideQueue;
     std::unique_ptr<SideQueue> side_queue;
     bool DownloadOnSideQueue(VAddr page, u64 length);
+    /// bbport: the same read back for a guest thread's write fault on GPU data whose writes are
+    /// submitted, made on the faulting thread instead of the GPU command thread (BB_GPU_MERGE=0).
+    /// False when it cannot be done there (the GPU command thread's path then settles it).
+    bool ReadBackOnFaultThread(VAddr device_addr, u64 size);
 
     /// bbport: deferred raycaster copies (DeferGuestCopy).
     struct Landing;

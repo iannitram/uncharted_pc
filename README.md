@@ -1,13 +1,11 @@
 # Uncharted: The Nathan Drake Collection for Linux/Steam Deck
-**WORK IN PROGRESS. READ BELOW FOR CURRENT PROGRESS ON EACH GAME**
 
 👾Join the Discord: https://discord.gg/X2YhSJg6R2
 
 **Uncharted 1, 2 and 3 from the PS4 collection running natively on Linux, forked by spacepepperoni from [SuperMedo](https://github.com/Supermedo).**
 
 **This client is a launcher that allows you to directly launch Uncharted 1-3, add to your desktop or add to your Steam Library. This fork features auto-updates, a modified save system and a Steam Deck mode that optimizes playback for Steam Deck.**
-<img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/361582f1-7221-4f99-9a67-1748343836ad" />
-
+<img width="2568" height="1675" alt="image" src="https://github.com/user-attachments/assets/4b519fd9-af3f-4118-b37d-2ff2469cc5b6" />
 
 ✅Uncharted 1: Confirmed fully playable with some visual glitches
 
@@ -37,9 +35,13 @@ This client ships with a built in updater that can be toggled on/off, and update
 
 
 ## Steam Deck
+
+<img width="1316" height="809" alt="image" src="https://github.com/user-attachments/assets/0e9cf5c1-2094-465f-b1b5-98d5575e88fe" />
+
 - For Steam Deck, it is recommended to install the [.AppImage](https://github.com/spacepepperoni/uncharted_Linux/releases/latest/download/Uncharted-x86_64.AppImage) and add the games to Steam to play in Game Mode. 
 - In the Display tab, a Steam Deck mode is auto-selected if you are on SteamOS. With this enabled, expect an average of 25-30fps with occasional dips during demanding segments.
 - The Steam Deck runs at 60 FPS by default; 30 FPS can be picked in the launcher.
+- For a 30 FPS cap, upstream recommends a Manual GPU Clock of 1300 MHz.
 
 ## Files needed 
 
@@ -66,7 +68,7 @@ Once your game folder has been specified: Play, Add to Steam (recommended for St
 - Trophies: the games' own trophy lists in the launcher, and a notice in the game when you earn one.
 - Button prompts for keyboard and mouse, Xbox or PlayStation controllers; controller vibration settings.
 - Cheats page (infinite health and ammo per game), launcher languages, your own covers and Steam art.
-- A Fixes page for fixes that cost speed: Automatic turns each one on only where it helps.
+- Performance and compatibility fixes apply automatically for each game.
 - Add to Steam and desktop shortcuts from the launcher, automatic updates.
 
 ## System Requirements
@@ -79,6 +81,11 @@ Once your game folder has been specified: Play, Add to Steam (recommended for St
 - About 8 GB of free RAM
 
 
+## Reporting a bug
+- Open the launcher, go to **Advanced** and click **Copy log for GitHub** (Steam Deck: in Desktop Mode). It copies your system details and the last game log, without your home folder or user name.
+- Open a new issue in the [Issues tab](https://github.com/spacepepperoni/uncharted_Linux/issues/new?template=bug_report.yml), choose **Bug report**, and paste the log into the **Log** field.
+- Say which game and where in it the problem happened.
+
 ## Credits
 
 Built on [bbport](https://github.com/deadinside28/bloodborne_pc), the native Linux port of
@@ -86,10 +93,9 @@ Bloodborne by deadinside28, and on the [shadPS4](https://github.com/shadps4-emu/
 renderer. Video decoding (Videodec2) and the DLSS bridge come from
 [IFreemz/shadPS4-Bloodborne-DLSS-FSR](https://github.com/IFreemz/shadPS4-Bloodborne-DLSS-FSR).
 Thanks to Mindro for the shadPS4 Uncharted build that showed which problems to look for.
-Several fixes come from BilalReloaded's
-[Uncharted port](https://github.com/bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port)
-(GPL v2): the Uncharted 3 cloth solver barriers (Sully's shirt), guest memory committed as the
-game allocates it (error 1450), the Uncharted 3 look-at reset and the garbage descriptor fixes.
+Several fixes also come from BilalReloaded's port: the Uncharted 3 cloth solver barriers, guest memory committed as the game allocates it, the look-at reset and garbage descriptor fixes.
+Performance work on Uncharted 2's draw recording and read-backs is [che2281337](https://github.com/che2281337)'s, and several freeze fixes are from [drakolordx7's community build](https://github.com/drakolordx7/uncharted_pc).
+The render resolution patch (scripts/render_res.py, cutscene movie scaling in gpu/shim/bbport_movie.cpp, the Uncharted 2 aim focus fix) is ported from [BilalReloaded's Uncharted PC port](https://github.com/bc160201983/Uncharted-The-Nathan-Drake-Collection-PC-port) (GPL-2.0-or-later).
 
 Also used: [FSR-Vulkan](https://github.com/FireBurn/FSR-Vulkan) and the AMD FidelityFX SDK (FSR),
 FSR 4 assets from [FireBurn/Q2RTX](https://github.com/FireBurn/Q2RTX), the

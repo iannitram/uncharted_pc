@@ -25,7 +25,7 @@ class LinuxPackageScriptsTests(unittest.TestCase):
     def test_run_py_scripts_are_found(self):
         self.assertEqual(scripts_run_py_needs(),
                          {'patches.py', 'prepare.py', 'link_modules.py', 'content_profile.py',
-                          'trophies.py', 'render_720p.py'})
+                          'trophies.py', 'render_720p.py', 'render_res.py'})
 
     def test_every_script_run_py_starts_is_packaged(self):
         self.assertEqual(scripts_run_py_needs() - packaged_scripts(), set())

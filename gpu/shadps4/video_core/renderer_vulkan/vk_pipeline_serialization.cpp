@@ -496,6 +496,13 @@ void PipelineCache::WarmUpThread() {
         if (!entry.parsed) {
             return;
         }
+        // bbport: motion-vector pipelines are never preloaded. The shader metadata is stored once
+        // per program, not per permutation, so the preload could build the 8-attachment motion
+        // key with plain shaders: the AMD driver refused some (the startup crash) and the rest
+        // were registered without motion output. Built at first use instead.
+        if (!entry.compute && entry.gkey.motion_vectors) {
+            return;
+        }
         if (entry.compute) {
             const auto it = by_hash.find(entry.ckey.value);
             if (it == by_hash.end() || !it->second->ready) {
@@ -510,8 +517,8 @@ void PipelineCache::WarmUpThread() {
             auto pipeline = std::make_unique<ComputePipeline>(
                 instance, scheduler, desc_heap, profile, *pipeline_cache, entry.ckey,
                 *it->second->owner->info_template, it->second->module, entry.csdata, true);
-            // Linux fork: a cached pipeline the driver cannot create (a new driver, or one saved
-            // by a build that stopped on it) is left to compile when the game uses it.
+            // bbport: a cached pipeline the driver cannot create (a new driver, or one saved by
+            // a build that stopped on it) is compiled again when the game uses it.
             if (!pipeline->IsValid()) {
                 return;
             }
@@ -553,8 +560,7 @@ void PipelineCache::WarmUpThread() {
         auto pipeline = std::make_unique<GraphicsPipeline>(
             instance, scheduler, desc_heap, profile, entry.gkey, *pipeline_cache, infos,
             no_runtime_infos, fetch_shader, modules, entry.gsdata, true);
-        // Linux fork: as for compute pipelines, a failed one is left to compile at first use.
-        if (!pipeline->IsValid()) {
+        if (!pipeline->IsValid()) { // bbport: as for compute pipelines
             ReleaseClaim(claim_id);
             return;
         }
