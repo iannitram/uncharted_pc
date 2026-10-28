@@ -432,6 +432,48 @@ struct XboxAtlas {
     } glyph[XGlyphs];
 };
 
+/// Linux fork: Steam Deck pictures (BB_DECK_PROMPTS=1, set in Steam Deck mode, or
+/// BB_BUTTON_PROMPTS=steamdeck): the Xbox ones with A B X Y as black buttons with white letters.
+bool DeckPictures() {
+    static const bool deck = [] {
+        const char* env = std::getenv("BB_DECK_PROMPTS");
+        const char* style = std::getenv("BB_BUTTON_PROMPTS");
+        return (env && env[0] == '1') || (style && !std::strcmp(style, "steamdeck"));
+    }();
+    return deck;
+}
+
+/// The face buttons' letters are holes in a coloured disc: the disc turns black and a white disc
+/// behind it fills the holes (4x4 samples per pixel for its edge).
+void MakeDeckFaceButtons(XboxAtlas& atlas) {
+    for (int i = 0; i < 4; ++i) { // button_color_a, _b, _x, _y
+        const auto& g = atlas.glyph[i];
+        if (g.right <= g.left || g.bottom <= g.top) {
+            continue;
+        }
+        const float cx = (g.left + g.right) * 0.5f, cy = (g.top + g.bottom) * 0.5f;
+        const float rx = (g.right - g.left) * 0.5f, ry = (g.bottom - g.top) * 0.5f;
+        for (u32 y = 0; y < xbox_glyph_size; ++y) {
+            for (u32 x = 0; x < xbox_glyph_size; ++x) {
+                int inside = 0;
+                for (int sy = 0; sy < 4; ++sy) {
+                    for (int sx = 0; sx < 4; ++sx) {
+                        const float dx = (x + (sx + 0.5f) / 4.0f - cx) / rx;
+                        const float dy = (y + (sy + 0.5f) / 4.0f - cy) / ry;
+                        inside += dx * dx + dy * dy <= 1.0f;
+                    }
+                }
+                u8* p = &atlas.rgba[(size_t(g.y + y) * xbox_atlas_width + g.x + x) * 4];
+                const float a = p[3] / 255.0f, disc = inside / 16.0f;
+                const float alpha = a + disc * (1.0f - a);
+                const float white = alpha > 0.0f ? disc * (1.0f - a) / alpha : 0.0f;
+                p[0] = p[1] = p[2] = u8(std::lround(white * 255.0f));
+                p[3] = u8(std::lround(alpha * 255.0f));
+            }
+        }
+    }
+}
+
 const XboxAtlas* Atlas() {
     static const std::unique_ptr<XboxAtlas> atlas = []() -> std::unique_ptr<XboxAtlas> {
         size_t size = 0;
@@ -458,6 +500,9 @@ const XboxAtlas* Atlas() {
                     }
                 }
             }
+        }
+        if (DeckPictures()) {
+            MakeDeckFaceButtons(*out);
         }
         return out;
     }();
@@ -1024,7 +1069,9 @@ std::vector<Patch> Build(const Sheet& sheet, u32 levels, Style style) {
 } // namespace
 
 namespace {
-std::atomic<int> device_used{0}; ///< 0 keyboard and mouse, 1 PlayStation pad, 2 Xbox or other pad
+/// 0 keyboard and mouse, 1 PlayStation pad, 2 Xbox or other pad. Linux fork: Steam Deck mode starts
+/// with the controller (runtime_pad.c then picks the active pad's style), not the keys.
+std::atomic<int> device_used{DeckPictures() ? 2 : 0};
 std::atomic<u32> switches{0};
 
 enum class Force : u8 { Auto, Off, Keyboard, Xbox };
@@ -1040,7 +1087,7 @@ Force Forced() {
         if (!std::strcmp(env, "keyboard")) {
             return Force::Keyboard;
         }
-        if (!std::strcmp(env, "xbox")) {
+        if (!std::strcmp(env, "xbox") || !std::strcmp(env, "steamdeck")) {
             return Force::Xbox;
         }
         return !std::strcmp(env, "0") || !std::strcmp(env, "off") || !std::strcmp(env, "playstation")

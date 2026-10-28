@@ -437,6 +437,56 @@ def _framed(art, size):
     return background
 
 
+# Linux fork: Steam library art for each game from SteamGridDB (steamgriddb.com), the first cover,
+# wide grid, hero and logo listed for the game there in October 2026. The pictures stay on
+# SteamGridDB: Add to Steam downloads them (no API key needed for the files) and falls back to
+# the art from the game folder when that fails. Keys: the Steam grid file suffix.
+STEAMGRIDDB = {
+    'u1': {  # SteamGridDB game 5209428
+        'p': 'https://cdn2.steamgriddb.com/grid/9f4e3ec64878410b0467d41b63b1be21.png',
+        '': 'https://cdn2.steamgriddb.com/grid/aac79a23aefdab909e904c8c4e1f7902.png',
+        '_hero': 'https://cdn2.steamgriddb.com/hero/8119c54dfcef505e4800af09b46d01ed.png',
+        '_logo': 'https://cdn2.steamgriddb.com/logo/55aeb76c83aa533b11cbc33f9e40aa95.png',
+    },
+    'u2': {  # SteamGridDB game 5245365
+        'p': 'https://cdn2.steamgriddb.com/grid/66dcd06dc5ad523aaeae95e64187e4ca.png',
+        '': 'https://cdn2.steamgriddb.com/grid/5c5efbfaf787d2980b728b0534d45a1c.png',
+        '_hero': 'https://cdn2.steamgriddb.com/hero/0f49d14c2bfc523456225589dc27b6db.png',
+        '_logo': 'https://cdn2.steamgriddb.com/logo/151d71ff5173c3e5ade51b51b1429c7c.png',
+    },
+    'u3': {  # SteamGridDB game 5245366
+        'p': 'https://cdn2.steamgriddb.com/grid/1e361d5309d990c95e367471f9533f79.png',
+        '': 'https://cdn2.steamgriddb.com/grid/67581ef623d779062a4db25896297301.png',
+        '_hero': 'https://cdn2.steamgriddb.com/hero/25397b4aa0a8d579b7f41bb0a4d5e1e3.png',
+        '_logo': 'https://cdn2.steamgriddb.com/logo/ab9ebd57177b5106ad7879f0896685d4.png',
+    },
+}
+
+
+def steamgriddb_artwork(game, grid_dir, appid, timeout=10):
+    """Steam library pictures for the shortcut with this id, downloaded from SteamGridDB.
+    Returns the files written; nothing when the game is unknown or a download failed."""
+    import urllib.request
+    urls = STEAMGRIDDB.get(game)
+    if not urls:
+        return []
+    grid_dir = Path(grid_dir)
+    pictures = {}
+    try:
+        for suffix, url in urls.items():
+            request = urllib.request.Request(url, headers={'User-Agent': 'uncharted-linux-launcher'})
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                pictures[f'{appid}{suffix}.png'] = response.read()
+    except OSError:
+        return []
+    grid_dir.mkdir(parents=True, exist_ok=True)
+    written = []
+    for name, data in pictures.items():
+        (grid_dir / name).write_bytes(data)
+        written.append(grid_dir / name)
+    return written
+
+
 def steam_artwork(game_dir, grid_dir, appid, custom_art='', crops=None):
     """Steam library pictures for the shortcut with this id: cover (p), header, hero.
     Returns the files written; nothing when the game folder has no art."""

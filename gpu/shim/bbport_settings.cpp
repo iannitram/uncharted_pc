@@ -47,6 +47,8 @@ void Set(Values& v, const std::string& key, const std::string& value) {
         v.sharpness = Clamp(f, 0.0f, 2.0f);
     } else if (key == "jitter") {
         v.jitter = i != 0;
+    } else if (key == "settings_version") {
+        v.settings_version = i;
     } else if (key == "reactive") {
         v.reactive = i != 0;
     } else if (key == "object_motion") {
@@ -109,7 +111,15 @@ void Load() {
         }
         std::fclose(file);
         std::printf("Settings: %s\n", Path());
+        // Linux fork: sub-pixel jitter off by default. Settings older than version 3 had it
+        // switched back on (version 2); distant objects still shimmer and shake with it, so it is
+        // turned off once. It can be switched on again in the overlay.
+        if (v.settings_version < 3 && v.jitter) {
+            v.jitter = false;
+            std::printf("Settings: sub-pixel jitter switched off (default)\n");
+        }
     }
+    v.settings_version = 3;
     // Environment overrides (scripts, A/B tests).
     if (const char* env = std::getenv("BB_UPSCALER")) {
         v.upscaler = UpscalerOff;
@@ -141,16 +151,26 @@ void Load() {
     v.startup_live_resolution = v.live_resolution;
 }
 
-void ConfigureUpscalerSupport(bool fsr4, bool fsr411) {
+void ConfigureUpscalerSupport(bool fsr4, bool fsr411, bool fsr4_assets) {
     auto& v = Get();
-    v.fsr4_supported = fsr4;
+    // FSR 4.1.1 has its own assets (fsr4_411/) and keeps its own check.
+    v.fsr4_supported = fsr4 && fsr4_assets;
     v.fsr411_supported = fsr4 && fsr411;
+    if (fsr4 && !fsr4_assets) {
+        v.fsr4_problem = "assets not installed (fsr4_shaders, tools/fetch_fsr4_assets.sh)";
+        std::printf("Upscaler: FSR 4 assets not installed (fsr4_shaders or BB_FSR4_DIR); FSR 4 is "
+                    "not offered\n");
+    }
     const int requested = v.upscaler;
     if ((requested == UpscalerFsr4 && !v.fsr4_supported) ||
         (requested == UpscalerFsr411 && !v.fsr411_supported)) {
-        v.fsr4_problem = "GPU does not support the selected FSR 4 shaders; using FSR 3.1";
-        std::printf("Upscaler: %s unsupported on this GPU; falling back to FSR 3.1 before the first frame\n",
-                    UpscalerName(requested));
+        const bool assets_only = requested == UpscalerFsr4 && fsr4 && !fsr4_assets;
+        if (!assets_only) {
+            v.fsr4_problem = "GPU does not support the selected FSR 4 shaders; using FSR 3.1";
+        }
+        std::printf("Upscaler: %s %s; falling back to FSR 3.1 before the first frame\n",
+                    UpscalerName(requested),
+                    assets_only ? "assets not installed" : "unsupported on this GPU");
         v.upscaler = UpscalerFsr3;
     }
 }
@@ -236,6 +256,7 @@ void Save() {
     }
     std::fprintf(file,
                  "# bbport settings (in-game menu: Insert / L3+R3)\n"
+                 "settings_version=3\n"
                  "upscaler=%s\npreset=%d\nsharpen=%d\nsharpness=%.2f\njitter=%d\n"
                  "reactive=%d\nobject_motion=%d\nreactive_scale=%.2f\nreactive_threshold=%.2f\nreactive_max=%.2f\n"
                  "debug_view=%d\nshow_fps=%d\nfsr4_auto_exposure=%d\nfsr4_invert_jitter=%d\n",

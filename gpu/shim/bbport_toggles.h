@@ -16,6 +16,7 @@ extern "C" [[noreturn]] void bb_longjmp(sigjmp_buf buffer, int value);
 #endif
 
 extern "C" std::uint64_t runtime_disabled_optimizations;
+extern "C" std::uint64_t runtime_disabled_optimizations2;
 /// Recovery point for speculative guest memory reads on this thread (runtime_memory.c).
 extern "C" __thread sigjmp_buf* runtime_fault_recover;
 
@@ -77,6 +78,20 @@ enum : std::uint64_t {
 inline bool Disabled(std::uint64_t bit) {
     return (__atomic_load_n(&runtime_disabled_optimizations, __ATOMIC_RELAXED) & bit) != 0;
 }
+
+/// Toggles in the second number of BB_TOGGLE_FILE ("mask mask2"; the first 64 bits are used).
+enum : std::uint64_t {
+    TextureSetExact = 1, ///< memoized texture sets of exact images survive (un)registrations
+    PipelinedRaycasterCopies = 2, ///< 64-dword copies of GPU data run on the recording thread
+    ChainedEosLabels = 4, ///< end-of-shader labels written behind the deferred fences
+    VoLabelNoDrain = 8, ///< a met display buffer label wait does not drain the draw pipe
+    FaultReadbackHere = 16, ///< guest write faults on submitted GPU data read back on their thread
+    RecycledImages = 32, ///< images remade by format reuse the Vulkan images freed that way
+    TrackedStreamReads = 64, ///< (bit set) stream buffer reads go to the barrier tracker again
+};
+inline bool Disabled2(std::uint64_t bit) {
+    return (__atomic_load_n(&runtime_disabled_optimizations2, __ATOMIC_RELAXED) & bit) != 0;
+}
 } // namespace BbToggle
 
 namespace BbStats {
@@ -89,6 +104,8 @@ inline std::atomic<std::uint64_t> dead_gpu_drops{0}, gpu_read_backs{0};
 inline std::atomic<std::uint64_t> gpu_merges{0};
 /// ... or read back on the second queue (GPU work done; BufferCache::DownloadOnSideQueue).
 inline std::atomic<std::uint64_t> gpu_side_downloads{0}, gpu_side_download_ns{0};
+/// ... of which on the faulting thread (BufferCache::ReadBackOnFaultThread).
+inline std::atomic<std::uint64_t> fault_thread_read_backs{0};
 inline std::atomic<std::int64_t> hot_pages{0};
 /// Stall diagnostics (BB_FRAME_STATS): per-frame deltas printed for frames over 40 ms.
 inline std::atomic<std::uint64_t> images_registered{0};
@@ -123,6 +140,65 @@ struct Timer {
 };
 /// Wall time the GPU command thread waited for guest submissions (ns).
 inline std::atomic<std::uint64_t> gpu_idle_ns{0};
+/// Command queues waiting on memory (WaitRegMem, MemSemaphore): wall time (ns) and waits, the
+/// graphics and compute queues apart; the longest single wait of the window and its address.
+inline std::atomic<std::uint64_t> gfx_wait_ns{0}, gfx_waits{0}, asc_wait_ns{0}, asc_waits{0},
+    longest_wait_ns{0}, longest_wait_addr{0};
+/// Wall time the GPU command thread cycled through queues that were all waiting (ns).
+inline std::atomic<std::uint64_t> queue_spin_ns{0};
+/// The last label writes the GPU emulation made (fences, WriteData) with their kind and order,
+/// and the graphics queue's waits such a write ended, by kind (the rest the guest's CPU code ended).
+enum FenceKind : std::uint32_t { FenceEop, FenceEos, FenceWriteData, FenceCompute, FenceKinds };
+inline std::atomic<std::uint64_t> fence_writes[256];
+inline std::atomic<std::uint32_t> fence_write_kinds[256];
+inline std::atomic<std::uint64_t> fence_write_seqs[256];
+inline std::atomic<std::uint64_t> fence_write_pos{0};
+inline std::atomic<std::uint64_t> gfx_fence_wait_ns[FenceKinds], gfx_fence_waits[FenceKinds];
+inline void NoteFenceWrite(std::uint64_t addr, FenceKind kind) {
+    const std::uint64_t seq = fence_write_pos.fetch_add(1, std::memory_order_relaxed);
+    fence_writes[seq & 255].store(addr, std::memory_order_relaxed);
+    fence_write_kinds[seq & 255].store(kind, std::memory_order_relaxed);
+    fence_write_seqs[seq & 255].store(seq, std::memory_order_release);
+}
+/// The kind of the latest recent write to the label at addr, or FenceKinds when there is none.
+inline FenceKind RecentFenceWrite(std::uint64_t addr) {
+    std::uint64_t newest = 0;
+    FenceKind kind = FenceKinds;
+    for (int i = 0; i < 256; ++i) {
+        const std::uint64_t written = fence_writes[i].load(std::memory_order_relaxed);
+        const std::uint64_t seq = fence_write_seqs[i].load(std::memory_order_acquire);
+        if (written && addr >= written && addr < written + 8 && (kind == FenceKinds || seq > newest)) {
+            newest = seq;
+            kind = static_cast<FenceKind>(fence_write_kinds[i].load(std::memory_order_relaxed));
+        }
+    }
+    return kind;
+}
+/// Whether the label at addr was written since write number `since` (or too long ago to tell).
+inline bool FenceWrittenSince(std::uint64_t addr, std::uint64_t since) {
+    if (fence_write_pos.load(std::memory_order_acquire) - since >= 256) {
+        return true;
+    }
+    for (int i = 0; i < 256; ++i) {
+        const std::uint64_t written = fence_writes[i].load(std::memory_order_relaxed);
+        if (written && addr >= written && addr < written + 8 &&
+            fence_write_seqs[i].load(std::memory_order_acquire) >= since) {
+            return true;
+        }
+    }
+    return false;
+}
+inline void NoteQueueWait(std::atomic<std::uint64_t>& total, std::atomic<std::uint64_t>& count,
+                          std::chrono::steady_clock::time_point start, std::uint64_t addr) {
+    const std::uint64_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                 std::chrono::steady_clock::now() - start).count();
+    total.fetch_add(ns, std::memory_order_relaxed);
+    count.fetch_add(1, std::memory_order_relaxed);
+    if (ns > longest_wait_ns.load(std::memory_order_relaxed)) {
+        longest_wait_ns.store(ns, std::memory_order_relaxed);
+        longest_wait_addr.store(addr, std::memory_order_relaxed);
+    }
+}
 /// Draws recorded into the reduced scene targets, and draws after the scene started.
 inline std::atomic<std::uint64_t> reduced_draws{0}, scene_draws{0};
 /// Wall time spent blocked in the scheduler (ns): waiting for the recording thread to drain,

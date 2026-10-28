@@ -97,6 +97,25 @@ class LogTests(unittest.TestCase):
             self.assertIn('0.3.6-linux.99', report.read('system.txt').decode())
 
 
+    def test_issue_text_fits_github_and_keeps_both_ends(self):
+        with open(self.saves / 'last_run.log', 'w') as f:
+            f.write(f'Run: {Path.home()}/game\n')
+            f.write('spam every frame\n' * 20000)
+            f.write('STOP: the real crash\n')
+        text = logs.issue_text(self.data, self.saves, {'frame_rate': '30'}, '0.3.8-linux.1', linux.crash_signature)
+        self.assertLessEqual(len(text), logs.ISSUE_CHARS)
+        self.assertIn('0.3.8-linux.1', text)
+        self.assertIn('Run: ~/game', text)
+        self.assertNotIn(str(Path.home()), text)
+        self.assertIn('lines left out', text)
+        self.assertTrue(text.rstrip().endswith('STOP: the real crash'))
+        self.assertIn('The last game run stopped with: STOP: the real crash', text)
+
+    def test_issue_text_without_a_game_run(self):
+        text = logs.issue_text(self.data, self.saves, {}, 'v', linux.crash_signature)
+        self.assertIn('(no game run logged yet)', text)
+
+
 class DialogLogTests(unittest.TestCase):
     def test_dialogs_and_answers_are_logged(self):
         box = mock.Mock(spec=['askyesno', 'showinfo', 'YES'])

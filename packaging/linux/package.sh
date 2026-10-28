@@ -20,7 +20,7 @@ icon.size = max(icon.ico.sizes())
 icon.convert('RGBA').save('launcher/uncharted.png')
 EOF
 hidden=()
-for module in argparse base64 collections hashlib json re shlex shutil struct tempfile zlib cheats \
+for module in argparse base64 collections hashlib json re shlex shutil struct tempfile zlib cheats xml.etree.ElementTree \
               uncharted_art uncharted_fonts uncharted_i18n uncharted_widgets uncharted_linux uncharted_logs bbport_steam PIL.ImageTk PIL._tkinter_finder; do
     hidden+=(--hidden-import "$module")
 done
@@ -62,11 +62,13 @@ ldd out/bb-probe out/gpu/libbbgpu.so out/bb-gpu-capabilities | awk '/=> \// {pri
         [[ $name == libbbgpu.so ]] && continue
         [[ $name =~ $system ]] || cp -L "$path" "$dest/bin/lib/$name"
     done
-cp scripts/prepare.py scripts/link_modules.py scripts/link_libc.py scripts/content_profile.py scripts/render_720p.py scripts/cheats.py scripts/trophies.py scripts/patches.py "$dest/scripts/"
+cp scripts/prepare.py scripts/link_modules.py scripts/link_libc.py scripts/content_profile.py scripts/render_720p.py scripts/render_res.py scripts/trophies.py scripts/cheats.py scripts/patches.py scripts/pkg.py "$dest/scripts/"
 cp run.py LICENSE "$dest/"
 cp launcher/uncharted.png "$dest/launcher/"
 cp README.md "$dest/README.md"
 echo "${LINUX_BUILD:-}" > "$dest/LINUX_BUILD"
+# A custom build that must never update itself to an official release (NO_UPDATE_CHECK=1).
+if [[ ${NO_UPDATE_CHECK:-0} == 1 ]]; then : > "$dest/NO_UPDATE_CHECK"; fi
 for license in gpu/third_party/httplib/LICENSE:cpp-httplib launcher/fonts/OFL.txt:Cinzel; do
     if [[ -f ${license%%:*} ]]; then cp "${license%%:*}" "$dest/licenses/${license##*:}-LICENSE.txt"; fi
 done
@@ -96,5 +98,7 @@ if [[ ! -x $tool ]]; then
     chmod +x "$tool"
 fi
 # Extract-and-run: works without FUSE (containers, CI).
-ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 "$tool" --no-appstream "$appdir" dist/Uncharted-x86_64.AppImage >/dev/null
-ls -lh dist/uncharted-linux.tar.gz dist/Uncharted-x86_64.AppImage
+# APPIMAGE_NAME: another file name (a custom build next to the official one).
+appimage=dist/${APPIMAGE_NAME:-Uncharted-x86_64.AppImage}
+ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 "$tool" --no-appstream "$appdir" "$appimage" >/dev/null
+ls -lh dist/uncharted-linux.tar.gz "$appimage"
