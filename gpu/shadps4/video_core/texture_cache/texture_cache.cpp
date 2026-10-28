@@ -703,7 +703,7 @@ ImageId TextureCache::FindImage(ImageDesc& desc, bool exact_fmt) {
             // Cannot reuse this image as we need the exact requested format.
             image_id = {};
         } else if (!image_resolved.info.resources.CanContain(info.resources)) {
-            // bbport: from Pepin208/uncharted_pc_linux 1d02741 (shadPS4 #4818, #5118)
+            // bbport: shadPS4 #4818 by @jute-ado, via Pepin208/uncharted_pc_linux 1d02741
             // The image was clearly picked up wrong.
             FreeImage(image_id);
             image_id = {};
@@ -856,7 +856,7 @@ ImageView& TextureCache::FindDepthTarget(ImageId image_id, const ImageDesc& desc
     // If there is a stencil attachment, link depth and stencil.
     if (desc.info.stencil_addr != 0) {
         ImageId stencil_id{};
-        // bbport: from Pepin208/uncharted_pc_linux 1d02741 (shadPS4 #4818, #5118)
+        // bbport: shadPS4 #5118 by @artemkaVG, via Pepin208/uncharted_pc_linux 1d02741
         ForEachImageInRegion(
             desc.info.stencil_addr, desc.info.stencil_size, [&](ImageId image_id, Image& image) {
                 if (image.info.guest_address != desc.info.stencil_addr) {

@@ -88,6 +88,17 @@ static const char* acb_task_name[] = NAME_ARRAY(ACB_TASK, MAX_NAMES);
 
 std::array<u8, 48_KB> Liverpool::ConstantEngine::constants_heap;
 
+// bbport: WAIT_ON_DE_COUNTER_DIFF compares as shadPS4 #5406 (by @mavethee) does; our first
+// back-port had the counters the wrong way round (#67).
+// WAIT_ON_DE_COUNTER_DIFF: the CE waits while it is `diff` or more increments ahead of the DE.
+// The CE normally runs ahead (see ConstantEngine::Diff); the first test keeps u32 from wrapping.
+static constexpr bool CeMustWaitOnDe(u32 ce_count, u32 de_count, u32 diff) {
+    return ce_count >= de_count && (ce_count - de_count) >= diff;
+}
+static_assert(CeMustWaitOnDe(5, 2, 3));  // CE 3 ahead, diff 3: wait
+static_assert(!CeMustWaitOnDe(4, 2, 3)); // CE 2 ahead, diff 3: go
+static_assert(!CeMustWaitOnDe(2, 5, 1)); // DE ahead: go, no wrap
+
 static std::span<const u32> NextPacket(std::span<const u32> span, size_t offset) {
     if (offset > span.size()) {
         LOG_ERROR(
@@ -676,8 +687,7 @@ Liverpool::Task Liverpool::ProcessCeUpdate(std::span<const u32> ccb) {
         }
         case PM4ItOpcode::WaitOnDeCounterDiff: {
             const auto diff = it_body[0];
-            while (cblock.de_count >= cblock.ce_count &&
-                   (cblock.de_count - cblock.ce_count) >= diff) {
+            while (CeMustWaitOnDe(cblock.ce_count, cblock.de_count, diff)) {
                 YIELD_CE();
             }
             break;
