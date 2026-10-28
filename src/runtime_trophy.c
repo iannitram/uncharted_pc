@@ -58,13 +58,6 @@ static void copy_text(char *to,size_t size,const char *text) {
     snprintf(to,size,"%s",plain ? plain : "");
     free(plain);
 }
-/* `text` cut to fit `size` bytes (with the terminator). Written as a copy, not snprintf: the cut is
- * meant, and GCC 15 reports it as -Werror=format-truncation when the source array is bigger. */
-static void copy_truncated(char *to,size_t size,const char *text) {
-    const size_t n=strnlen(text,size-1);
-    memcpy(to,text,n);
-    to[n]=0;
-}
 static char *read_file(const char *path,size_t *size) {
     FILE *f=fopen(path,"rb");
     if (!f) return NULL;
@@ -264,7 +257,7 @@ static ABI int32_t trophy_game_info(int32_t ctx,int32_t handle,void *details,voi
         v[0]=(uint32_t)set.groups; v[1]=all; v[2]=total[0]; v[3]=total[1]; v[4]=total[2]; v[5]=total[3];
         char *text=(char *)details+32;
         memset(text,0,128+1024);
-        copy_truncated(text,128,set.title); copy_truncated(text+128,1024,set.detail);
+        snprintf(text,128,"%.127s",set.title); snprintf(text+128,1024,"%.1023s",set.detail);
     }
     if (data) {
         uint64_t size; memcpy(&size,data,8);

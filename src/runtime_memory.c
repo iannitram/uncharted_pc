@@ -485,6 +485,10 @@ static ABI int32_t direct_allocate(int64_t low, int64_t high, uint64_t size,
     if (!alignment) alignment = PAGE;
     if (!out || low < 0 || high < 0 || !size || size % PAGE || !valid_alignment(alignment) || type < 0 || type > 10)
         return INVALID;
+    /* Render resolution (scripts/render_res.py, after BilalReloaded's Uncharted PC port): the
+     * games search up to the retail pool size (5056 MiB); a raised pool (BB_DMEM_MB) extends
+     * that search so the larger render target heaps fit. */
+    if ((uint64_t)high >= UINT64_C(5056) * 1024 * 1024 && (uint64_t)high < POOL_SIZE) high = (int64_t)POOL_SIZE;
     uint64_t end = (uint64_t)high < POOL_SIZE ? (uint64_t)high : POOL_SIZE;
     if ((uint64_t)low >= end || size > end - (uint64_t)low) {
         printf("Runtime: direct allocation of %" PRIu64 " bytes in [%#" PRIx64 ", %#" PRIx64 ") refused: no space (pool %" PRIu64 " bytes)\n",size,(uint64_t)low,(uint64_t)high,(uint64_t)POOL_SIZE);
@@ -754,6 +758,15 @@ uintptr_t runtime_memory_resolve(const char *name) {
     if (!strcmp(name, "cQke9UuBQOk#p#J")) return (uintptr_t)direct_unmap;
     return RUNTIME_LOOKUP(exports,name);
 }
+/* Render resolution (gpu/shim/bbport_movie.cpp, after BilalReloaded's Uncharted PC port): guest
+ * memory for the GPU library's own data (movie frames scaled to the display size): flexible
+ * memory, CPU and GPU read/write. Placed high: games claim virtual ranges from 0x1000000000 up
+ * without reserving them (Uncharted's memory areas, whose freed pages leave holes that look free
+ * here). */
+void *runtime_map_guest_memory(uint64_t size) {
+    void *address=(void *)UINT64_C(0xf000000000);
+    return map_flexible(&address,align_up(size,PAGE),0x33,0)==0 ? address : NULL;
+}
 /* Host-owned memory the guest can see (image, stacks, trampolines) lives in
  * [LOW_MIN, USER_MIN): PS4 code packs pointers into 40-bit fields. */
 #define LOW_MIN UINT64_C(0x0800000000)
@@ -818,18 +831,27 @@ void *runtime_image_map(size_t size, int prot) {
  * 1073741824 the lock-free UpdateImage path for clean, tracked images. */
 /* Bits 32 and up: the draw pipeline and related GPU thread work (gpu/shim/bbport_toggles.h). */
 uint64_t runtime_disabled_optimizations;
+/* A second number in the file: more toggles (gpu/shim/bbport_toggles.h, BbToggle::Disabled2). */
+uint64_t runtime_disabled_optimizations2;
 /* Speculative readers of guest memory (GPU draw-preparation workers) register a recovery
  * point: a fault on that thread jumps back to it instead of terminating (probe.c). */
 __thread sigjmp_buf *runtime_fault_recover;
 static void *toggle_watcher(void *path) {
-    for (unsigned long long last=ULLONG_MAX;;) {
+    for (unsigned long long last=ULLONG_MAX,last2=ULLONG_MAX;;) {
         FILE *f=fopen(path,"r");
-        unsigned long long value=0;
-        if (f) { if (fscanf(f,"%llu",&value)!=1) value=0; fclose(f); }
-        if (value!=last) {
+        unsigned long long value=0,value2=0;
+        if (f) {
+            const int n=fscanf(f,"%llu %llu",&value,&value2);
+            if (n<1) value=0;
+            if (n<2) value2=0;
+            fclose(f);
+        }
+        if (value!=last || value2!=last2) {
             __atomic_store_n(&runtime_disabled_optimizations,(uint64_t)value,__ATOMIC_RELEASE);
-            printf("Runtime: disabled optimizations mask=%llu\n",value);
+            __atomic_store_n(&runtime_disabled_optimizations2,(uint64_t)value2,__ATOMIC_RELEASE);
+            printf("Runtime: disabled optimizations mask=%llu %llu\n",value,value2);
             last=value;
+            last2=value2;
         }
 #ifdef _WIN32
         compat_sleep_ns(250000000);
@@ -841,6 +863,10 @@ static void *toggle_watcher(void *path) {
 }
 void runtime_memory_set_gpu_hooks(GpuRange map, GpuRange unmap, GpuRange invalidate) {
     const char *toggles=getenv("BB_TOGGLE_FILE");
+    /* BB_TOGGLE2: starting value of the second toggle number (a toggle file, when used,
+     * replaces it). */
+    const char *start2=getenv("BB_TOGGLE2");
+    if (start2 && *start2) __atomic_store_n(&runtime_disabled_optimizations2,(uint64_t)strtoull(start2,NULL,0),__ATOMIC_RELEASE);
     static pthread_t watcher;
     if (toggles && !watcher) pthread_create(&watcher,NULL,toggle_watcher,(void *)toggles);
     write_lock();

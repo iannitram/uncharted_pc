@@ -1351,13 +1351,11 @@ void TextureCache::GarbageCollectImages() {
         }
         ticks_to_destroy = std::min(ticks_to_destroy, gc_tick);
         below_tick = gc_tick - ticks_to_destroy;
-        if (!tight_budget) {
-            if (!pressured && !aggresive) {
-                below_tick = std::min(below_tick, idle_tick);
-            } else if (!emergency) {
-                below_tick =
-                    std::min(below_tick, tick_seconds_ago(aggresive ? 1 : pressure_idle_seconds));
-            }
+        if (!pressured && !aggresive) {
+            below_tick = std::min(below_tick, idle_tick);
+        } else if (!emergency && !urgent_pass) {
+            below_tick = std::min(below_tick, tick_seconds_ago(aggresive ? 1 : pressure_idle_seconds));
+        }
         }
         visited = 0;
     };

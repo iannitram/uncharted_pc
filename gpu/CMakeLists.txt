@@ -169,7 +169,7 @@ add_dependencies(bbgpu host_shaders)
 # (github.com/Wozzardman/shadp2p, GPL-2.0), for private Bloodborne co-op servers.
 find_package(Protobuf CONFIG QUIET)
 if (NOT Protobuf_FOUND)
-    # Linux fork: distributions with protobuf 3.x (Debian) ship no CMake package.
+    # distributions with protobuf 3.x (Debian) ship no CMake package.
     find_package(Protobuf REQUIRED)
 endif()
 set(SHADNET_PROTO_OUT "${CMAKE_CURRENT_BINARY_DIR}/shadnet_proto_gen")
@@ -198,13 +198,14 @@ target_link_libraries(bbnet PRIVATE OpenSSL::SSL OpenSSL::Crypto ZLIB::ZLIB)
 if (WIN32)
     target_sources(bbnet PRIVATE third_party/wepoll/wepoll.c)
     target_include_directories(bbnet PRIVATE third_party/wepoll)
+endif()
+    find_path(MINIUPNPC_INCLUDE miniupnpc.h PATH_SUFFIXES miniupnpc REQUIRED)
+    find_library(MINIUPNPC_LIBRARY NAMES libminiupnpc.a miniupnpc REQUIRED)
+    target_include_directories(bbnet PRIVATE "${MINIUPNPC_INCLUDE}")
+if (WIN32)
     target_compile_definitions(bbnet PRIVATE MINIUPNP_STATICLIB)
 endif()
-# Linux fork: UPnP is needed on every platform, not only Windows.
-find_path(MINIUPNPC_INCLUDE miniupnpc.h PATH_SUFFIXES miniupnpc REQUIRED)
-find_library(MINIUPNPC_LIBRARY NAMES libminiupnpc.a miniupnpc REQUIRED)
-target_include_directories(bbnet PRIVATE "${MINIUPNPC_INCLUDE}")
-target_link_libraries(bbnet PRIVATE "${MINIUPNPC_LIBRARY}")
+    target_link_libraries(bbnet PRIVATE "${MINIUPNPC_LIBRARY}")
 target_compile_definitions(bbnet PRIVATE BOOST_ASIO_STANDALONE NDEBUG)
 target_compile_options(bbnet PRIVATE -Wno-deprecated-declarations -Wno-missing-field-initializers)
 target_link_libraries(bbnet PUBLIC Vulkan::Headers fmt::fmt Boost::headers magic_enum::magic_enum
@@ -245,7 +246,7 @@ if (WIN32)
     target_include_directories(bbgpu PRIVATE third_party/xbyak)
     target_link_libraries(bbgpu PUBLIC Vulkan::Vulkan ws2_32 bcrypt ntdll synchronization winmm)
 else()
-    # Linux fork: the xbyak submodule, as on Windows (no system package needed).
+    # the xbyak submodule, as on Windows (no system package needed).
     target_include_directories(bbgpu PRIVATE third_party/xbyak)
     target_link_libraries(bbgpu PUBLIC PkgConfig::X11)
 endif()

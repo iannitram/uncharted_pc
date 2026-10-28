@@ -61,7 +61,7 @@ struct Values {
     std::atomic<int> preset{NativeAA};
     std::atomic<bool> sharpen{true};
     std::atomic<float> sharpness{0.3f};
-    std::atomic<bool> jitter{true};
+    std::atomic<bool> jitter{false}; ///< off by default: distant detail shimmers with it
     std::atomic<bool> reactive{false};
     std::atomic<bool> object_motion{true};
     std::atomic<float> reactive_scale{1.0f};
@@ -99,6 +99,9 @@ struct Values {
     /// The player's ini or BB_UPSCALER named the upscaler (else the default may change with the
     /// driver: ConfigureDriverDefault).
     bool upscaler_chosen = false;
+    /// The settings file's version (settings_version): below 3 the jitter switch is turned off
+    /// once (version 2 had switched it back on; distant objects still shimmer and shake with it).
+    int settings_version = 0;
 
     /// Startup settings for the explicit BB_RENDER_RES compatibility patch only.
     int startup_preset = NativeAA;
@@ -115,7 +118,9 @@ Values& Get();
 /// Reads the file, then the environment overrides. Called once at start.
 void Load();
 /// Checks the loaded choice before the first frame; unsupported FSR 4 uses FSR 3.1.
-void ConfigureUpscalerSupport(bool fsr4, bool fsr411);
+/// fsr4_assets (Linux fork): the FSR 4 v07 assets are installed; without them FSR 4 is not
+/// offered (it would only fall back to FSR 3.1 mid-game).
+void ConfigureUpscalerSupport(bool fsr4, bool fsr411, bool fsr4_assets = true);
 /// The upscaler a start uses: FSR 3.1 is the default only on a driver it has been checked on;
 /// elsewhere the default is Off (noise on RADV PHOENIX, 2026-10-19). A choice the player made
 /// (ini or BB_UPSCALER) is kept.

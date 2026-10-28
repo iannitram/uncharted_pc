@@ -7,6 +7,11 @@ BB_GAME_DIR_U1 / _U2 / _U3   optional: the folder of a game that was dumped on i
               that game instead of BB_GAME_DIR (its executable may be that folder's eboot.bin)
 BB_EXE        u1 / u2 / u3 or an executable name (default u1: eboot.bin, the collection menu)
 BB_USER_DIR   saves and shader caches (default user/ beside this script)
+BB_RESOLUTION / BB_RESOLUTION_U1 / _U2 / _U3   resolution WxH (default 1920x1080, the PS4's):
+              the game's display settings and memory table are patched for the size it draws at
+              (scripts/render_res.py, after BilalReloaded's Uncharted PC port)
+BB_UPSCALE_QUALITY / _U1 / _U2 / _U3   quality, balanced, performance or ultra: the game draws
+              at the resolution divided by 1.5 / 1.7 / 2 / 3 and DLSS / FSR upscales to it
 Extra arguments go to bb-probe. When the game starts another executable of the collection
 (sceSystemServiceLoadExec), that one is prepared and started in its place.
 The in-game "Apply and restart" runs this script again through BB_RESTART_COMMAND;
@@ -221,6 +226,91 @@ def prepare(game, exe, out):
     stamp.write_text(source, encoding='utf-8')
 
 
+# Upscaling presets (BB_UPSCALE_QUALITY[_U1/_U2/_U3]): the resolution chosen (BB_RESOLUTION) is the
+# output; the game draws at it divided by the preset's scale, and DLSS / FSR 4 / FSR 3.1 (or TAA
+# with FSR 1) bring each frame up to it before the HUD and menus are drawn at the output size
+# (TemporalUpscaler::OnComposite). After BilalReloaded's Uncharted PC port.
+UPSCALE_SCALES = {'quality': 1.5, 'balanced': 1.7, 'performance': 2.0, 'ultra': 3.0}
+COMPOSITE_PS = '749bbec9'  # the copy of the finished frame into the display buffer (all three games)
+TONEMAP_PS = '484cdbf5'    # the draw finishing the frame (Uncharted 3 draws prompts into it after)
+
+
+def parse_size(text):
+    try:
+        width, height = (int(value) for value in text.lower().split('x'))
+        return width, height
+    except ValueError:
+        return None
+
+
+def render_resolution(env, exe, out, image):
+    """The image to start for the chosen resolution (BB_RESOLUTION[_U1/_U2/_U3]=WxH) and upscaling
+    preset (BB_UPSCALE_QUALITY[_U1/_U2/_U3]): boot-linked.bin patched by scripts/render_res.py for
+    the size the game draws at, kept until it or the scripts change, and the environment for it:
+    the scene size (anti-aliasing, scene depth), the movie size (cutscene movies scaled to it),
+    the direct memory the larger render target heaps need, and, when the game draws below the
+    resolution chosen, the upscale to it. 1920x1080 without a preset: the image as it is."""
+    key = next((k for k, v in EXECUTABLES.items() if v == exe), '')
+    for name in ('BB_SCENE_SIZE', 'BB_MOVIE_SIZE', 'BB_RENDER_RES', 'BB_OUTPUT_RES',
+                 'BB_UI_COMPOSITE_PS', 'BB_UI_TONEMAP_PS'):
+        env.pop(name, None)
+    if 'BB_DMEM_MB_USER' in env:
+        env['BB_DMEM_MB'] = env['BB_DMEM_MB_USER']
+    else:
+        env.pop('BB_DMEM_MB', None)
+    if not key:
+        return image
+    # Steam Deck mode renders at 720p its own way (BB_RENDER_720P, scripts/render_720p.py).
+    if env.get('BB_RENDER_720P') == '1':
+        if env.get(f'BB_RESOLUTION_{key.upper()}') or env.get('BB_RESOLUTION'):
+            print('Render resolution: not used in Steam Deck mode (the game renders at 1280x720)')
+        return image
+    size = (env.get(f'BB_RESOLUTION_{key.upper()}') or env.get('BB_RESOLUTION', '')).strip().lower()
+    output = parse_size(size) if size not in ('', 'native', 'off', '0') else None
+    output = output or (1920, 1080)
+    preset = (env.get(f'BB_UPSCALE_QUALITY_{key.upper()}') or env.get('BB_UPSCALE_QUALITY', '')).strip().lower()
+    scale = UPSCALE_SCALES.get(preset)
+    if scale and env.get('BB_UPSCALER', '').lower() == 'none':
+        print('Upscaling preset: needs the camera tracking (BB_UPSCALER=none): drawing at the output size')
+        scale = None
+    wanted = output
+    if scale:
+        # Widths in steps of 16 (Uncharted 3 asserts it in its post processing), heights of 4.
+        wanted = (max(640, round(output[0] / scale / 16) * 16), max(360, round(output[1] / scale / 4) * 4))
+    render = wanted
+    patched = image
+    if wanted != (1920, 1080):
+        import json
+        text = f'{wanted[0]}x{wanted[1]}'
+        patched = out / f'boot-res-{text}.bin'
+        meta = patched.with_suffix('.json')
+        sources = [image, PORT / 'scripts' / 'render_res.py']
+        if not (patched.is_file() and meta.is_file() and
+                all(patched.stat().st_mtime >= s.stat().st_mtime for s in sources)):
+            print(f'Render resolution: preparing {text} for {key.upper()} ...')
+            for old in out.glob('boot-res-*'):
+                old.unlink(missing_ok=True)
+            run_script('render_res.py', image, '--out', patched, '--exe', key, '--size', text)
+        info = json.loads(meta.read_text(encoding='utf-8'))
+        render = parse_size(info['render'])
+        if info.get('extra_mib'):
+            needed = 5056 + int(info['extra_mib']) + 64
+            player = env.get('BB_DMEM_MB_USER', '')
+            env['BB_DMEM_MB'] = str(max(needed, int(player)) if player.isdigit() else needed)
+    render_text = f'{render[0]}x{render[1]}'
+    env['BB_SCENE_SIZE'] = render_text
+    if render != (1920, 1080):
+        env['BB_MOVIE_SIZE'] = render_text
+    upscaled = render[0] < output[0] or render[1] < output[1]
+    if upscaled:
+        env['BB_RENDER_RES'] = render_text
+        env['BB_OUTPUT_RES'] = f'{output[0]}x{output[1]}'
+        env['BB_UI_COMPOSITE_PS'] = COMPOSITE_PS
+        env['BB_UI_TONEMAP_PS'] = TONEMAP_PS
+    print(f'Render resolution: {key.upper()} draws {render_text}'
+          f'{", upscaled to " + env["BB_OUTPUT_RES"] + (" (" + preset + ")" if scale else "") if upscaled else ""}'
+          f', direct memory {env.get("BB_DMEM_MB", "5056")} MiB')
+    return patched
 # Render target memory the games need per extra 1080p worth of pixels (measured; docs/resolution.md), and
 # how much the GPU pool (2988 MiB, 3052 in Uncharted 3) can grow before its 32-bit size overflows 4 GiB.
 RT_MIB_PER_1080P = 300
@@ -328,6 +418,9 @@ def main():
     # GPU caches (shaders, pipelines) beside the saves; read before main(), so set here.
     env.setdefault('BB_GPU_USER_DIR', str(user_dir))
     env.setdefault('BB_VBLANK_HZ', '60')
+    # A direct memory size the player set stays theirs; the render resolution raises it per game.
+    if env.get('BB_DMEM_MB') and 'BB_DMEM_MB_USER' not in env:
+        env['BB_DMEM_MB_USER'] = env['BB_DMEM_MB']
     loadexec = out_root / 'loadexec.txt'
     env['BB_LOADEXEC_FILE'] = str(loadexec)
     guest_argv = None
@@ -354,7 +447,8 @@ def main():
         env['BB_SKIP_COLLECTION_MENU'] = '1'
     # Uncharted 2 reads the results of GPU work (grenade explosions, vehicle damage, the convoy
     # of chapter 21) from memory it also writes: merging leaves them on the GPU, so it runs with
-    # accurate GPU memory (BB_GPU_MERGE=0) unless the player chose otherwise.
+    # accurate GPU memory (BB_GPU_MERGE=0) unless the player chose otherwise. Uncharted 3 runs the
+    # same engine and showed the same floating NPCs (Linux fork), so it does too.
     # Its aim and turret blur reads tiny render results back (BB_TINY_READBACK, ~13% elsewhere).
     all_cheats = env.setdefault('BB_CHEATS_ALL', env.get('BB_CHEATS', ''))
     # Take a copy of the environment once before the loop
@@ -366,6 +460,10 @@ def main():
                 env.pop(key, None)
         # Apply the per-game defaults
         env.update(fix_defaults(player_env, exe))
+        # Chained end-of-shader labels (toggle2 4) and met display-label waits without a drain
+        # (toggle2 8) were measured in U2 only: off for U1 and U3 until they are.
+        if exe in (EXECUTABLES['u1'], EXECUTABLES['u3']):
+            env.setdefault('BB_TOGGLE2', '12')
         game, file = locate(env, exe)
         if not game:
             fail('Set BB_GAME_DIR to the game folder (the one with eboot.bin).')
@@ -373,6 +471,7 @@ def main():
             fail(f'No {file} in {game}.')
         out = out_root / Path(exe).stem.split('-')[0]
         prepare(game, file, out)
+        image = render_resolution(env, exe, out, out / 'boot-linked.bin')
         run_script('content_profile.py', game, '--out', out, '--sku', env.get('BB_CONTENT_SKU', 'full'))
         # The trophy set of this game (its texts in the console language, the icons) for the runtime.
         trophy_dir = out / 'trophy'
@@ -386,7 +485,7 @@ def main():
         env['BB_EXE'] = exe
         env['BB_RESTART_COMMAND'] = (subprocess.list2cmdline if WINDOWS else shlex.join)([sys.executable, *this, '--after', str(os.getpid()), *args])
         env['BB_CHEATS'] = game_cheats(all_cheats, exe)
-        command = [str(probe), str(out / 'boot-linked.bin'), '--content-profile', str(out / 'content.bin'),
+        command = [str(probe), str(image), '--content-profile', str(out / 'content.bin'),
                    '--app0', str(game), '--user', str(user_dir), '--timeout', env.get('BB_TIMEOUT', '0')]
         # bb-probe takes any number of --patches files (BBPATCH2, each with its own image base),
         # applied in this order: third-party patches, cheats, the 720p video settings.
@@ -395,7 +494,8 @@ def main():
             command += ['--patches', str(patch_file)]
         if guest_argv:
             command += ['--guest-argv', str(guest_argv)]
-        if key and (trophy_dir / 'trophies.txt').is_file():
+        # BB_TROPHIES=0 (the launcher's Trophies switch): no trophies earned or shown.
+        if key and env.get('BB_TROPHIES', '1') != '0' and (trophy_dir / 'trophies.txt').is_file():
             command += ['--trophies', str(trophy_dir)]
         loadexec.unlink(missing_ok=True)
         # No stdin: an inherited pipe (shells such as Git Bash) cost the game its console output.
