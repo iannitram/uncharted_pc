@@ -63,6 +63,11 @@ struct SubresourceExtent {
     u32 levels = 1;
     u32 layers = 1;
 
+    // bbport: from Pepin208/uncharted_pc_linux 1d02741 (shadPS4 #4818, #5118)
+    constexpr bool CanContain(const SubresourceExtent& requested) const {
+        return levels >= requested.levels && layers >= requested.layers;
+    }
+
     auto operator<=>(const SubresourceExtent&) const = default;
 };
 
