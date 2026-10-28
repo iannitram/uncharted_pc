@@ -54,7 +54,7 @@ def deck_frame_rate():
     return '60'
 
 
-DECK_FRAME_RATES = ('30', '60')
+DECK_FRAME_RATES = ('30', '45', '60')
 
 
 def clean_env():
@@ -417,20 +417,30 @@ def version_key(text):
 
 def apply_defaults(ns):
     """Linux settings the Windows launcher does not have: Steam Deck mode (on by default on
-    SteamOS) and a 30 FPS choice in the frame rate list."""
+    SteamOS) and 30 and 45 FPS choices in the frame rate list."""
     ns['APP_DEFAULTS'].setdefault('steam_deck', steam_deck())
     # No Fixes page: each fix stays automatic (run.py turns it on where it helps), whatever an
     # earlier version saved for it.
-    for key, (title, hint, _choices) in ns['FIXES'].items():
+    for key, (title, hint, _choices) in ns.get('FIXES', {}).items():
         ns['FIXES'][key] = (title, hint, {})
     ns['version_tuple'] = version_key  # the launcher's update check compares with it
     for name in ('WINDOW_SIZES', 'ANTI_ALIASING'):
-        ns[name][:] = [(value, text.replace("(the games' own)", '(Default)').replace("(the game's own)", '(Default)'))
-                       for value, text in ns[name]]
-    ns['FRAME_RATES'][:] = [(value, '60 FPS (Default)' if value == '60' else text) for value, text in ns['FRAME_RATES']]
-    if not any(value == '30' for value, _text in ns['FRAME_RATES']):
-        ns['FRAME_RATES'].insert(0, ('30', '30 FPS'))
-    if not any(value == '1280x800' for value, _text in ns['WINDOW_SIZES']):
+        if name in ns:
+            ns[name][:] = [(value, text.replace("(the games' own)", '(Default)').replace("(the game's own)", '(Default)'))
+                           for value, text in ns[name]]
+    if 'FRAME_RATES' in ns:
+        ns['FRAME_RATES'][:] = [(value, '60 FPS (Default)' if value == '60' else text) for value, text in ns['FRAME_RATES']]
+        if not any(value == '30' for value, _text in ns['FRAME_RATES']):
+            ns['FRAME_RATES'].insert(0, ('30', '30 FPS'))
+        if not any(value == '45' for value, _text in ns['FRAME_RATES']):
+            if any(value == '60' for value, _text in ns['FRAME_RATES']):
+                index = next(i for i, (value, _text) in enumerate(ns['FRAME_RATES']) if value == '60')
+            elif any(value == '30' for value, _text in ns['FRAME_RATES']):
+                index = next(i for i, (value, _text) in enumerate(ns['FRAME_RATES']) if value == '30') + 1
+            else:
+                index = 0
+            ns['FRAME_RATES'].insert(index, ('45', '45 FPS'))
+    if 'WINDOW_SIZES' in ns and not any(value == '1280x800' for value, _text in ns['WINDOW_SIZES']):
         ns['WINDOW_SIZES'].insert(1, ('1280x800', '1280 × 800 (Steam Deck)'))
 
 
@@ -449,7 +459,7 @@ def default_saves(settings, data_dir=None):
 DECK_SETTINGS = {'frame_rate': '60', 'window_size': '1280x800', 'present_mode': 'Fifo', 'fullscreen': True,
                  'anti_aliasing': 'off', 'frame_generation': 'off'}
 DECK_LOCKED = ('window_size', 'present_mode', 'fullscreen')
-DECK_FRAME_RATES = ('30', '60')  # 60 by default (owner's decision, 2026-10-18); 30 stays selectable
+DECK_FRAME_RATES = ('30', '45', '60')  # 60 by default (owner's decision, 2026-10-18); 30 and 45 stay selectable
 # Choices the Deck's hardware cannot run (an RDNA 2 GPU, a 60 Hz screen): greyed out in Steam
 # Deck mode, and replaced by these settings' first Deck-safe value at launch.
 DECK_UNAVAILABLE = {'anti_aliasing': ('fsr4', 'fsr411', 'dlss'), 'frame_generation': ('dlss',),
@@ -482,7 +492,7 @@ def deck_allows(key, value):
 
 
 def deck_environment(settings, env):
-    """Steam Deck mode: the Deck's screen and presentation, 30 or 60 FPS, and nothing its GPU
+    """Steam Deck mode: the Deck's screen and presentation, 30, 45 or 60 FPS, and nothing its GPU
     cannot run. Applied before the player's own Environment entries, which can override any of it.
     The GPU readbacks choice was removed (Off made Uncharted 2's convoy unpassable, Precise hangs
     Uncharted 2 at startup), so a gpu_readbacks value saved by an older launcher is ignored."""
@@ -928,7 +938,7 @@ def launcher_class(base, ns):
 
         def steam_deck_changed(self, startup=False):
             """Steam Deck mode on: the affected settings switch to the Deck's values (the previous ones
-            are kept in deck_saved), the enforced ones are locked, the frame rate is 30 or 60 and the
+            are kept in deck_saved), the enforced ones are locked, the frame rate is 30, 45 or 60 and the
             choices the Deck cannot run are greyed out. Off: the kept values come back."""
             on = bool(self.var('steam_deck').get())
             saved = self.app.get('deck_saved')
@@ -936,7 +946,7 @@ def launcher_class(base, ns):
                 self.app['deck_saved'] = {key: self.var(key).get() for key in DECK_SETTINGS}
                 for key, value in DECK_SETTINGS.items():
                     if key == 'frame_rate' and self.var(key).get() in DECK_FRAME_RATES:
-                        continue  # 30 or 60 already: the player's choice stays
+                        continue  # 30, 45 or 60 already: the player's choice stays
                     self.var(key).set(value)
             elif not on and isinstance(saved, dict):
                 for key, value in saved.items():
