@@ -46,17 +46,6 @@ def steam_deck():
         return False
 
 
-def deck_frame_rate():
-    """Steam Deck mode's default frame rate: 60 on every handheld (owner's decision,
-    2026-10-18). Measured on the Legion Go 8APU1: U1 57-59, U2 and
-    U3 60 FPS at 1280x800, anti-aliasing off, 20 W. Not measured on the Steam Deck (a weaker GPU)
-    or the ROG Flow Z13. 30 stays selectable, and a saved choice is kept."""
-    return '60'
-
-
-DECK_FRAME_RATES = ('30', '60')
-
-
 def clean_env():
     """The environment for programs outside this one: a frozen launcher (PyInstaller) points
     LD_LIBRARY_PATH at its own libraries, which xdg-open or Steam must not get."""
@@ -417,7 +406,7 @@ def version_key(text):
 
 def apply_defaults(ns):
     """Linux settings the Windows launcher does not have: Steam Deck mode (on by default on
-    SteamOS) and a 30 FPS choice in the frame rate list."""
+    SteamOS) and a 30 FPS frame rate."""
     ns['APP_DEFAULTS'].setdefault('steam_deck', steam_deck())
     # No Fixes page: each fix stays automatic (run.py turns it on where it helps), whatever an
     # earlier version saved for it.
@@ -446,10 +435,10 @@ def default_saves(settings, data_dir=None):
 
 # Steam Deck mode shows its values in these settings while it is on (deck_environment enforces
 # the locked ones at launch); turning it off restores what the player had.
-DECK_SETTINGS = {'frame_rate': '60', 'window_size': '1280x800', 'present_mode': 'Fifo', 'fullscreen': True,
+DECK_SETTINGS = {'frame_rate': '30', 'window_size': '1280x800', 'present_mode': 'Fifo', 'fullscreen': True,
                  'anti_aliasing': 'off', 'frame_generation': 'off'}
 DECK_LOCKED = ('window_size', 'present_mode', 'fullscreen')
-DECK_FRAME_RATES = ('30', '60')  # 60 by default (owner's decision, 2026-10-18); 30 stays selectable
+DECK_FRAME_RATES = ('30', '60')  # 30 by default: the Deck does not hold 60 yet
 # Choices the Deck's hardware cannot run (an RDNA 2 GPU, a 60 Hz screen): greyed out in Steam
 # Deck mode, and replaced by these settings' first Deck-safe value at launch.
 DECK_UNAVAILABLE = {'anti_aliasing': ('fsr4', 'fsr411', 'dlss'), 'frame_generation': ('dlss',),
@@ -472,6 +461,18 @@ ROW_HINTS = {'Frame rate': None,
 def unsaved_changes(saved, current):
     """The settings whose value in the launcher differs from the saved one."""
     return sorted(key for key in current if current[key] != saved.get(key))
+
+
+def deck_frame_rate_30(saved):
+    """Steam Deck mode's default became 30 FPS (it was 60, which the Deck does not hold yet): saved
+    settings from an older launcher switch to 30 once, even when the game starts from Steam without
+    the launcher window. 60 can be chosen again. Returns True when `saved` changed."""
+    if not saved or saved.get('deck_30fps'):
+        return False
+    saved['deck_30fps'] = True
+    if saved.get('steam_deck') and str(saved.get('frame_rate')) == '60':
+        saved['frame_rate'] = '30'
+    return True
 
 
 def deck_allows(key, value):
