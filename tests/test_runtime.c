@@ -11,6 +11,11 @@ void runtime_restart(void) { abort(); }
 #include <pthread.h>
 #include <stdatomic.h>
 #include <time.h>
+#ifndef _WIN32
+#include <errno.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#endif
 
 typedef int (ABI *Register)(GuestCallback);
 typedef int (ABI *RegisterCxa)(void (ABI *)(void *), void *, void *);
@@ -202,6 +207,116 @@ static void direct_memory(void) {
     assert(*(uint64_t *)x==0); /* released allocation does not leak previous data */
     assert(release(a,length)==0); /* release also unmaps owned mapping */
 }
+#ifndef _WIN32
+/* Linux uses sparse backing: exercise the reported multi-GiB layout without committing
+ * GiB of RAM. mincore checks host mappings as well as the runtime's VMA table; residency
+ * bits are deliberately ignored. Windows commits direct allocations eagerly. */
+static void mapped_range(uintptr_t address, uint64_t size) {
+    long page=sysconf(_SC_PAGESIZE);
+    assert(page>0);
+    unsigned char *vec=malloc((size+page-1)/page);
+    assert(vec);
+    assert(runtime_memory_is_mapped(address,size));
+    assert(mincore((void *)address,size,vec)==0);
+    free(vec);
+}
+static void unmapped_page(uintptr_t address) {
+    unsigned char vec;
+    assert(!runtime_memory_is_mapped(address,16384));
+    errno=0;
+    assert(mincore((void *)address,1,&vec)==-1 && errno==ENOMEM);
+}
+static void direct_memory_large_layout(void) {
+    Allocate alloc=GET(Allocate,"rTXw65xmLIA#p#J");
+    Map map=GET(Map,"L-Q3LEjIbgA#p#J");
+    Unmap unmap=GET(Unmap,"cQke9UuBQOk#p#J");
+    Release release=GET(Release,"MBuItvba6z8#p#J");
+    typedef uint64_t (ABI *DirectSize)(void);
+    typedef int32_t (ABI *Flexible)(void **,uint64_t,int,int);
+    Flexible flexible=GET(Flexible,"IWIBBdTHit4#p#J");
+    const uint64_t page=16384, pool=GET(DirectSize,"pO96TwzOm5E#p#J")();
+    /* Illustrative first block fills the retail pool alongside the reported second block. */
+    const uint64_t first_size=UINT64_C(0x7d400000), second_size=UINT64_C(0xbec00000);
+    const uintptr_t first=UINT64_C(0x1000000000), second=UINT64_C(0x1100000000);
+    const uintptr_t end=second+second_size, fault=UINT64_C(0x11cff83f88);
+    const uintptr_t probe=fault & ~(uintptr_t)(page-1), cut=second+page;
+    int64_t a=-1,b=-1,reused=-1;
+    assert(alloc(0,pool,first_size,page,0,&a)==0 && a==0);
+    assert(alloc(0,pool,second_size,page,0,&b)==0 && b==(int64_t)first_size);
+    void *x=(void *)first,*y=(void *)second;
+    assert(map(&x,first_size,3,0x10,a,0)==0 && (uintptr_t)x==first);
+    assert(map(&y,second_size,3,0x10,b,0)==0 && (uintptr_t)y==second);
+    mapped_range(first,first_size); mapped_range(second,second_size);
+    assert(fault-end==UINT64_C(0x11383f88));
+    unmapped_page(probe); /* Neither reported block promises backing here. */
+
+    /* A hint inside block two must move past its full end. Alignment chooses
+     * the address; it must not shrink a mapping shorter than that alignment. */
+    void *hint=(void *)(second+page);
+    assert(map(&hint,page,3,0,a,2097152)==0 && (uintptr_t)hint==end);
+    mapped_range(second,second_size+page);
+    assert(unmap(hint,page)==0);
+    mapped_range(second,second_size); unmapped_page(end);
+
+    /* Model a separate mapping after block two, aliasing a page in block one. */
+    void *tail=(void *)probe;
+    assert(map(&tail,page,3,0x10,a,0)==0 && (uintptr_t)tail==probe);
+    *(volatile uint64_t *)first=UINT64_C(0x123456789abcdef0);
+    mapped_range(probe,page);
+    assert(*(volatile uint64_t *)probe==UINT64_C(0x123456789abcdef0));
+
+    /* Unmap and remap a page, then replace a larger interval. Both surviving
+     * sides must retain host mappings even after several VMA splits. */
+    assert(unmap((void *)cut,page)==0);
+    unmapped_page(cut);
+    mapped_range(second,page); mapped_range(cut+page,second_size-2*page);
+    y=(void *)cut;
+    assert(map(&y,page,3,0x10,b+page,0)==0);
+    y=(void *)cut;
+    assert(map(&y,3*page,3,0x10,b+page,0)==0);
+    mapped_range(second,second_size); mapped_range(probe,page);
+
+    /* A flexible replacement straddles the end of block two, then disappears.
+     * Only the explicitly replaced direct page should be missing. */
+    void *f=(void *)(end-page);
+    assert(flexible && flexible(&f,2*page,3,0x10)==0 && (uintptr_t)f==end-page);
+    mapped_range(second,second_size+page); mapped_range(probe,page);
+    assert(unmap(f,2*page)==0);
+    mapped_range(second,second_size-page); unmapped_page(end-page);
+    mapped_range(probe,page);
+    y=(void *)(end-page);
+    assert(map(&y,page,3,0x10,b+second_size-page,0)==0);
+
+    /* Releasing a physical subrange removes just its virtual aliases. Reuse
+     * does not implicitly remap it; explicitly map it back at the same address. */
+    assert(release(b+page,page)==0);
+    unmapped_page(cut);
+    mapped_range(second,page); mapped_range(cut+page,second_size-2*page);
+    mapped_range(probe,page);
+    assert(alloc(b+page,b+2*page,page,page,0,&reused)==0 && reused==b+(int64_t)page);
+    unmapped_page(cut);
+    y=(void *)cut;
+    assert(map(&y,page,3,0x10,reused,0)==0);
+    mapped_range(second,second_size); mapped_range(first,first_size);
+    mapped_range(probe,page);
+    assert(*(volatile uint64_t *)probe==UINT64_C(0x123456789abcdef0));
+    assert(unmap(tail,page)==0);
+    assert(release(a,first_size)==0 && release(b,second_size)==0);
+    unmapped_page(first); unmapped_page(second); unmapped_page(probe);
+
+    /* The advertised pool, including its very last page, is allocatable and
+     * mappable. GPU VRAM size does not enter the Linux memfd sizing path. */
+    assert(alloc(0,pool,pool,page,0,&a)==0 && a==0);
+    x=(void *)UINT64_C(0x2000000000);
+    assert(map(&x,pool,3,0,a,0)==0);
+    mapped_range((uintptr_t)x,pool);
+    uintptr_t last=(uintptr_t)x+pool-page;
+    *(volatile uint64_t *)last=UINT64_C(0xabcdef0123456789);
+    assert(*(volatile uint64_t *)last==UINT64_C(0xabcdef0123456789));
+    assert(release(a,pool)==0);
+    unmapped_page(last);
+}
+#endif
 static void memory_primitives(void) {
     typedef void *(ABI *Set)(void *,int,size_t);
     typedef void *(ABI *Copy)(void *,const void *,size_t);
@@ -384,10 +499,20 @@ int main(int argc,char **argv) {
     if (argc>1 && !strcmp(argv[1],"--stack-failure")) {
         GET(GuestCallback,"Ou3iL1abvng#p#J")(); return 99;
     }
+#ifndef _WIN32
+    if (argc>1 && !strcmp(argv[1],"--direct-memory-large-layout")) {
+        direct_memory_large_layout();
+        puts("PASS: large direct mappings, neighbouring replacements, release/reuse and advertised pool");
+        return 0;
+    }
+#endif
     if (argc>1 && !strcmp(argv[1],"--rwlock-lifecycle")) { rw_lifecycle(); return 0; }
     if (argc>1 && !strcmp(argv[1],"--rwlock-concurrency")) { rw_concurrency(); return 0; }
     if (argc>1 && !strcmp(argv[1],"--rwlock-timeouts")) { rw_timeouts(); return 0; }
     libc_support(); posix_mutexes(); wall_time(); exit_handlers(); guards(); mutexes(); direct_memory(); memory_primitives();
+#ifndef _WIN32
+    direct_memory_large_layout();
+#endif
     rw_lifecycle(); rw_concurrency(); rw_timeouts(); guest_fpu_state();
     puts("PASS: callback lifecycle, guard ABI, mutex errors, shared direct memory, memory primitives, resolver scope, guest thread and fiber FPU state");
     return 0;
