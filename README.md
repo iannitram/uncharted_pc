@@ -69,7 +69,6 @@ Once your game folder has been specified: Play, Add to Steam (recommended for St
 - Trophies: the games' own trophy lists in the launcher, and a notice in the game when you earn one.
 - Button prompts for keyboard and mouse, Xbox or PlayStation controllers; controller vibration settings.
 - Cheats page (infinite health and ammo per game), launcher languages, your own covers and Steam art.
-- A Fixes page for fixes that cost speed: Automatic turns each one on only where it helps.
 - Add to Steam and desktop shortcuts from the launcher, automatic updates.
 
 ## System Requirements

@@ -48,6 +48,8 @@ def fix_defaults(player_env, exe):
             result['BB_SCALAR_COPY64_SYNC'] = '2'
             result['BB_SCALAR_COPY64_DEFER'] = '1'
     elif exe == EXECUTABLES['u3']:
+        if 'BB_GPU_MERGE' not in player_env:
+            result['BB_GPU_MERGE'] = '0'
         if 'BB_TINY_READBACK' not in player_env:
             result['BB_TINY_READBACK'] = '0'
         if 'BB_SCALAR_COPY64_SYNC' not in player_env:

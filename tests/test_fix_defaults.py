@@ -34,7 +34,7 @@ class FixDefaults(unittest.TestCase):
 
     def test_uncharted_3_keeps_the_copies_off_because_they_cost_94_to_54_fps(self):
         self.assertEqual(run.fix_defaults(frozen(), U3),
-                         {'BB_TINY_READBACK': '0', 'BB_SCALAR_COPY64_SYNC': '0',
+                         {'BB_GPU_MERGE': '0', 'BB_TINY_READBACK': '0', 'BB_SCALAR_COPY64_SYNC': '0',
                           'BB_SCALAR_COPY64_DEFER': '0'})
 
     def test_a_copy_setting_the_player_chose_removes_both_copy_defaults(self):
