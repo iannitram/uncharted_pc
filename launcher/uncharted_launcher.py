@@ -81,11 +81,25 @@ FRAME_RATES = [('30', '30 FPS'), ('60', '60 FPS (as on PS4)'), ('120', '120 FPS'
 # The window (or the screen in fullscreen) shows the game's picture at its size: FSR 1 (EASU) or
 # bilinear when the picture is smaller, then RCAS sharpening (BB_RCAS_ATTENUATION, lower is sharper).
 WINDOW_SIZES = [('1280x720', '1280 × 720'), ('1600x900', '1600 × 900'),
-                ('1920x1080', '1920 × 1080'), ('2560x1440', '2560 × 1440'),
-                ('3840x2160', '3840 × 2160 (4K)'), ('2560x1080', '2560 × 1080 (21:9)'),
-                ('3440x1440', '3440 × 1440 (21:9)'), ('3840x1600', '3840 × 1600 (21:9)'),
-                ('5120x1440', '5120 × 1440 (32:9)')]
-# The size the games themselves render and show (BB_GAME_RES: run.py, src/runtime_display.c): a real
+                ('1920x1080', "1920 × 1080 (the games' own)"), ('2560x1440', '2560 × 1440'),
+                ('3840x2160', '3840 × 2160 (4K)'),
+                ('2560x1080', '2560 × 1080 (21:9)'), ('3440x1440', '3440 × 1440 (21:9)'),
+                ('3840x1600', '3840 × 1600 (21:9)'), ('5120x1440', '5120 × 1440 (32:9)')]
+# Render resolution (BB_RESOLUTION; run.py, scripts/render_res.py, after BilalReloaded's Uncharted
+# PC port): the games' display settings and memory table are patched for it, and the
+# anti-aliasing runs at it. Drake's Fortune renders at most 2880 x 1620 (its memory layout).
+# Upscaling presets (BB_UPSCALE_QUALITY; run.py): the resolution above is the output, the game
+# draws at it divided by the scale and the anti-aliasing chosen (DLSS, FSR 4, FSR 3.1; TAA with
+# FSR 1) brings each frame up to it; the HUD and menus are drawn at the output size.
+UPSCALE_PRESETS = [('off', 'Native (anti-aliasing only: Native AA / DLAA)'), ('quality', 'Quality (× 1.5)'),
+                   ('balanced', 'Balanced (× 1.7)'), ('performance', 'Performance (× 2)'),
+                   ('ultra', 'Ultra Performance (× 3)')]
+RENDER_RESOLUTIONS = [('1280x720', '1280 × 720'), ('1600x900', '1600 × 900'),
+                      ('1920x1080', "1920 × 1080 (the games' own)"), ('2560x1440', '2560 × 1440'),
+                      ('2880x1620', '2880 × 1620'), ('3200x1800', '3200 × 1800'),
+                      ('3840x2160', '3840 × 2160 (4K; Drake\'s Fortune 1620p)')]
+# Upstream's BB_GAME_RES (run.py, src/runtime_display.c; not offered by the Linux fork's launcher,
+# which uses BB_RESOLUTION above). The size the games themselves render and show (BB_GAME_RES: run.py, src/runtime_display.c): a real
 # higher resolution, not an enlarged 1080p picture. The height here and the shape below make the
 # width; the games keep their memory for it, so the sizes stop where it runs out.
 RENDER_HEIGHTS = [('1080', "1080p (the games' own)"), ('1440', '1440p'), ('1620', '1620p'), ('2160', '2160p (4K)')]
@@ -101,17 +115,24 @@ SCALERS = [('fsr1', 'FSR 1 (AMD FidelityFX, sharp)'), ('bilinear', 'Smooth (bili
 SHARPENING = [('off', 'Off'), ('1000', 'Low'), ('500', 'Medium'), ('250', 'High'), ('0', 'Maximum')]
 # Temporal anti-aliasing at the games' 1920x1080 (BB_UPSCALER): it takes the scene before the
 # games' post-processing with their own motion vectors, so it replaces their edge smoothing.
-ANTI_ALIASING = [('off', "Off (the game's own)"), ('taa', 'TAA'), ('fsr3', 'AMD FSR 3.1 (Native AA)'),
-                 ('fsr4', 'AMD FSR 4 (Native AA)'), ('dlss', 'NVIDIA DLSS (DLAA, GeForce RTX)')]
-FSR411 = ('fsr411', 'AMD FSR 4.1.1 (Native AA)')
-XESS = ('xess', 'Intel XeSS (Native AA, any GPU)')
+# The upscaler (Display -> Upscaling): BB_UPSCALER for the temporal ones (FSR 3.1, FSR 4, DLSS,
+# and TAA, anti-aliasing only), FSR 1 (spatial: BB_FSR1, the frame alone) or off. With the Native
+# quality they only smooth edges at the resolution (Native AA, DLAA).
+ANTI_ALIASING = [('off', "Off (the game's own anti-aliasing)"), ('taa', 'TAA (anti-aliasing only)'),
+                 ('fsr1', 'AMD FSR 1 (spatial)'), ('fsr3', 'AMD FSR 3.1'), ('fsr4', 'AMD FSR 4'),
+                 ('dlss', 'NVIDIA DLSS (GeForce RTX)')]
+FSR411 = ('fsr411', 'AMD FSR 4.1.1')
+XESS = ('xess', 'Intel XeSS (any GPU)')
 AA_SHARPNESS = [('0', 'Off'), ('0.2', 'Low'), ('0.4', 'Medium'), ('0.7', 'High')]
+# The same levels for FSR 1's RCAS (SHARPENING's attenuations).
+RCAS_FOR_SHARPNESS = {'0': 'off', '0.2': '1000', '0.4': '500', '0.7': '250'}
 # Frames generated between two of the game's (BB_FRAME_GEN, BB_FRAME_GEN_MULTIPLIER).
 FRAME_GENERATION = [('off', 'Off'), ('fsr3', 'AMD FSR 3 Frame Generation (any GPU)'),
                     ('dlss', 'NVIDIA DLSS Frame Generation (GeForce RTX 40/50)')]
 BUTTON_PROMPTS = [('auto', 'Automatic (follows the device you used last)'),
                   ('keyboard', 'Keyboard and mouse keys'), ('xbox', 'Xbox buttons'),
-                  ('0', "PlayStation buttons (the game's own)")]
+                  ('0', "PlayStation buttons (the game's own)"),
+                  ('steamdeck', 'Steam Deck / Steam Controller buttons')]
 FRAME_GEN_MULTIPLIERS = [('2', '2× (one generated frame)'), ('3', '3× (DLSS on GeForce RTX 50)'),
                          ('4', '4× (DLSS on GeForce RTX 50)')]
 # Controls (input.ini, read by the game: src/runtime_pad.c). Actions with their PS4 names, the
@@ -207,8 +228,10 @@ RESERVED_KEYS = {'Insert': 'Insert opens the in-game settings menu.',
                  'Alt_L': 'Left Alt frees the mouse cursor while held.'}
 
 APP_DEFAULTS = {'game_dir': '', 'game_dir_u1': '', 'game_dir_u2': '', 'game_dir_u3': '', 'user_dir': '', 'start': 'u1', 'language': '1', 'ui_language': '', 'player_name': '',
-                'fullscreen': False, 'present_mode': 'Mailbox', 'frame_rate': '60', 'show_fps': False,
-                'window_size': '1920x1080', 'render_height': '1080', 'aspect': '16:9', 'speakers': 'auto', 'scaler': 'fsr1', 'sharpening': '500',
+                'trophies': True, 'fullscreen': False, 'present_mode': 'Mailbox', 'frame_rate': '60', 'show_fps': False,
+                'window_size': '1920x1080', 'render_resolution': '1920x1080', 'upscale_preset': 'off',
+                'render_height': '1080', 'aspect': '16:9', 'speakers': 'auto', 'scaler': 'fsr1',
+                'sharpening': '500',
                 'anti_aliasing': 'off', 'aa_sharpness': '0.2', 'frame_generation': 'off',
                 'frame_gen_multiplier': '2', 'extra_env': '', 'close_on_play': False,
                 'mouse_look': True, 'mouse_sensitivity': '1.0', 'mouse_invert_y': False,
@@ -601,30 +624,31 @@ def game_environment(s, start=None):
     env['BB_WINDOW_SIZE'] = str(s.get('window_size') or '1920x1080')
     if str(s.get('speakers') or 'auto') != 'auto':
         env['BB_SPEAKERS'] = str(s['speakers'])
-    resolution = game_resolution(s, screen_size())
-    if resolution:
-        env['BB_GAME_RES'] = resolution
-    window = parse_size(s.get('window_size'))
-    if not s.get('fullscreen') and resolution and window and s.get('aspect', '16:9') != '16:9':
-        shape = parse_size(resolution)
-        # A window of another shape than the picture would show bars: keep its height, take the picture's width.
-        env['BB_WINDOW_SIZE'] = f'{round(window[1] * shape[0] / shape[1] / 2) * 2}x{window[1]}'
-    env['BB_FSR1'] = '1' if s.get('scaler', 'fsr1') == 'fsr1' else '0'
-    sharpening = str(s.get('sharpening') or 'off')
+    env['BB_RESOLUTION'] = str(s.get('render_resolution') or '1920x1080')
+    upscaler = str(s.get('anti_aliasing') or 'off')
+    # No upscaler: the games draw at the resolution (a quality has nothing to upscale with).
+    env['BB_UPSCALE_QUALITY'] = str(s.get('upscale_preset') or 'off') if upscaler != 'off' else 'off'
+    # FSR 1: the upscaler chosen, or the window scaling (a window larger than the picture).
+    env['BB_FSR1'] = '1' if upscaler == 'fsr1' or s.get('scaler', 'fsr1') == 'fsr1' else '0'
+    # One sharpness for every upscaler: the temporal ones' own (BB_FSR_SHARPNESS) and FSR 1's
+    # RCAS pass (BB_RCAS_ATTENUATION in thousandths of a stop, lower is sharper).
+    sharpness = str(s.get('aa_sharpness') or '0')
+    sharpening = RCAS_FOR_SHARPNESS.get(sharpness, 'off')
     env['BB_RCAS'] = '0' if sharpening == 'off' else '1'
     if sharpening != 'off':
         env['BB_RCAS_ATTENUATION'] = sharpening
-    env['BB_UPSCALER'] = str(s.get('anti_aliasing') or 'off')
+    env['BB_UPSCALER'] = 'off' if upscaler == 'fsr1' else upscaler
     env['BB_FSR_SHARPNESS'] = str(s.get('aa_sharpness') or '0')
     env['BB_FRAME_GEN'] = str(s.get('frame_generation') or 'off')
     env['BB_FRAME_GEN_MULTIPLIER'] = str(s.get('frame_gen_multiplier') or '2')
+    if not WINDOWS:  # Linux fork: Steam Deck mode, before the player's own variables
+        uncharted_linux.deck_environment(s, env)
     for key, (_title, _hint, choices) in FIXES.items():
         env.update(choices.get(str(s.get(key) or 'auto'), {}))
     env['BB_BUTTON_PROMPTS'] = str(s.get('button_prompts') or 'auto')
+    env['BB_TROPHIES'] = '1' if s.get('trophies', True) else '0'
     env['BB_CHEATS'] = ','.join(f'{game}:{cheat}' for game, _t, _s, _e in GAMES for cheat in ('health', 'ammo')
                                 if s.get(f'{game}_infinite_{cheat}'))
-    if not WINDOWS:  # Linux fork: Steam Deck mode, before the player's own variables
-        uncharted_linux.deck_environment(s, env)
     for item in str(s['extra_env']).split():
         if '=' in item:
             key, value = item.split('=', 1)
@@ -1055,7 +1079,8 @@ class Launcher:
         head = tk.Frame(shell, bg=SURFACE)
         head.pack(fill='x', padx=self.px(26), pady=(self.px(18), self.px(14)))
         tk.Label(head, text=title, bg=SURFACE, fg=TEXT, font=self.font_title).pack(anchor='w')
-        tk.Label(head, text=subtitle, bg=SURFACE, fg=MUTED, font=self.font_ui).pack(anchor='w', pady=(2, 0))
+        if subtitle:
+            tk.Label(head, text=subtitle, bg=SURFACE, fg=MUTED, font=self.font_ui).pack(anchor='w', pady=(2, 0))
         # The page body scrolls when it is taller than the window (Display holds many options).
         body = tk.Frame(shell, bg=SURFACE)
         body.pack(fill='both', expand=True)
@@ -1186,8 +1211,9 @@ class Launcher:
 
     def nav_pages(self):
         """The sidebar's pages (Linux fork: a subclass adds its own)."""
-        return [('play', _('Play')), ('game', _('Game')), ('display', _('Display')),
-                ('controls', _('Controls')), ('advanced', _('Advanced')), ('log', _('Log'))]
+        return [('play', _('Play')), ('game', _('Game')), ('cheats', _('Cheats')), ('display', _('Display')),
+                ('controls', _('Controls')), ('fixes', _('Fixes')), ('trophies', _('Trophies')),
+                ('advanced', _('Advanced')), ('log', _('Log'))]
 
     def _nav_style(self, name, active=False, hover=False):
         if active:
@@ -1473,29 +1499,28 @@ class Launcher:
             hint += ' ' + _('Your display runs at {} Hz.').format(refresh)
         self.row(f, _('Frame rate'), self.choice(f, 'frame_rate', FRAME_RATES, 34), hint)
         self.section(f, _('Resolution'))
-        self.row(f, _('Render resolution'), self.choice(f, 'render_height', RENDER_HEIGHTS, 34),
-                 _('The size the games draw at, so a 1440p or 4K screen gets a sharper picture, not an enlarged '
-                   '1080p one. It needs more graphics memory and a faster GPU; the games\' GPU memory limits the '
-                   'largest size.'))
-        self.row(f, _('Aspect ratio'), self.choice(f, 'aspect', ASPECTS, 34),
-                 _('Ultrawide screens: the games draw a wider view (more at the sides) instead of stretching the '
-                   '16:9 picture. "The shape of the window or screen" follows the window size below, or the '
-                   'screen in fullscreen.'))
+        self.row(f, _('Resolution'), self.choice(f, 'render_resolution', RENDER_RESOLUTIONS, 34),
+                 _('The size of the picture (the PS4: 1920 × 1080); set your screen\'s. With the Native '
+                   'quality the games draw at it: above 1080p that needs a faster GPU and more video '
+                   'memory. Drake\'s Fortune draws at most 2880 × 1620 and is upscaled from there. The '
+                   'first start at a new size prepares the game again.'))
         self.row(f, _('Window size'), self.choice(f, 'window_size', WINDOW_SIZES, 34),
-                 _('The window the picture is shown in; fullscreen uses the screen. A picture of another size is '
-                   'scaled to fit (FSR 1 below when it is enlarged).'))
-        self.row(f, _('Upscaling'), self.choice(f, 'scaler', SCALERS, 34),
-                 _('FSR 1 keeps edges sharp when the image is enlarged; bilinear is softer.'))
-        self.row(f, _('Sharpening'), self.choice(f, 'sharpening', SHARPENING, 34),
-                 _('AMD RCAS after FSR 1 (only while the image is enlarged).'))
-        self.section(f, _('Anti-aliasing'))
+                 _('The picture is scaled to the window (or the screen in fullscreen). Pick the same '
+                   'size as the resolution for a sharp 1:1 picture.'))
+        self.section(f, _('Upscaling'))
         modes = ANTI_ALIASING + ([FSR411] if fsr411_assets() else []) + ([XESS] if xess_available() else [])
-        self.row(f, _('Anti-aliasing'), self.choice(f, 'anti_aliasing', modes, 34),
-                 _('Temporal anti-aliasing at the games\' 1920 × 1080, with their own motion vectors: '
-                   'smoother edges and less shimmering than the games\' own. DLSS needs a GeForce RTX; '
-                   'FSR 4 runs best on a Radeon RX 7000/9000 or a GeForce RTX 40/50. '
-                   'Intel XeSS runs on any GPU (best on Intel Arc).'))
-        self.row(f, _('Anti-aliasing sharpness'), self.choice(f, 'aa_sharpness', AA_SHARPNESS, 34))
+        self.row(f, _('Upscaler'), self.choice(f, 'anti_aliasing', modes, 34),
+                 _('DLSS, FSR 4 and FSR 3.1 rebuild each frame with the games\' depth and motion: they '
+                   'smooth edges and, below Native, draw fewer pixels and rebuild the resolution. DLSS '
+                   'needs a GeForce RTX; FSR 4 runs best on a Radeon RX 7000/9000 or a GeForce RTX 40/50. '
+                   'FSR 1 enlarges the frame alone (sharp but no anti-aliasing); TAA only smooths edges.'))
+        self.row(f, _('Quality'), self.choice(f, 'upscale_preset', UPSCALE_PRESETS, 34),
+                 _('Native draws at the resolution (anti-aliasing only: Native AA, DLAA). Quality draws '
+                   'at ÷ 1.5 (1440p: 1712 × 960), Balanced ÷ 1.7, Performance ÷ 2, Ultra Performance ÷ 3. '
+                   'The HUD and menus stay at the resolution.'))
+        self.row(f, _('Sharpness'), self.choice(f, 'aa_sharpness', AA_SHARPNESS, 34),
+                 _('For every upscaler: DLSS, FSR 4 and FSR 3.1 sharpen their result, FSR 1 adds AMD '
+                   'RCAS after it enlarges the picture.'))
         self.section(f, _('Frame generation'))
         hint = _('Frames made between two of the game\'s, for smoother motion: 60 FPS shows as 120. '
                  'Use Mailbox or Immediate presentation and a display of at least that refresh rate. '
@@ -1535,7 +1560,8 @@ class Launcher:
         self.row(f, _('Show in the game'), self.choice(f, 'button_prompts', BUTTON_PROMPTS, 40),
                  _('The pictures of buttons in menus and hints. Automatic shows your keys while you use '
                    'the keyboard or mouse, Xbox buttons after an Xbox (or other) controller, and the '
-                   'PlayStation buttons after a PlayStation controller.'))
+                   'PlayStation buttons after a PlayStation controller. Steam Deck buttons are the Xbox ones '
+                   'with A, B, X and Y in black and white; Steam Deck mode uses them in place of the Xbox ones.'))
 
         self.section(f, _('Keyboard and mouse buttons'))
         self.note(f, _('Click a box, then press a key or a mouse button (the wheel counts too). '
@@ -1720,9 +1746,9 @@ class Launcher:
     # ---- trophies ----------------------------------------------------------------------------
     def build_trophies(self):
         tk = self.tk
-        f = self.page('trophies', _('Trophies'),
-                      _("The games' own trophy lists. A trophy shows here, and as a notice in the game, "
-                        'when you earn it.'))
+        f = self.page('trophies', _('Trophies'), '')
+        self.check(f, 'trophies', _('Trophies'), _('Earn trophies while you play, with a notice in the game. '
+                                                   'Off: no trophies are earned or shown.'))
         self.trophy_game = self.app.get('trophy_game') if self.app.get('trophy_game') in dict(
             (k, 1) for k, _t, _s, _e in GAMES) else GAMES[0][0]
         self.trophy_filter = 'all'
@@ -1879,8 +1905,8 @@ class Launcher:
 
     def build_cheats(self):
         f = self.page('cheats', _('Cheats'), _('Each cheat only affects its own game; changes apply when the game starts.'))
-        for game, title, subtitle, _exe in GAMES:
-            self.section(f, f'{title} · {subtitle}')
+        for game, title, _subtitle, _exe in GAMES:
+            self.section(f, title)
             self.check(f, f'{game}_infinite_health', _('Infinite Health'))
             self.check(f, f'{game}_infinite_ammo', _('Infinite Ammo'))
 
@@ -2367,7 +2393,7 @@ class Launcher:
 
     def shortcut(self):
         """Configure the collection shortcut where the action happens."""
-        if not WINDOWS:  # Linux fork: a .desktop entry, no dialog
+        if not WINDOWS:
             try:
                 uncharted_linux.desktop_entry(__file__, PORT_DIR)
                 self.messagebox.showinfo(NAME, _('Shortcut created on the desktop.'))
@@ -2678,6 +2704,10 @@ def version_tuple(text):
 
 def latest_release():
     """(version, zip URL, page URL, notes) of the newest GitHub release; notes is its text."""
+    # A custom build (NO_UPDATE_CHECK in the package, e.g. the render resolution test build) is
+    # never replaced by an official release.
+    if (PORT_DIR / 'NO_UPDATE_CHECK').is_file():
+        raise OSError('updates are off in this custom build')
     request = urllib.request.Request(RELEASES_API, headers={'Accept': 'application/vnd.github+json',
                                                             'User-Agent': 'uncharted-launcher'})
     with urllib.request.urlopen(request, timeout=15) as response:
@@ -2760,6 +2790,12 @@ def main():
         shutil.rmtree(UPDATE_DIR, ignore_errors=True)  # what a finished update left behind
     if not WINDOWS:
         uncharted_linux.apply_defaults(globals())
+        saved = load_json(CONFIG_FILE, {})
+        if uncharted_linux.deck_frame_rate_30(saved):  # Linux fork: Steam Deck mode at 30 FPS
+            try:
+                CONFIG_FILE.write_text(json.dumps(saved, indent=2) + '\n', encoding='utf-8')
+            except OSError:
+                pass
     settings = {**APP_DEFAULTS, **load_json(CONFIG_FILE, {})}
     if not WINDOWS:  # Linux fork: an empty saves folder is <game folder>/Saves
         uncharted_linux.default_saves(settings, DATA_DIR)
@@ -2807,7 +2843,7 @@ def main():
                 uncharted_linux.add_font(font_path(name))
     import tkinter as tk
     from tkinter import filedialog, messagebox, ttk
-    try:  # drag and drop of images into the art dialogs, where tkinterdnd2 is installed
+    try:
         from tkinterdnd2 import TkinterDnD
         root = TkinterDnD.Tk()
     except (ImportError, tk.TclError):

@@ -46,17 +46,6 @@ def steam_deck():
         return False
 
 
-def deck_frame_rate():
-    """Steam Deck mode's default frame rate: 60 on every handheld (owner's decision,
-    2026-10-18). Measured on the Legion Go 8APU1: U1 57-59, U2 and
-    U3 60 FPS at 1280x800, anti-aliasing off, 20 W. Not measured on the Steam Deck (a weaker GPU)
-    or the ROG Flow Z13. 30 stays selectable, and a saved choice is kept."""
-    return '60'
-
-
-DECK_FRAME_RATES = ('30', '60')
-
-
 def clean_env():
     """The environment for programs outside this one: a frozen launcher (PyInstaller) points
     LD_LIBRARY_PATH at its own libraries, which xdg-open or Steam must not get."""
@@ -314,9 +303,6 @@ def steam_command(steam, launcher_file, game):
 
 
 REPO_URL = 'https://github.com/spacepepperoni/uncharted_Linux'
-# Crash reports go to upstream's tracker: the fork has no issues, and most crashes are in the
-# emulation shared with upstream.
-UPSTREAM_ISSUES = 'https://github.com/Supermedo/uncharted_pc/issues'
 
 
 def icon_image(name, size, color, background):
@@ -406,34 +392,6 @@ def crash_signature(log_path):
     return None, text
 
 
-def system_summary():
-    def read(path, key=None):
-        try:
-            for line in Path(path).read_text().splitlines():
-                if key is None or line.startswith(key):
-                    return line.split('=', 1)[-1].split(':', 1)[-1].strip().strip('"')
-        except OSError:
-            pass
-        return '?'
-    return (f"{read('/etc/os-release', 'PRETTY_NAME')}; CPU {read('/proc/cpuinfo', 'model name')}; "
-            f"{'Steam Deck' if steam_deck() else 'PC'}")
-
-
-def crash_report_url(signature, text):
-    """A new-issue link on upstream's tracker with the crash line, the system and the end of the
-    log (GitHub opens it pre-filled; nothing is sent until the player submits it)."""
-    import urllib.parse
-    run = next((line for line in text.splitlines() if line.startswith('Run: ')), 'Run: ?')
-    tail = '\n'.join(text.splitlines()[-45:])[-3500:]
-    body = (f'**Crash:** `{signature[:200]}`\n\n**Build:** Linux fork ({REPO_URL}), not the Windows '
-            f'release\n\n**{run}**\n\n**System:** {system_summary()}\n\n'
-            f'Please attach `last_run.log` from the saves folder (the launcher opened it) and say '
-            f'where in the game it happened.\n\n<details><summary>End of the log</summary>\n\n```\n'
-            f'{tail}\n```\n</details>\n')
-    query = urllib.parse.urlencode({'title': f'Crash (Linux): {signature[:90]}', 'body': body})
-    return f'{UPSTREAM_ISSUES}/new?{query}'
-
-
 def version_key(text):
     """A comparable form of this fork's versions: the upstream version padded to four parts,
     then the Linux build number ('0.4-linux.57' -> (0, 4, 0, 0, 57)). Joining all the digits, as
@@ -448,8 +406,12 @@ def version_key(text):
 
 def apply_defaults(ns):
     """Linux settings the Windows launcher does not have: Steam Deck mode (on by default on
-    SteamOS) and a 30 FPS choice in the frame rate list."""
+    SteamOS) and a 30 FPS frame rate."""
     ns['APP_DEFAULTS'].setdefault('steam_deck', steam_deck())
+    # No Fixes page: each fix stays automatic (run.py turns it on where it helps), whatever an
+    # earlier version saved for it.
+    for key, (title, hint, _choices) in ns['FIXES'].items():
+        ns['FIXES'][key] = (title, hint, {})
     ns['version_tuple'] = version_key  # the launcher's update check compares with it
     for name in ('WINDOW_SIZES', 'ANTI_ALIASING'):
         ns[name][:] = [(value, text.replace("(the games' own)", '(Default)').replace("(the game's own)", '(Default)'))
@@ -473,10 +435,10 @@ def default_saves(settings, data_dir=None):
 
 # Steam Deck mode shows its values in these settings while it is on (deck_environment enforces
 # the locked ones at launch); turning it off restores what the player had.
-DECK_SETTINGS = {'frame_rate': '60', 'window_size': '1280x800', 'present_mode': 'Fifo', 'fullscreen': True,
+DECK_SETTINGS = {'frame_rate': '30', 'window_size': '1280x800', 'present_mode': 'Fifo', 'fullscreen': True,
                  'anti_aliasing': 'off', 'frame_generation': 'off'}
 DECK_LOCKED = ('window_size', 'present_mode', 'fullscreen')
-DECK_FRAME_RATES = ('30', '60')  # 60 by default (owner's decision, 2026-10-18); 30 stays selectable
+DECK_FRAME_RATES = ('30', '60')  # 30 by default: the Deck does not hold 60 yet
 # Choices the Deck's hardware cannot run (an RDNA 2 GPU, a 60 Hz screen): greyed out in Steam
 # Deck mode, and replaced by these settings' first Deck-safe value at launch.
 DECK_UNAVAILABLE = {'anti_aliasing': ('fsr4', 'fsr411', 'dlss'), 'frame_generation': ('dlss',),
@@ -486,14 +448,31 @@ DECK_FALLBACK = {'anti_aliasing': 'off', 'frame_generation': 'off', 'frame_gen_m
 
 # The texts under upstream's settings rows, by row title: replaced, or None for none.
 ROW_HINTS = {'Frame rate': None,
-             'Window size': 'Game renders at 1920 x 1080 and is upscaled at higher resolutions',
-             'Upscaling': None, 'Sharpening': None, 'Anti-aliasing': None,
+             'Window size': 'Set it to the Resolution above for a sharp 1:1 picture',
+             'Resolution': "Your screen's resolution. Drake's Fortune draws at most 2880 x 1620",
+             'Upscaler': 'DLSS or FSR 4 for upscaling; FSR 1 only enlarges, TAA only smooths edges',
+             'Quality': 'Native: anti-aliasing only (DLAA). Quality 1.5x, Balanced 1.7x, Performance 2x, '
+                        'Ultra Performance 3x',
+             'Sharpness': 'For every upscaler, FSR 1 included (AMD RCAS)', 'Sharpening': None,
+             'Anti-aliasing': None,
              'Frame generation': None, 'Multiplier': None, 'Mouse sensitivity': None}
 
 
 def unsaved_changes(saved, current):
     """The settings whose value in the launcher differs from the saved one."""
     return sorted(key for key in current if current[key] != saved.get(key))
+
+
+def deck_frame_rate_30(saved):
+    """Steam Deck mode's default became 30 FPS (it was 60, which the Deck does not hold yet): saved
+    settings from an older launcher switch to 30 once, even when the game starts from Steam without
+    the launcher window. 60 can be chosen again. Returns True when `saved` changed."""
+    if not saved or saved.get('deck_30fps'):
+        return False
+    saved['deck_30fps'] = True
+    if saved.get('steam_deck') and str(saved.get('frame_rate')) == '60':
+        saved['frame_rate'] = '30'
+    return True
 
 
 def deck_allows(key, value):
@@ -517,6 +496,7 @@ def deck_environment(settings, env):
     env['BB_PRESENT_MODE'] = 'Fifo'      # gamescope paces FIFO best
     env['BB_FULLSCREEN'] = '1'
     env['BB_FRAME_STATS'] = '1'          # frame time breakdown in last_run.log (tuning the Deck)
+    env['BB_DECK_PROMPTS'] = '1'         # Xbox button pictures with black and white A B X Y
     for key, name in (('anti_aliasing', 'BB_UPSCALER'), ('frame_generation', 'BB_FRAME_GEN'),
                       ('frame_gen_multiplier', 'BB_FRAME_GEN_MULTIPLIER')):
         if not deck_allows(key, str(settings.get(key) or '')):
@@ -982,7 +962,7 @@ def launcher_class(base, ns):
 
         def nav_pages(self):
             return [('play', _('Library')), ('display', _('Settings')), ('controls', _('Controls')),
-                    ('cheats', _('Cheats')), ('fixes', _('Fixes')), ('trophies', _('Trophies')),
+                    ('cheats', _('Cheats')), ('trophies', _('Trophies')),
                     ('game', _('Files')), ('advanced', _('Advanced'))]
 
         def build_header(self):
@@ -1138,10 +1118,12 @@ def launcher_class(base, ns):
             extra = self.ttk.Entry(f, textvariable=self.var('extra_env'), width=60)
             self.row(f, _('Environment'), extra, _('Extra variables for the game, NAME=value separated by spaces.'))
             self.section(f, _('Logs and bug reports'))
-            self.note(f, _('Logs of the last 5 launcher and game runs. Create bug report saves them with your '
-                           'system details and settings as one zip file in Downloads, without your home folder or '
-                           'user name; nothing is uploaded. If the launcher window does not work, right-click '
-                           'Uncharted in the application menu and choose Create bug report.'), top=2)
+            self.note(f, _('Something wrong? Copy log for GitHub copies your system details and the last game '
+                           'log, without your home folder or user name. Paste it into a new issue in the Issues '
+                           'tab of the Uncharted Linux port on GitHub. Create bug report saves all logs of the '
+                           'last 5 runs as one zip file in Downloads instead; nothing is uploaded. If the '
+                           'launcher window does not work, right-click Uncharted in the application menu and '
+                           'choose Create bug report.'), top=2)
             card = self.target(f)
             self.health_label = self.ttk.Label(card, text='', style='Muted.TLabel', wraplength=self.px(680),
                                                justify='left')
@@ -1149,7 +1131,8 @@ def launcher_class(base, ns):
             self.show_health()
             holder = self.tk.Frame(card, bg=CARD)
             holder.grid(row=self.next_row(card), column=0, columnspan=2, sticky='w', pady=(12, 0))
-            self.pill(holder, _('Create bug report'), self.create_report, kind='primary').pack(side='left')
+            self.pill(holder, _('Copy log for GitHub'), self.copy_for_github, kind='primary').pack(side='left')
+            self.pill(holder, _('Create bug report'), self.create_report).pack(side='left', padx=(8, 0))
             self.pill(holder, _('Show the game log'), lambda: self.show('log')).pack(side='left', padx=(8, 0))
             self.pill(holder, _('Open the logs folder'),
                       lambda: open_path(uncharted_logs.log_dir(ns['DATA_DIR']))).pack(side='left', padx=(8, 0))
@@ -1162,6 +1145,20 @@ def launcher_class(base, ns):
             else:
                 text = _('No problems found in the recent logs.')
             self.health_label.configure(text=text, foreground=GOLD if found else MUTED)
+
+        def copy_for_github(self, intro=''):
+            """The log for the bug report form on the clipboard, then the form opened."""
+            self.collect()
+            text = uncharted_logs.issue_text(ns['DATA_DIR'], self.saves_folder(), self.app, ns['VERSION'],
+                                             crash_signature)
+            self.root.clipboard_clear()
+            self.root.clipboard_append(text)
+            self.root.update()  # hand the clipboard over now, not when the dialog closes
+            if self.messagebox.askyesno(NAME, intro + _('Your log is copied.\n\nOpen the Issues tab of the Uncharted '
+                                                        'Linux port on GitHub now? Fill in the form and paste the log '
+                                                        'into its Log field (Ctrl+V). Keep this launcher open until '
+                                                        'you have pasted it.')):
+                open_path(uncharted_logs.ISSUE_URL)
 
         def create_report(self):
             self.collect()
@@ -1286,9 +1283,6 @@ def launcher_class(base, ns):
             if name == 'display':
                 title, subtitle = _('Settings'), _('Display, graphics and the console.')
             f = super().page(name, title, subtitle)
-            if not subtitle:  # the heading's empty second line (page body -> canvas -> body -> shell)
-                head = f.master.master.master.winfo_children()[0]
-                head.winfo_children()[1].pack_forget()
             self.page_inner = getattr(self, 'page_inner', {})
             self.page_inner[name] = f
             if name == 'display':
@@ -1375,12 +1369,8 @@ def launcher_class(base, ns):
                 return
             self.app['reported_crash'] = key  # asked once per crashed run, whatever the answer
             self.collect()
-            if self.messagebox.askyesno(NAME, _('Uncharted stopped with:\n\n{}\n\nOpen a crash report on the Uncharted port\'s GitHub? '
-                                                'Your system details and the end of the log are filled in; nothing '
-                                                'is sent until you submit it. Please check its open issues for the '
-                                                'same crash first.').format(signature[:160])):
-                open_path(crash_report_url(signature, text))
-                open_path(self.saves_folder())
+            self.copy_for_github(_('Uncharted stopped with:\n\n{}\n\nPlease check the open issues for the same '
+                                   'crash first; nothing is sent until you submit the form.\n\n').format(signature[:160]))
 
         def saves_autofill(self):
             # Choosing a game folder fills in <folder>/Saves, unless the player chose a saves
@@ -1534,10 +1524,11 @@ def launcher_class(base, ns):
                 for config in configs:
                     bbport_steam.add_shortcut(config / 'shortcuts.vdf', name, exe, str(start_dir),
                                               str(icon) if icon.is_file() else '', options, match_options=True)
-                    try:  # library pictures from the player's own game folder
+                    try:  # library pictures: SteamGridDB's, else the player's own game folder's
                         import uncharted_art
-                        uncharted_art.steam_artwork(self.app['game_dir'], config / 'grid',
-                                                    bbport_steam.shortcut_id(f'"{exe}"', name))
+                        appid = bbport_steam.shortcut_id(f'"{exe}"', name)
+                        if not uncharted_art.steamgriddb_artwork(key, config / 'grid', appid):
+                            uncharted_art.steam_artwork(self.app['game_dir'], config / 'grid', appid)
                     except Exception:
                         pass
             except (OSError, ValueError) as error:

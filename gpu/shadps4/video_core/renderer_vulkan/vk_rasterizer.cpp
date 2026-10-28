@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2024-2026 shadPS4 Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <cmath>
+#include <mutex>
+#include <unordered_map>
 #include <array>
 #include <atomic>
 #include <chrono>
@@ -469,30 +472,18 @@ void Rasterizer::PrepareRenderState(const GraphicsPipeline* pipeline) {
     if (gbuffer_draw) {
         camera_motion->OnGBufferPass(db_desc.first);
     } else if (camera_motion->VelocityMode() && db_desc.first && !camera_motion->Depth()) {
-        // Uncharted: no G-buffer of 5 targets. The frame's first pass at the display size that
+        // Uncharted: no G-buffer of 5 targets. The frame's first pass at the render size that
         // is depth-only (U1's prepass) or draws RGBA16F color (U2's first scene pass) holds the
-        // scene depth.
+        // scene depth. The render size is the patched one (BB_SCENE_SIZE, render resolution).
         const auto& depth = texture_cache.GetImage(db_desc.first);
-        // The game's render size: 1920x1080, or BB_GAME_RES (src/runtime_display.c).
-        static const auto game_size = [] {
-            unsigned w = 1920, h = 1080;
-            if (const char* res = std::getenv("BB_GAME_RES")) {
-                unsigned pw = 0, ph = 0;
-                if (std::sscanf(res, "%ux%u", &pw, &ph) == 2 && pw >= 640 && ph >= 360) {
-                    w = pw & ~1u;
-                    h = ph & ~1u;
-                }
-            }
-            return std::pair<u32, u32>{w, h};
-        }();
-        const u32 game_w = game_size.first, game_h = game_size.second;
+        const auto [scene_w, scene_h] = camera_motion->SceneSize();
         bool scene_pass = !cb_descs[0].first;
         if (cb_descs[0].first) {
             const auto& color = texture_cache.GetImage(cb_descs[0].first);
             scene_pass = color.info.pixel_format == vk::Format::eR16G16B16A16Sfloat &&
-                         color.info.size.width == game_w && color.info.size.height == game_h;
+                         color.info.size.width == scene_w && color.info.size.height == scene_h;
         }
-        if (scene_pass && depth.info.size.width == game_w && depth.info.size.height == game_h &&
+        if (scene_pass && depth.info.size.width == scene_w && depth.info.size.height == scene_h &&
             (depth.info.pixel_format == vk::Format::eD32SfloatS8Uint ||
              depth.info.pixel_format == vk::Format::eD32Sfloat)) {
             camera_motion->OnGBufferPass(db_desc.first);
@@ -1503,16 +1494,7 @@ void Rasterizer::DrawRecord(const GraphicsPipeline* pipeline, const PreparedDraw
         return; // bbport: BB_SKIP_SHADERS also matches vertex shaders
     }
     const auto& regs = Regs();
-    // bbport: the pass copying a finished frame to a display buffer; the previous draw's
-    // target is that frame. Uncharted draws twice into the same display buffer per frame
-    // (484cdbf5, then 749bbec9): only the first starts a frame. The second start reset the
-    // upscaler's history every frame (DLSS/FSR/TAA showed the raw jittered scene: shimmer on
-    // every edge) and skipped every other jitter phase. Toggle 1 << 59 brings it back.
-    if (camera_motion->Enabled() && regs.color_buffers[0] &&
-        FrameCapture::IsDisplayBuffer(regs.color_buffers[0].Address()) &&
-        (scene_started || regs.color_buffers[0].Address() != frame_display_address ||
-         BbToggle::Disabled(BbToggle::OneFrameStart))) {
-        frame_display_address = regs.color_buffers[0].Address();
+    const auto frame_start = [&] {
         scene_started = false;
         camera_motion->OnDisplayPass(cb_descs[0].first);
         if (upscaler->OnFrameStart()) {
@@ -1525,12 +1507,38 @@ void Rasterizer::DrawRecord(const GraphicsPipeline* pipeline, const PreparedDraw
         static const char* scene_debug = std::getenv("BB_SCENE_DEBUG");
         scene_debug_frame = scene_debug && std::remove(scene_debug) == 0;
         scene_targets->debug = scene_debug_frame;
+    };
+    // bbport: the pass copying a finished frame to a display buffer; the previous draw's
+    // target is that frame. After BilalReloaded's Uncharted PC port (from Supermedo/uncharted_pc
+    // #261): Uncharted draws twice into the same display buffer per frame (484cdbf5, then
+    // 749bbec9): only the first starts a frame. The second reset the upscaler's history every
+    // frame (shimmer on every edge under TAA, FSR and DLAA) and skipped every other jitter
+    // phase. BB_ONE_FRAME_START=0 brings the old behaviour back. With an upscaling preset
+    // (TemporalUpscaler::OnComposite) the frames start at the upscale instead.
+    static const bool every_display_draw = [] {
+        const char* env = std::getenv("BB_ONE_FRAME_START");
+        return env && env[0] == '0';
+    }();
+    if (camera_motion->Enabled() && !upscaler->CompositeFrames() && regs.color_buffers[0] &&
+        FrameCapture::IsDisplayBuffer(regs.color_buffers[0].Address()) &&
+        (scene_started || regs.color_buffers[0].Address() != frame_display_address ||
+         every_display_draw)) {
+        frame_display_address = regs.color_buffers[0].Address();
+        frame_start();
     }
     bind_prepared = used_prepared;
     motion_draw = pipeline->GetGraphicsKey().motion_vectors;
     motion_geometry = 0;
 
     PrepareRenderState(pipeline);
+    if (upscaler->CompositeFrames()) {
+        const auto* fragment = pipeline->GetStages()[u32(Shader::SwStage::Fragment)];
+        if (fragment && upscaler->OnComposite(fragment->pgm_hash, cb_descs[0].first)) {
+            bind_prepared = nullptr; // as after a draw: later dispatches bind without its sharps
+            frame_start();           // the guest's copy is replaced by the upscale
+            return;
+        }
+    }
     if (upscaler->Enabled() && std::popcount(pipeline->GetGraphicsKey().mrt_mask) == 1) {
         const auto& viewport = Regs().viewports[0];
         upscaler->OnDraw(pipeline->GetStage(Shader::SwStage::Vertex).pgm_hash,
@@ -2059,13 +2067,58 @@ void Rasterizer::DispatchDirect() {
     if (!pipeline) {
         return;
     }
-    if (pipelined &&
-        !IsGuestMemoryShaderHLE(pipeline->GetStage(Shader::SwStage::Compute).pgm_hash)) {
+    const auto& cs = pipeline->GetStage(Shader::SwStage::Compute);
+    if (pipelined && !IsGuestMemoryShaderHLE(cs.pgm_hash)) {
         PostDraw(pipeline, nullptr, false, 0, &CsRegs());
         return;
     }
+    if (pipelined) {
+        if (const auto stage_b = GuestCopyOnStageB(cs)) {
+            PostDraw(pipeline, nullptr, false, 0, &CsRegs());
+            // Constants overlapping the destination are bound on the recording thread, after
+            // it. Noted once the dispatch is queued: the position is the dispatch's own.
+            NotePendingGpuWrite(stage_b->dst, stage_b->size);
+            return;
+        }
+    }
     DrainDrawPipe();
     DispatchRecord(pipeline);
+}
+
+std::optional<Rasterizer::StageBCopy> Rasterizer::GuestCopyOnStageB(const Shader::Info& cs) {
+    // bbport: U2 runs ~10 raycaster copies a frame (a 64-dword copy shader). Done here, each
+    // drained the draw pipe: the GPU command thread waited for the recording thread to run dry
+    // (~30% of it in the Borneo jungle) and the recording thread then idled. A copy of GPU data
+    // (results of raycaster dispatches already recorded) writes guest memory only for the record
+    // arrays the game's CPU code reads, and only through DeferGuestCopy, never the constants the
+    // SRT walkers here read, so it runs in order on the recording thread. Only then, though:
+    // the guest memory copy the HLE makes otherwise (BB_SCALAR_COPY64_SYNC=1, or =2 without
+    // BB_SCALAR_COPY64_DEFER=1, or a source with no GPU-written bytes yet, such as one only a
+    // queued write overlaps) would land after the SRT walkers here read the destination for
+    // the draws behind it (the stale constants of U3's exploded cloth, ExecuteScalarCopyHLE).
+    // Those still drain and copy here. BB_HLE_PIPE=0 or toggle2 PipelinedRaycasterCopies: off.
+    static const bool enabled = [] {
+        const char* env = std::getenv("BB_HLE_PIPE");
+        return !(env && env[0] == '0');
+    }();
+    if (!enabled || BbToggle::Disabled2(BbToggle::PipelinedRaycasterCopies)) {
+        return std::nullopt;
+    }
+    const auto copy = RaycasterCopyRange(cs, CsRegs());
+    if (!copy) {
+        return std::nullopt;
+    }
+    if (copy->size == 0) {
+        return StageBCopy{}; // the HLE takes it and writes nothing
+    }
+    // A source with GPU-written bytes stays so when the copy runs (writes queued meanwhile
+    // only add to them); one that only a queued write overlaps is copied in guest memory.
+    if (!buffer_cache.IsRangeGpuWritten(copy->src, copy->size) ||
+        !RaycasterCopyLeavesGuestMemory(copy->size) ||
+        !buffer_cache.CanDeferGuestCopy(copy->src, copy->dst, copy->size)) {
+        return std::nullopt;
+    }
+    return StageBCopy{copy->dst, copy->size};
 }
 
 void Rasterizer::DispatchRecord(const ComputePipeline* pipeline) {
@@ -2795,7 +2848,9 @@ void Rasterizer::ResolveVertexBuffers(const GraphicsPipeline* pipeline,
         }
         std::tie(range.buffer, range.offset) =
             buffer_cache.ObtainBuffer(range.base_address, size, false);
-        needs_barrier |= runtime.IsBufferAccessed(range.buffer, range.offset, size);
+        if (!IsHostStreamRead(range.buffer)) {
+            needs_barrier |= runtime.IsBufferAccessed(range.buffer, range.offset, size);
+        }
     }
 
     // Bind vertex buffers
@@ -2857,8 +2912,19 @@ void Rasterizer::ResolveIndexBuffer(u32 index_offset) {
     }
     const auto [buffer, offset] =
         buffer_cache.ObtainBuffer(index_address, index_buffer_size, false);
-    needs_barrier |= runtime.IsBufferAccessed(buffer, offset, index_buffer_size);
+    if (!IsHostStreamRead(buffer)) {
+        needs_barrier |= runtime.IsBufferAccessed(buffer, offset, index_buffer_size);
+    }
     index_bind = {buffer->Handle(), offset, index_type};
+}
+
+// bbport: a read of a stream buffer range is a copy the CPU made for this command buffer
+// (ObtainBuffer): nothing the GPU wrote before is in it (a new ring range), and nothing it writes
+// later lands there (the ring keeps the range until the GPU is past it). The barrier tracker need
+// not hear of it: most bindings are such constants (~7% of the draw recording thread in Borneo).
+bool Rasterizer::IsHostStreamRead(const VideoCore::Buffer* buffer) {
+    return buffer == &buffer_cache.GetStreamBuffer() &&
+           !BbToggle::Disabled2(BbToggle::TrackedStreamReads);
 }
 
 void Rasterizer::ResetBindings(bool is_compute) {
@@ -3038,6 +3104,56 @@ VAddr WatchedGpuWrite() {
 }
 } // namespace
 
+// Render resolution (after BilalReloaded's Uncharted PC port, 16 Oct): Uncharted 2's aim depth of
+// field focuses on the depth under the crosshair: ps 9f801363 samples a 24-pixel box of the scene
+// depth at uv = c[6] * (ndc * c[2] + 0.5) + c[0] (and 1 - c[1] + ... for v), c = 8 floats the game
+// writes per frame. c[0], c[1] are the crosshair in pixels of the HUD's 1920x1080 space times
+// 1 / render size (c[6], c[7]): with a render resolution above 1080p the box left the crosshair
+// (4K: uv 0.25 instead of 0.5, the depth of the wall beside Nate) and everything behind the
+// target was blurred while aiming. The centre is corrected to the HUD space for every render size
+// (no change at 1080p). BB_AIM_FOCUS_FIX=0: off.
+static void FixAimFocusCentre(Core::MemoryManager* memory, VAddr address) {
+    static const bool enabled = [] {
+        const char* env = std::getenv("BB_AIM_FOCUS_FIX");
+        return !(env && env[0] == '0');
+    }();
+    if (!enabled || !memory->IsValidGpuMapping(address, 32)) {
+        return;
+    }
+    float c[8];
+    memory->CopySparseMemory(address, reinterpret_cast<u8*>(c), sizeof(c));
+    const float inv_width = c[6], inv_height = c[7];
+    if (!(inv_width > 0.0f && inv_width < 1.0f && inv_height > 0.0f && inv_height < 1.0f)) {
+        return;
+    }
+    const float x_scale = 1920.0f * inv_width, y_scale = 1080.0f * inv_height;
+    if (std::abs(x_scale - 1.0f) < 1e-4f && std::abs(y_scale - 1.0f) < 1e-4f) {
+        return; // 1080p: already right
+    }
+    // The block may be bound by more than one draw: values corrected once stay as they are.
+    static std::mutex mutex;
+    static std::unordered_map<VAddr, std::pair<float, float>> corrected;
+    std::scoped_lock lock{mutex};
+    if (const auto it = corrected.find(address);
+        it != corrected.end() && it->second == std::pair{c[0], c[1]}) {
+        return;
+    }
+    const float fixed[2] = {c[0] / x_scale, c[1] / y_scale};
+    memory->TryWriteBacking(reinterpret_cast<void*>(address), fixed, sizeof(fixed));
+    if (corrected.size() >= 512) {
+        corrected.clear();
+    }
+    corrected[address] = {fixed[0], fixed[1]};
+    static bool reported = false;
+    if (!reported) {
+        reported = true;
+        std::printf("Aim focus: crosshair box centre %.4f,%.4f -> %.4f,%.4f (render %ux%u)\n", c[0],
+                    c[1], fixed[0], fixed[1], u32(1.0f / inv_width + 0.5f),
+                    u32(1.0f / inv_height + 0.5f));
+        std::fflush(stdout);
+    }
+}
+
 void Rasterizer::BindBuffers(const Shader::Info& stage, const PreparedStage* prepared,
                              Shader::Backend::Bindings& binding,
                              Shader::PushData& push_data, u32& write_index) {
@@ -3201,6 +3317,9 @@ void Rasterizer::BindBuffers(const Shader::Info& stage, const PreparedStage* pre
                     LOG_ERROR(Render, "Clamped size from {} to {} for stage {:#x}",
                               vsharp.GetSize(), size, stage.pgm_hash);
                 }
+                if (stage.pgm_hash == 0x9f801363 && !desc.is_written && size >= 32) {
+                    FixAimFocusCentre(memory, vsharp.base_address);
+                }
                 static const bool force_upload = std::getenv("BB_FORCE_VB_UPLOAD") != nullptr;
                 if ((force_upload || (ForceUploadVs(false) &&
                                       ForceUploadVs(false) == u32(stage.pgm_hash))) &&
@@ -3217,7 +3336,10 @@ void Rasterizer::BindBuffers(const Shader::Info& stage, const PreparedStage* pre
                 }
                 push_data.AddOffset(binding.buffer, adjust);
                 buffer_infos.emplace_back(buffer->Handle(), offset_aligned, size + adjust);
-                bound_buffers.emplace_back(buffer, offset, size, desc.is_written);
+                const bool host_stream_read = !desc.is_written && IsHostStreamRead(buffer);
+                if (!host_stream_read) {
+                    bound_buffers.emplace_back(buffer, offset, size, desc.is_written);
+                }
                 if (g_gpu_checkpoints && num_checkpoint_buffers < std::size(checkpoint_buffers)) {
                     checkpoint_buffers[num_checkpoint_buffers++] = {
                         vsharp.base_address, static_cast<u32>(size), desc.is_written};
@@ -3226,7 +3348,9 @@ void Rasterizer::BindBuffers(const Shader::Info& stage, const PreparedStage* pre
                     // Raw storage-buffer writes can also make an aliased cached image stale.
                     texture_cache.InvalidateMemoryFromGPU(vsharp.base_address, size);
                 }
-                needs_barrier |= runtime.IsBufferAccessed(buffer, offset, size, desc.is_written);
+                if (!host_stream_read) {
+                    needs_barrier |= runtime.IsBufferAccessed(buffer, offset, size, desc.is_written);
+                }
                 if (const VAddr watch = WatchedGpuWrite();
                     watch && desc.is_written && vsharp.base_address < watch + 0x1000 &&
                     watch < vsharp.base_address + size) {

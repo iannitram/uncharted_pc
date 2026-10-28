@@ -20,22 +20,25 @@ def environment(**settings):
 
 
 class DeckModeTests(unittest.TestCase):
-    def test_60_by_default_and_30_kept(self):
-        self.assertEqual(linux.DECK_SETTINGS['frame_rate'], '60')
-        self.assertEqual(environment(steam_deck=True)['BB_VBLANK_HZ'], '60')
-        self.assertEqual(environment(steam_deck=True, frame_rate='30')['BB_VBLANK_HZ'], '30')
+    def test_30_by_default_and_60_kept(self):
+        self.assertEqual(linux.DECK_SETTINGS['frame_rate'], '30')
+        self.assertEqual(environment(steam_deck=True)['BB_VBLANK_HZ'], '30')
+        self.assertEqual(environment(steam_deck=True, frame_rate='60')['BB_VBLANK_HZ'], '60')
 
-    def test_rates_above_60_fall_back_to_60(self):
-        self.assertEqual(environment(steam_deck=True, frame_rate='144')['BB_VBLANK_HZ'], '60')
+    def test_rates_above_60_fall_back_to_30(self):
+        self.assertEqual(environment(steam_deck=True, frame_rate='144')['BB_VBLANK_HZ'], '30')
 
-    def test_saved_rate_survives(self):
-        # 60 by default (owner's decision, 2026-10-18): a saved 30 or 60 is kept as chosen, and the
-        # sync's one-time migration of a saved 60 to 30 (deck_frame_rate_30) stays out.
-        for rate in ('30', '60'):
-            self.assertTrue(linux.deck_allows('frame_rate', rate))
-            self.assertEqual(environment(steam_deck=True, frame_rate=rate)['BB_VBLANK_HZ'], rate)
-        self.assertFalse(linux.deck_allows('frame_rate', '144'))
-        self.assertFalse(hasattr(linux, 'deck_frame_rate_30'))
+    def test_old_60_default_becomes_30_once(self):
+        saved = {'steam_deck': True, 'frame_rate': '60'}
+        self.assertTrue(linux.deck_frame_rate_30(saved))
+        self.assertEqual(saved['frame_rate'], '30')
+        saved['frame_rate'] = '60'  # chosen again afterwards: kept
+        self.assertFalse(linux.deck_frame_rate_30(saved))
+        self.assertEqual(saved['frame_rate'], '60')
+        desktop = {'steam_deck': False, 'frame_rate': '60'}
+        self.assertTrue(linux.deck_frame_rate_30(desktop))
+        self.assertEqual(desktop['frame_rate'], '60')
+        self.assertFalse(linux.deck_frame_rate_30({}))  # first start: nothing saved yet
 
     def test_update_highlights(self):
         notes = ('**Steam Deck**\nText.\n\n<!-- Update notes:\n- Steam Deck performance improvements\n'

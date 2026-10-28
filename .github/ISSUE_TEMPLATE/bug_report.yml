@@ -1,0 +1,53 @@
+name: Bug report
+description: A crash, a glitch, poor performance or a launcher problem in the Linux port
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please check the open issues for the same problem first.
+
+        **Getting your log:** open the Uncharted launcher, go to **Advanced**, and click **Copy log for GitHub**
+        (on a Steam Deck, do this in Desktop Mode). Then paste it into the **Log** field below with Ctrl+V.
+        If the game crashed, play up to the crash once more before copying, so the log shows it.
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - Uncharted 1
+        - Uncharted 2
+        - Uncharted 3
+        - The launcher
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - Steam Deck (Gaming Mode)
+        - Steam Deck (Desktop Mode)
+        - Linux PC
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where in the game
+      placeholder: e.g. chapter 21, the convoy, after the grenade launcher pickup
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead. Screenshots help.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Paste what **Advanced → Copy log for GitHub** copied (Ctrl+V). It has no home folder or user name in it.
+      render: text
+    validations:
+      required: true

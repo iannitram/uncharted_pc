@@ -34,8 +34,8 @@ class FixDefaults(unittest.TestCase):
 
     def test_uncharted_3_keeps_the_copies_off_because_they_cost_94_to_54_fps(self):
         self.assertEqual(run.fix_defaults(frozen(), U3),
-                         {'BB_TINY_READBACK': '0', 'BB_SCALAR_COPY64_SYNC': '0',
-                          'BB_SCALAR_COPY64_DEFER': '0'})
+                         {'BB_GPU_MERGE': '0', 'BB_TINY_READBACK': '0', 'BB_SCALAR_COPY64_SYNC': '0',
+                          'BB_SCALAR_COPY64_DEFER': '0', 'BB_TOGGLE2': '12'})
 
     def test_a_copy_setting_the_player_chose_removes_both_copy_defaults(self):
         got = run.fix_defaults(frozen(BB_SCALAR_COPY64_SYNC='0'), U1)
@@ -47,6 +47,15 @@ class FixDefaults(unittest.TestCase):
         got = run.fix_defaults(frozen(BB_TINY_READBACK='0'), U2)
         self.assertEqual(got, {'BB_GPU_MERGE': '0', 'BB_SCALAR_COPY64_SYNC': '2',
                                'BB_SCALAR_COPY64_DEFER': '1'})
+
+    def test_u2_label_shortcuts_are_restricted_to_u2(self):
+        for exe in (U1, U3):
+            self.assertEqual(run.fix_defaults(frozen(), exe)['BB_TOGGLE2'], '12')
+            self.assertNotIn('BB_TOGGLE2', run.fix_defaults(frozen(BB_TOGGLE2='0'), exe))
+        self.assertNotIn('BB_TOGGLE2', run.fix_defaults(frozen(), U2))
+
+    def test_u3_keeps_a_player_memory_override(self):
+        self.assertNotIn('BB_GPU_MERGE', run.fix_defaults(frozen(BB_GPU_MERGE='1'), U3))
 
     def test_an_unknown_executable_gets_no_defaults(self):
         self.assertEqual(run.fix_defaults(frozen(), 'other.elf'), {})
