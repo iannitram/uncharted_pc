@@ -2,7 +2,7 @@
 
 - Repo: iannitram/uncharted_pc, a fork of Supermedo/uncharted_pc (C, C++20, Python; GPL-2.0-or-later parts from shadPS4).
 - Kind: a native port (not an emulator) that runs the decrypted PS4 build of Uncharted: The Nathan Drake Collection as an x86-64 image, with the PS4 system libraries reimplemented in C and GNM graphics translated to Vulkan through a vendored shadPS4 renderer. Ships a Python launcher.
-- Integration branch: `linux` (not `main`). Described commit: `585632eb9` (2026-10-26). `main` is the release branch of the sync workflow described under CI.
+- Integration branch: `linux` (not `main`). Describes commit: 4c4ef03 (2026-10-28). `main` is kept as a copy of upstream; it is the branch the sync workflow described under CI publishes to.
 - Upstream: `Supermedo/uncharted_pc` (`upstream/main`). A second source, `spacepepperoni/uncharted_Linux`, is merged separately. Nothing is posted to either.
 - No game files, keys or RE output are in the repo; the user supplies a decrypted dump.
 - Naming oddity: many file and variable names use `bbport` / `BB_*` / `bb-probe` because the code started as a Bloodborne port. `patches/Bloodborne.xml` is still Bloodborne's patch database and does not apply to Uncharted.
@@ -11,21 +11,21 @@
 
 | Path | What it owns |
 |---|---|
-| `src/` | The host runtime in C (about 10.5k lines). `probe.c` is the loader (ELF mapping, import resolution by NID, guest hooks, fault handling, MOVBE emulation); `runtime_*.c` is one file per PS4 library (memory, thread, fiber, mutex/rwlock/sema, file VFS, pad over SDL3, audio, AJM decode, display, savedata, trophy, rtc, services, content); `cpu_patch.c` and `red_zone.c` are code patching; `compat_win.c` has MinGW POSIX shims; `vulkan_smoke.c`. |
+| `src/` | The host runtime in C (about 10.8k lines). `probe.c` is the loader (ELF mapping, import resolution by NID, guest hooks, fault handling, MOVBE emulation); `runtime_*.c` is one file per PS4 library (memory, thread, fiber, mutex/rwlock/sema, file VFS, pad over SDL3, audio, AJM decode, display, savedata, trophy, rtc, services, content); `cpu_patch.c` and `red_zone.c` are code patching; `compat_win.c` has MinGW POSIX shims; `vulkan_smoke.c`. |
 | `gpu/` | The renderer. `CMakeLists.txt` builds the GPU library and `bb-probe`. `shadps4/` is shadPS4 pinned to one commit (`VENDOR.txt`), with local edits marked `bbport:`; `shim/` is the port's own C++ layer (ImGui settings menu, window, async copy threads, overlay); `bbgpu.h` is the C ABI; `bbnet/` network glue for private co-op; `dlss_bridge/` optional NVIDIA DLSS bridge; `patches/fsr-vulkan/` patches applied to the FSR submodule; `tools/`; `third_party/` submodules. |
-| `launcher/` | Python/Tk launcher (`uncharted_launcher.py`, `bbport_*.py` helpers for Steam, Vulkan, i18n, assets), desktop entry, icons, covers, fonts. |
+| `launcher/` | Python/Tk launcher: `uncharted_linux.py` (Linux GUI launcher: game choice, Add to Steam, Deck mode, update check) and `uncharted_launcher.py` (Windows GUI) with `uncharted_*.py` helpers (`art`, `fonts`, `i18n` and `i18n_extra` for the translated texts, `logs`, `widgets`); `bbport_*.py` helpers for Steam, Vulkan, i18n, assets and the older launchers (`bbport_launcher*.py`); `bb-launcher.sh`, desktop entry, icons, covers, fonts. | |
 | `scripts/` | Python prep tools run by the launcher or `run.py`: `prepare.py`, `link_modules.py`, `link_libc.py`, `content_profile.py`, `patches.py`, `pkg.py`, `mods.py`, `cheats.py`, `trophies.py`, `render_720p.py`. |
 | `PIPELINE.md`, `SPEC.md`, `AGENTS.fork.md`, `CHANGELOG.md` | Our pipeline files (stage, 1.0 spec, short agent rules, decisions log); upstream owns `README.md` and `docs/ROADMAP.md`. |
 | `install.sh` | One-line Linux installer from the spacepepperoni fork (fetches that fork's latest AppImage; not our release channel). |
-| `run.py`, `run.sh` | Builds the boot image and sets `BB_*` environment, then starts `bb-probe`. `BB_PREBUILT=1` is the packaged mode. |
+| `run.py`, `run.sh` | `run.py` builds the boot image, sets `BB_*` environment (per-game defaults in `fix_defaults()`), then starts `bb-probe`; `run.sh` is the older Bloodborne-era shell launcher. `BB_PREBUILT=1` is the packaged mode. |
 | `build.sh` | Native build (Linux gcc/cc, or MSYS2 CLANG64 on Windows); `build.sh --test` compiles and runs the C and C++ tests. |
 | `msys2-env.sh`, `shell.nix`, `packaging/default.nix` | Windows toolchain env; Nix shell. |
 | `packaging/` | `linux/` (AppImage, `package.sh`, `AppRun`, desktop file), `windows/` (PyInstaller packaging, resources, DLSS/XeSS fetch scripts, READMEs), `appimage.sh`, `bbport-entry.c`. |
 | `patches/Bloodborne.xml` | Community patch database (Bloodborne only). |
 | `third_party/` | LibAtrac9, Vulkan-Headers submodules. |
 | `tools/` | Dev helpers: frame A/B (`ab.sh`), `soak.sh`, stack and freeze tools, FSR4 capture and optimize scripts (`fsr4cap/`), name importers, `gpu_capabilities.c`. |
-| `tests/` | C/C++ unit tests (`test_runtime.c`, `test_pad.c`, `test_sema.c`, `test_cpu_patch.c`, `test_eop_matcher.c`, shader and motion tests) and about 28 Python `unittest` files (launcher, patches, pkg, mods, trophies, i18n, display). |
-| `docs/` | `ARCHITECTURE.md`, `LINUX_BUILD.md`, `BUILDING_LINUX.md`, `ROADMAP.md`, `upscaler.md`, `PKG.md`, `MODS.md`, `resolution.md`, `parallel_gpu.md`, `DEVELOPMENT_LOG.md`, `keyboard-prompts.md`, `motion_vectors.md`, `DEPTH_ADAPTIVE_TAA.md`, `CHANGES_2026-10-0*.md`, `maps/overview.md`, `code-map.md` (this file), `review-2026-10-24/` (code review and our delivery roadmap `ROADMAP-proposed.md`), Russian translations in `ru/`, `history/`. |
+| `tests/` | C/C++ unit tests (`test_runtime.c`, `test_pad.c`, `test_sema.c`, `test_cpu_patch.c`, `test_eop_matcher.c`, shader and motion tests) and about 30 Python `unittest` files (launcher, patches, pkg, mods, trophies, i18n, display). |
+| `docs/` | `ARCHITECTURE.md`, `LINUX_BUILD.md`, `BUILDING_LINUX.md`, `ROADMAP.md`, `upscaler.md`, `PKG.md`, `MODS.md`, `resolution.md`, `parallel_gpu.md`, `DEVELOPMENT_LOG.md` (and `.ru.md`), `docs/README.md`, `TEMPORAL_REVIEW_2026-10-01.md`, `keyboard-prompts.md`, `motion_vectors.md`, `DEPTH_ADAPTIVE_TAA.md`, `CHANGES_2026-10-0*.md`, `maps/overview.md` (older, longer index), `code-map.md` (this file), `review-2026-10-24/` (code review with its own `CODE_MAP.md`, findings, and our delivery roadmap `ROADMAP-proposed.md`), Russian translations in `ru/`, `history/`. |
 | `Research/` | Background research notes (architecture, upscaling, licensing, similar projects). |
 | `.github/workflows/` | `build.yml`, `sync-upstream.yml`. |
 
@@ -48,11 +48,12 @@ flowchart TD
 
 ## Where our work is
 
-`git log upstream/main..HEAD` shows 244 commits and `git diff upstream/main...HEAD` is 171 files (+17,471 / -2,203); upstream is not ahead of `linux` at this snapshot. Most of the 244 commits come from other contributors and from the spacepepperoni fork's history (about 56 by its maintainer, 22 by one Deck contributor, 10 by Supermedo, the rest scattered); about 65 are ours. Our commits concentrate on:
+`git log upstream/main..HEAD` shows 256 commits and `git diff upstream/main...HEAD` is 173 files (+18,567 / -2,633); upstream is not ahead of `linux` at this snapshot (it is at 0.3.9). About 108 of the 256 are ours; the rest come from the spacepepperoni fork's history (about 79 by its maintainer, 34 by one Deck contributor, 10 by Supermedo, the rest scattered). Our commits concentrate on:
 
 | Area | Files |
 |---|---|
-| Docs: `docs/review-2026-10-24/` code review and cross-platform roadmap, `ROADMAP.md`, `LINUX_BUILD.md`, `docs/history/`, `docs/ru/`, `Research/` | most of our changed lines |
+| Docs: `docs/review-2026-10-24/` code review and cross-platform roadmap, `SPEC.md`, `ROADMAP.md`, `LINUX_BUILD.md`, `docs/history/`, `docs/ru/`, `Research/` | most of our changed lines |
+| Launcher texts and per-game defaults: `launcher/uncharted_i18n*.py` (es, pt, fr, de, it, ja), `run.py` `fix_defaults()` with `tests/test_fix_defaults.py`, `scripts/pkg.py` overlap and chunked-copy fixes, `packaging/linux/package.sh` (ships `scripts/patches.py`) and `tests/test_linux_package_scripts.py` | few files |
 | Patch handling: `scripts/patches.py`, `tests/test_patches.py` (per-executable third-party patches, `APP_VER` decides the external version, own-executable-only patches) | few files |
 | Renderer fixes under `gpu/shadps4/` (nested indirect-buffer frame leak; `WAIT_ON_CE_COUNTER` guard and compute ring offset reset from PRs #45 and #43, which reached `linux` through the main merge; the `WAIT_ON_DE_COUNTER_DIFF` operands of that merge are still backwards, #67) and FSR 3.1 defaults/protected-memory handling | about 300 changed lines |
 | `src/runtime_trophy.c`, `src/runtime_thread.c` (`host_priority` compiled only on Windows, 4dd6034, so Linux `-Werror` builds pass), MXCSR test, `tests/test_eop_matcher.c`, `render_720p` tests | few files |
@@ -81,11 +82,11 @@ Python tests are `unittest` files in `tests/`, importing the scripts through `te
 
 Needs Vulkan, SDL3, fmt, Boost, tsl-robin-map, VMA, xxhash, Zydis, FFmpeg libraries, protobuf, nlohmann-json, OpenSSL, zlib, miniupnpc and glslang (the exact list is in `build.yml`).
 
-CI: `build.yml` (job `build` in a `debian:trixie` container on ubuntu-latest: install dependencies, `build.sh`, package, upload the AppImage and tarball, and create a release on `main`); it skips doc-only changes. `sync-upstream.yml` merges `Supermedo/uncharted_pc` into an `upstream-merge` branch every six hours, builds it, and only a passing merge reaches `main`. CI does not run `build.sh --test` or the Python tests.
+CI: `build.yml` (runs on pushes to `main` and on every pull request; a push straight to `linux` is not built; job `build` in a `debian:trixie` container on ubuntu-latest: install dependencies, `build.sh`, package, upload the AppImage and tarball, and create a release on `main`); it skips doc-only changes. `sync-upstream.yml` merges `Supermedo/uncharted_pc` into an `upstream-merge` branch every six hours, builds it, and only a passing merge reaches `main`. CI does not run `build.sh --test` or the Python tests.
 
 ## Mac / PC / Linux
 
-- Linux x86-64 is the target of this branch and the only platform CI builds. Hardware testing (Steam Deck, handhelds) is manual. R04: a Linux machine must run the game before a sync is merged; CI proves only that it builds.
+- Linux x86-64 is the target of this branch and the only platform CI builds. Hardware testing (Steam Deck, handhelds) is manual. R04: a Linux machine must run the game before a sync is merged; CI proves only that it builds, and only for `main` and pull requests, not for plain pushes to `linux`.
 - Windows: built with MSYS2 CLANG64 (`build.sh` branch for MINGW, `packaging/windows/`, `launcher/bbport_launcher_win.py`); the code carries Windows-specific paths in `src/compat_win.c`, `runtime_memory.c` and `runtime_thread.c`. No Windows CI job here.
 - macOS: out of scope (the roadmap puts it outside the launcher phase; Linux and Windows only).
 - Needs a Vulkan GPU; DLSS needs NVIDIA.
