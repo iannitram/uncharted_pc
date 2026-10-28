@@ -1339,9 +1339,7 @@ void TextureCache::GarbageCollectImages() {
         u64 ticks_to_destroy = aggresive ? 40 : pressured ? 80 : 16;
         num_deletions = aggresive ? 40 : pressured ? 20 : 10;
         if (tight_budget) {
-            // Cards of 5.5 GB or less (Vram): pressure widens the set of eviction candidates here
-            // (it narrowed it), and the age in seconds below does not apply: an allocation that
-            // went over the budget (urgent_pass) needs room now.
+            // Pressure widens the set of eviction candidates here (it narrowed it).
             ticks_to_destroy = urgent_pass ? 2 : aggresive ? 4 : pressured ? 8 : 16;
             num_deletions = aggresive ? 80 : pressured ? 40 : 10;
             if (urgent_pass) {
@@ -1355,7 +1353,6 @@ void TextureCache::GarbageCollectImages() {
             below_tick = std::min(below_tick, idle_tick);
         } else if (!emergency && !urgent_pass) {
             below_tick = std::min(below_tick, tick_seconds_ago(aggresive ? 1 : pressure_idle_seconds));
-        }
         }
         visited = 0;
     };
