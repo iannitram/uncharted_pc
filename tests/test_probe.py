@@ -142,7 +142,7 @@ class LoaderTests(unittest.TestCase):
     def test_too_many_patches_files_are_refused(self):
         r = self.run_image(package(b'\xc3'), *(['--patches', 'x'] * 9))
         self.assertEqual(r.returncode, 1)
-        self.assertIn('Too many --patches', r.stderr)
+        self.assertIn('too many --patches', r.stderr)
 
     def test_illegal_instruction_reports_guest_offset(self):
         r = self.run_image(package(b'\x0f\x0b'))
