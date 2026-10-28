@@ -30,7 +30,8 @@ class FixDefaults(unittest.TestCase):
     def test_uncharted_2_gets_all_four_of_its_fixes(self):
         self.assertEqual(run.fix_defaults(frozen(), U2),
                          {'BB_GPU_MERGE': '0', 'BB_TINY_READBACK': '1',
-                          'BB_SCALAR_COPY64_SYNC': '2', 'BB_SCALAR_COPY64_DEFER': '1'})
+                          'BB_SCALAR_COPY64_SYNC': '2', 'BB_SCALAR_COPY64_DEFER': '1',
+                          'BB_READBACK_SMALL_BUFFERS': '1'})
 
     def test_uncharted_3_keeps_the_copies_off_because_they_cost_94_to_54_fps(self):
         self.assertEqual(run.fix_defaults(frozen(), U3),
@@ -46,7 +47,7 @@ class FixDefaults(unittest.TestCase):
     def test_a_setting_the_player_chose_is_left_out_and_the_rest_stay(self):
         got = run.fix_defaults(frozen(BB_TINY_READBACK='0'), U2)
         self.assertEqual(got, {'BB_GPU_MERGE': '0', 'BB_SCALAR_COPY64_SYNC': '2',
-                               'BB_SCALAR_COPY64_DEFER': '1'})
+                               'BB_SCALAR_COPY64_DEFER': '1', 'BB_READBACK_SMALL_BUFFERS': '1'})
 
     def test_u2_label_shortcuts_are_restricted_to_u2(self):
         for exe in (U1, U3):

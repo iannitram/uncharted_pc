@@ -41,6 +41,8 @@ def fix_defaults(player_env, exe):
         if 'BB_SCALAR_COPY64_SYNC' not in player_env:
             result['BB_SCALAR_COPY64_SYNC'] = '2'
             result['BB_SCALAR_COPY64_DEFER'] = '1'
+        if 'BB_READBACK_SMALL_BUFFERS' not in player_env:
+            result['BB_READBACK_SMALL_BUFFERS'] = '1'
     elif exe == EXECUTABLES['u1']:
         if 'BB_TINY_READBACK' not in player_env:
             result['BB_TINY_READBACK'] = '0'
@@ -466,7 +468,8 @@ def main():
     player_env = dict(env)
     while True:
         # Remove existing keys that we'll be setting from fix_defaults, but only if they weren't set by the player
-        for key in ('BB_GPU_MERGE', 'BB_TINY_READBACK', 'BB_SCALAR_COPY64_SYNC', 'BB_SCALAR_COPY64_DEFER', 'BB_TOGGLE2'):
+        for key in ('BB_GPU_MERGE', 'BB_TINY_READBACK', 'BB_SCALAR_COPY64_SYNC', 'BB_SCALAR_COPY64_DEFER', 'BB_TOGGLE2',
+                    'BB_READBACK_SMALL_BUFFERS'):
             if key not in player_env:
                 env.pop(key, None)
         # Apply the per-game defaults

@@ -40,6 +40,21 @@ Each Must is checked on the owner's Legion Go (AMD Z1 Extreme, a Phoenix APU, Ra
 - Windows and macOS delivery (#54, #55, #65, #39), plain ELF input (#66), the save edge cases from the review (#38, #48-#53, #57), runner caching (#58), full platform CI and release verification (#59), and upstream PR pulls that wait on upstream (#41, #42).
 - Running above 60 FPS (not a goal, #23).
 
+## Prior art
+
+Notes and the survey's findings: [PEERS.md](PEERS.md).
+
+peer: Supermedo/uncharted_pc | GPL-2.0 | upstream: Linux, handheld, resolution, frame rate and upscaler issues and PRs
+peer: spacepepperoni/uncharted_Linux | GPL-2.0 | the Linux fork we sync from: launcher, Steam Deck mode, releases
+peer: drakolordx7/uncharted_pc | GPL-2.0 | community build: VRAM budget, FSR fixes, 45 FPS limit
+peer: Pepin208/uncharted_pc_linux | GPL-2.0 | Linux AppImage, shadPS4 texture-cache back-ports
+peer: AdilDevStuff/uncharted_pc_linux | GPL-2.0 | raw mouse, CI packages, aim blur and exposure fixes
+peer: Mevlock/uncharted_pc-dev | GPL-2.0 | performance builds: pools, buffer arenas, overlay stats
+peer: revvv991/uncharted-android | GPL-2.0 | low-power GPU ideas (Adreno)
+peer: shadps4-emu/shadPS4 | GPL-2.0 | texture and buffer cache fixes to back-port into gpu/shadps4
+peer: bloodborne-native/bloodborne-runtime | GPL-2.0 | the shim's ancestor: loader and Vulkan layer fixes
+peer: bloodborne-native/bloodborne-launcher | GPL-2.0 | launcher profiles and settings (#10)
+
 ## Platforms
 
 Linux (SteamOS on the Legion Go) is the 1.0 target; the Strix Halo laptop is a second Linux check where it helps. Windows builds keep building but are not a 1.0 gate; macOS is research only (R04: see the code map's platform section).
