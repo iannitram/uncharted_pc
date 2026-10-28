@@ -2790,6 +2790,12 @@ def main():
         shutil.rmtree(UPDATE_DIR, ignore_errors=True)  # what a finished update left behind
     if not WINDOWS:
         uncharted_linux.apply_defaults(globals())
+        saved = load_json(CONFIG_FILE, {})
+        if uncharted_linux.deck_frame_rate_30(saved):  # Linux fork: Steam Deck mode at 30 FPS
+            try:
+                CONFIG_FILE.write_text(json.dumps(saved, indent=2) + '\n', encoding='utf-8')
+            except OSError:
+                pass
     settings = {**APP_DEFAULTS, **load_json(CONFIG_FILE, {})}
     if not WINDOWS:  # Linux fork: an empty saves folder is <game folder>/Saves
         uncharted_linux.default_saves(settings, DATA_DIR)

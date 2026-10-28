@@ -40,7 +40,7 @@ This client ships with a built in updater that can be toggled on/off, and update
 
 - For Steam Deck, it is recommended to install the [.AppImage](https://github.com/spacepepperoni/uncharted_Linux/releases/latest/download/Uncharted-x86_64.AppImage) and add the games to Steam to play in Game Mode. 
 - In the Display tab, a Steam Deck mode is auto-selected if you are on SteamOS. With this enabled, expect an average of 25-30fps with occasional dips during demanding segments.
-- The Steam Deck runs at 60 FPS by default; 30 FPS can be picked in the launcher.
+- The Steam Deck runs at 30 FPS by default; 60 FPS can be picked in the launcher.
 - For a 30 FPS cap, upstream recommends a Manual GPU Clock of 1300 MHz.
 
 ## Files needed 
